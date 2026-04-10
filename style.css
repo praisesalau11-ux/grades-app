@@ -1,0 +1,60 @@
+body {
+  font-family: Arial;
+  text-align: center;
+  background: #0f172a;
+  color: white;
+  margin: 0;
+}
+
+.nav {
+  display: flex;
+  justify-content: space-around;
+  background: #111827;
+  padding: 10px;
+}
+
+.nav button {
+  padding: 10px 15px;
+  background: transparent;
+  border: 1px solid white;
+  color: white;
+  cursor: pointer;
+}
+
+.nav button:hover {
+  background: white;
+  color: black;
+}
+
+#app {
+  padding: 20px;
+}
+
+input {
+  display: block;
+  margin: 10px auto;
+  padding: 10px;
+  width: 250px;
+  border-radius: 5px;
+  border: none;
+}
+
+button {
+  padding: 10px 15px;
+  margin: 10px;
+  cursor: pointer;
+  border-radius: 5px;
+  border: none;
+}
+
+.card {
+  background: #1f2937;
+  padding: 10px;
+  margin: 10px auto;
+  width: 80%;
+  border-radius: 10px;
+}
+.logo {
+  width: 120px;
+  margin-bottom: 15px;
+}

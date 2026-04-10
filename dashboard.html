@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Grades App</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="nav">
+    <button onclick="showPage('dashboard')">Dashboard</button>
+    <button onclick="showPage('history')">History</button>
+    <button onclick="showPage('settings')">Settings</button>
+  </div>
+
+  <div id="app"></div>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script type="module" src="dashboard.js"></script>
+
+</body>
+</html>
