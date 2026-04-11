@@ -1,11 +1,68 @@
+/* GLOBAL */
 body {
-  font-family: Arial;
-  text-align: center;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
   background: #0f172a;
   color: white;
-  margin: 0;
+  text-align: center;
 }
 
+/* CONTAINER */
+.container {
+  padding: 20px;
+  max-width: 400px;
+  margin: auto;
+}
+
+/* LOGO */
+.logo {
+  width: 100px;
+  margin-bottom: 10px;
+}
+
+/* TEXT */
+h1, h2 {
+  margin-bottom: 10px;
+}
+
+p {
+  color: #cbd5f5;
+}
+
+/* INPUTS */
+input {
+  width: 90%;
+  max-width: 350px;
+  padding: 12px;
+  margin: 10px auto;
+  display: block;
+  border-radius: 8px;
+  border: none;
+  font-size: 16px;
+}
+
+/* BUTTONS (FIXED BIG SIZE) */
+button {
+  width: 90%;
+  max-width: 350px;
+  padding: 14px;
+  margin: 10px auto;
+  display: block;
+  font-size: 16px;
+  border-radius: 8px;
+  border: none;
+  background: #60a5fa;
+  color: white;
+  cursor: pointer;
+}
+
+/* BUTTON HOVER */
+button:hover {
+  opacity: 0.9;
+}
+
+/* NAVBAR */
 .nav {
   display: flex;
   justify-content: space-around;
@@ -14,52 +71,32 @@ body {
 }
 
 .nav button {
-  padding: 10px 15px;
+  width: auto;
+  padding: 10px;
   background: transparent;
   border: 1px solid white;
-  color: white;
-  cursor: pointer;
 }
 
-.nav button:hover {
-  background: white;
-  color: black;
-}
-
-#app {
-  padding: 20px;
-}
-
-input {
-  display: block;
-  margin: 10px auto;
-  padding: 10px;
-  width: 250px;
-  border-radius: 5px;
-  border: none;
-}
-
-button {
-  padding: 10px 15px;
-  margin: 10px;
-  cursor: pointer;
-  border-radius: 5px;
-  border: none;
-}
-
+/* CARDS */
 .card {
   background: #1f2937;
-  padding: 10px;
+  padding: 15px;
   margin: 10px auto;
-  width: 80%;
   border-radius: 10px;
+  width: 90%;
 }
-.logo {
-  width: 120px;
-  margin-bottom: 15px;
-}
-button {
-  width: 80%;
-  max-width: 300px;
-  font-size: 16px;
+
+/* MOBILE FIX */
+@media (max-width: 600px) {
+  h1 {
+    font-size: 22px;
+  }
+
+  h2 {
+    font-size: 20px;
+  }
+
+  button {
+    font-size: 15px;
+  }
 }

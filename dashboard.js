@@ -72,11 +72,11 @@ window.addSubject = function () {
   const div = document.getElementById("subjects");
 
   div.innerHTML += `
-    <div>
-      <input placeholder="Subject Name" id="sub${subjectCount}">
-      <input type="number" placeholder="Score" id="score${subjectCount}">
-    </div>
-  `;
+  <div class="card">
+    <input placeholder="Subject Name" id="sub${subjectCount}">
+    <input type="number" placeholder="Score" id="score${subjectCount}">
+  </div>
+`;
 
   subjectCount++;
 };
