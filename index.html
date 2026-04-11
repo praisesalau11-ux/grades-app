@@ -30,11 +30,16 @@
       window.location.href = "signup.html";
     }
   </script>
-<script>
+
+  <script>
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js")
-      .then(() => console.log("Service Worker Registered"));
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./sw.js")
+        .then(reg => console.log("SW registered", reg))
+        .catch(err => console.log("SW error", err));
+    });
   }
 </script>
+
 </body>
 </html>
