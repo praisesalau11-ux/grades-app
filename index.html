@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  >
+
+  <meta
+    name="theme-color"
+    content="#11110f"
+  >
+
+  <meta
+    name="description"
+    content="GradeFlow helps students calculate, understand, and track their academic progress."
+  >
+
+  <title>GradeFlow — Your Academic Progress</title>
+
+  <link rel="stylesheet" href="css/index.css">
+</head>
+
+<body>
+
+  <!-- ==========================================
+       PAGE LOADER
+       ========================================== -->
+
+  <div class="page-loader" id="pageLoader">
+    <div class="loader-mark">
+      <span>G</span>
+    </div>
+
+    <p>GradeFlow</p>
+  </div>
+
+
+  <!-- ==========================================
+       MAIN APP
+       ========================================== -->
+
+  <main class="landing-page">
+
+    <!-- ========================================
+         NAVIGATION
+         ======================================== -->
+
+    <header class="top-nav">
+
+      <a
+        href="index.html"
+        class="brand"
+        aria-label="GradeFlow home"
+      >
+        <span class="brand-symbol">G</span>
+
+        <span class="brand-name">
+          GradeFlow
+        </span>
+      </a>
+
+      <button
+        class="nav-explore"
+        id="navExplore"
+        type="button"
+      >
+        Explore
+        <span>↗</span>
+      </button>
+
+    </header>
+
+
+    <!-- ========================================
+         HERO
+         ======================================== -->
+
+    <section class="hero-section">
+
+      <div class="hero-copy">
+
+        <p class="eyebrow">
+          A clearer way to understand your grades
+        </p>
+
+        <h1>
+          Your grades.
+          <span>Your progress.</span>
+        </h1>
+
+        <p class="hero-description">
+          GradeFlow gives you a simple place to calculate,
+          understand, and keep track of your academic progress.
+        </p>
+
+        <div class="hero-actions">
+
+          <a
+            href="screen.html"
+            class="primary-button"
+            id="continueButton"
+          >
+            <span>Continue with GradeFlow</span>
+            <span class="button-arrow">→</span>
+          </a>
+
+          <button
+            type="button"
+            class="secondary-button"
+            id="exploreButton"
+          >
+            <span>Explore GradeFlow</span>
+            <span>↓</span>
+          </button>
+
+        </div>
+
+        <div class="hero-note">
+          <span class="status-dot"></span>
+          Built for students who want clarity, not clutter.
+        </div>
+
+      </div>
+
+
+      <!-- ========================================
+           3D VISUAL AREA
+           ======================================== -->
+
+      <div
+        class="hero-visual"
+        id="heroVisual"
+        aria-hidden="true"
+      >
+
+        <div class="visual-orbit orbit-one"></div>
+        <div class="visual-orbit orbit-two"></div>
+
+        <div class="depth-floor"></div>
+
+
+        <!-- Main grade card -->
+
+        <div
+          class="grade-card main-card"
+          data-depth="18"
+        >
+
+          <div class="card-top">
+            <div>
+              <span class="mini-label">CURRENT TERM</span>
+              <strong>Academic Progress</strong>
+            </div>
+
+            <span class="card-menu">•••</span>
+          </div>
+
+          <div class="grade-number">
+            <span>3.82</span>
+            <small>/ 4.00</small>
+          </div>
+
+          <div class="progress-track">
+            <div class="progress-fill"></div>
+          </div>
+
+          <div class="card-bottom">
+            <span>GPA</span>
+            <span class="positive">+0.24</span>
+          </div>
+
+        </div>
+
+
+        <!-- Floating subject card -->
+
+        <div
+          class="floating-card subject-card"
+          data-depth="28"
+        >
+
+          <div class="subject-icon">
+            A
+          </div>
+
+          <div class="subject-info">
+            <strong>Mathematics</strong>
+            <span>Excellent progress</span>
+          </div>
+
+          <div class="subject-grade">
+            A
+          </div>
+
+        </div>
+
+
+        <!-- Floating result card -->
+
+        <div
+          class="floating-card result-card"
+          data-depth="38"
+        >
+
+          <span class="result-label">
+            LAST RESULT
+          </span>
+
+          <strong>
+            86%
+          </strong>
+
+          <span>
+            Overall score
+          </span>
+
+        </div>
+
+
+        <!-- Floating graph -->
+
+        <div
+          class="floating-card graph-card"
+          data-depth="32"
+        >
+
+          <div class="graph-heading">
+            <span>Progress</span>
+            <span>2026</span>
+          </div>
+
+          <div class="mini-graph">
+
+            <span class="graph-line line-one"></span>
+            <span class="graph-line line-two"></span>
+
+            <i></i>
+            <i></i>
+            <i></i>
+            <i></i>
+            <i></i>
+
+          </div>
+
+        </div>
+
+
+        <!-- Small decorative blocks -->
+
+        <div
+          class="floating-block block-one"
+          data-depth="45"
+        >
+          +
+        </div>
+
+        <div
+          class="floating-block block-two"
+          data-depth="52"
+        >
+          A
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ========================================
+         TRUST / INTRO STRIP
+         ======================================== -->
+
+    <section class="intro-strip">
+
+      <div class="strip-item">
+        <strong>01</strong>
+        <span>Calculate</span>
+      </div>
+
+      <div class="strip-line"></div>
+
+      <div class="strip-item">
+        <strong>02</strong>
+        <span>Understand</span>
+      </div>
+
+      <div class="strip-line"></div>
+
+      <div class="strip-item">
+        <strong>03</strong>
+        <span>Track</span>
+      </div>
+
+    </section>
+
+
+    <!-- ========================================
+         EXPLORE SECTION
+         ======================================== -->
+
+    <section
+      class="explore-section"
+      id="exploreSection"
+    >
+
+      <div class="section-heading">
+
+        <p class="eyebrow">
+          Explore GradeFlow
+        </p>
+
+        <h2>
+          Everything you need to
+          <span>see your progress clearly.</span>
+        </h2>
+
+        <p>
+          GradeFlow is being designed around one simple idea:
+          your academic information should be easy to understand
+          and easy to act on.
+        </p>
+
+      </div>
+
+
+      <div class="feature-grid">
+
+        <article class="feature-card">
+
+          <span class="feature-number">01</span>
+
+          <div class="feature-icon">
+            %
+          </div>
+
+          <h3>
+            Calculate
+          </h3>
+
+          <p>
+            Enter your subjects and scores and get your
+            academic results without unnecessary complexity.
+          </p>
+
+        </article>
+
+
+        <article class="feature-card">
+
+          <span class="feature-number">02</span>
+
+          <div class="feature-icon">
+            ↗
+          </div>
+
+          <h3>
+            Understand
+          </h3>
+
+          <p>
+            See how individual subjects affect your overall
+            performance and identify where you are improving.
+          </p>
+
+        </article>
+
+
+        <article class="feature-card">
+
+          <span class="feature-number">03</span>
+
+          <div class="feature-icon">
+            ◷
+          </div>
+
+          <h3>
+            Track
+          </h3>
+
+          <p>
+            Keep your academic history organized so your
+            progress does not disappear after one calculation.
+          </p>
+
+        </article>
+
+      </div>
+
+
+      <div class="explore-cta">
+
+        <div>
+          <span class="mini-label">
+            READY WHEN YOU ARE
+          </span>
+
+          <h3>
+            Start building your academic record.
+          </h3>
+        </div>
+
+        <a
+          href="screen.html"
+          class="primary-button small-button"
+        >
+          Continue
+          <span class="button-arrow">→</span>
+        </a>
+
+      </div>
+
+    </section>
+
+
+    <!-- ========================================
+         FOOTER
+         ======================================== -->
+
+    <footer class="landing-footer">
+
+      <div class="footer-brand">
+        <span class="brand-symbol">G</span>
+        <span>GradeFlow</span>
+      </div>
+
+      <p>
+        Calculate. Understand. Track.
+      </p>
+
+      <span class="footer-year">
+        © <span id="currentYear"></span> GradeFlow
+      </span>
+
+    </footer>
+
+  </main>
+
+
+  <script type="module" src="js/index.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <meta
+    name="theme-color"
+    content="#11110f"
+  >
+
+  <meta
+    name="description"
+    content="Create your GradeFlow account."
+  >
+
+  <title>Create your GradeFlow account</title>
+
+  <link
+    rel="stylesheet"
+    href="css/signup.css"
+  >
+</head>
+
+<body>
+
+  <main class="signup-page">
+
+    <section class="signup-container">
+
+      <!-- HEADER -->
+
+      <header class="signup-header">
+
+        <a
+          href="choice.html"
+          class="back-link"
+          aria-label="Go back"
+        >
+          <span aria-hidden="true">←</span>
+          Back
+        </a>
+
+        <div class="header-copy">
+
+          <p class="eyebrow">
+            CREATE YOUR ACCOUNT
+          </p>
+
+          <h1>
+            Create your GradeFlow account.
+          </h1>
+
+          <p class="subtitle">
+            Enter your details to get started.
+          </p>
+
+        </div>
+
+      </header>
+
+
+      <!-- SIGNUP FORM -->
+
+      <form
+        id="signupForm"
+        class="signup-form"
+        novalidate
+      >
+
+        <!-- PERSONAL INFORMATION -->
+
+        <section class="form-section">
+
+          <div class="section-heading">
+
+            <span class="section-number">
+              01
+            </span>
+
+            <div>
+              <h2>Personal information</h2>
+
+              <p>
+                Tell us a little about yourself.
+              </p>
+            </div>
+
+          </div>
+
+
+          <!-- FULL NAME -->
+
+          <div class="field">
+
+            <label for="fullName">
+              Full name
+            </label>
+
+            <input
+              type="text"
+              id="fullName"
+              name="fullName"
+              autocomplete="name"
+              placeholder="Enter your full name"
+              maxlength="100"
+            >
+
+            <p
+              class="field-error"
+              id="fullNameError"
+            ></p>
+
+          </div>
+
+
+          <!-- DATE OF BIRTH -->
+
+          <div class="field">
+
+            <label for="dateOfBirth">
+              Date of birth
+            </label>
+
+            <input
+              type="date"
+              id="dateOfBirth"
+              name="dateOfBirth"
+              autocomplete="bday"
+            >
+
+            <p
+              class="field-error"
+              id="dateOfBirthError"
+            ></p>
+
+          </div>
+
+
+          <!-- GENDER -->
+
+          <div class="field">
+
+            <label for="gender">
+              Gender
+            </label>
+
+            <select
+              id="gender"
+              name="gender"
+            >
+
+              <option value="">
+                Select your gender
+              </option>
+
+              <option value="male">
+                Male
+              </option>
+
+              <option value="female">
+                Female
+              </option>
+
+              <option value="non-binary">
+                Non-binary
+              </option>
+
+              <option value="prefer-not-to-say">
+                Prefer not to say
+              </option>
+
+            </select>
+
+            <p
+              class="field-error"
+              id="genderError"
+            ></p>
+
+          </div>
+
+        </section>
+
+
+        <!-- ACCOUNT INFORMATION -->
+
+        <section class="form-section">
+
+          <div class="section-heading">
+
+            <span class="section-number">
+              02
+            </span>
+
+            <div>
+
+              <h2>
+                Account information
+              </h2>
+
+              <p>
+                Choose how you will be identified on GradeFlow.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <!-- EMAIL -->
+
+          <div class="field">
+
+            <label for="email">
+              Email address
+            </label>
+
+            <input
+              type="email"
+              id="email"
+              name="email"
+              autocomplete="email"
+              placeholder="you@example.com"
+              maxlength="254"
+            >
+
+            <p class="field-hint">
+              This will be used to sign in to GradeFlow.
+            </p>
+
+            <p
+              class="field-error"
+              id="emailError"
+            ></p>
+
+          </div>
+
+
+          <!-- USERNAME -->
+
+          <div class="field">
+
+            <label for="username">
+              Username
+            </label>
+
+            <div class="input-with-prefix">
+
+              <span>@</span>
+
+              <input
+                type="text"
+                id="username"
+                name="username"
+                autocomplete="username"
+                placeholder="yourusername"
+                maxlength="20"
+                spellcheck="false"
+                autocapitalize="none"
+              >
+
+            </div>
+
+            <p class="field-hint">
+              3–20 letters, numbers or underscores.
+            </p>
+
+            <p
+              class="username-status"
+              id="usernameStatus"
+              aria-live="polite"
+            ></p>
+
+            <p
+              class="field-error"
+              id="usernameError"
+            ></p>
+
+          </div>
+
+        </section>
+
+
+        <!-- EDUCATION -->
+
+        <section class="form-section">
+
+          <div class="section-heading">
+
+            <span class="section-number">
+              03
+            </span>
+
+            <div>
+
+              <h2>
+                Education
+              </h2>
+
+              <p>
+                Set your current education level.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <!-- CLASS -->
+
+          <div class="field">
+
+            <label for="class">
+              Class / education level
+            </label>
+
+            <select
+              id="class"
+              name="class"
+            >
+
+              <option value="">
+                Select your class
+              </option>
+
+            </select>
+
+            <p class="field-hint">
+              GradeFlow supports education systems worldwide.
+            </p>
+
+            <p
+              class="field-error"
+              id="classError"
+            ></p>
+
+          </div>
+
+        </section>
+
+
+        <!-- LOCATION -->
+
+        <section class="form-section">
+
+          <div class="section-heading">
+
+            <span class="section-number">
+              04
+            </span>
+
+            <div>
+
+              <h2>
+                Location
+              </h2>
+
+              <p>
+                Choose your country and phone number.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <!-- COUNTRY -->
+
+          <div class="field">
+
+            <label for="country">
+              Country
+            </label>
+
+            <select
+              id="country"
+              name="country"
+              autocomplete="country"
+            >
+
+              <option value="">
+                Select your country
+              </option>
+
+            </select>
+
+            <p
+              class="field-error"
+              id="countryError"
+            ></p>
+
+          </div>
+
+
+          <!-- PHONE -->
+
+          <div class="field">
+
+            <label for="phone">
+              Phone number
+            </label>
+
+            <div class="phone-input">
+
+              <div
+                class="phone-country"
+                aria-hidden="true"
+              >
+
+                <span id="countryFlag">
+                  🌐
+                </span>
+
+                <span id="countryDialCode">
+                  +
+                </span>
+
+              </div>
+
+              <input
+                type="tel"
+                id="phone"
+                name="phone"
+                autocomplete="tel-national"
+                placeholder="Phone number"
+                inputmode="tel"
+                maxlength="20"
+              >
+
+            </div>
+
+            <p class="field-hint">
+              Your country code will be added automatically.
+            </p>
+
+            <p
+              class="field-error"
+              id="phoneError"
+            ></p>
+
+          </div>
+
+        </section>
+
+
+        <!-- SECURITY -->
+
+        <section class="form-section">
+
+          <div class="section-heading">
+
+            <span class="section-number">
+              05
+            </span>
+
+            <div>
+
+              <h2>
+                Secure your account
+              </h2>
+
+              <p>
+                Create a strong password.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <!-- PASSWORD -->
+
+          <div class="field">
+
+            <label for="password">
+              Password
+            </label>
+
+            <div class="password-input">
+
+              <input
+                type="password"
+                id="password"
+                name="password"
+                autocomplete="new-password"
+                placeholder="Create a password"
+                maxlength="128"
+              >
+
+              <button
+                type="button"
+                class="password-toggle"
+                data-password-toggle="password"
+                aria-label="Show password"
+              >
+                Show
+              </button>
+
+            </div>
+
+            <div class="password-strength">
+
+              <div class="strength-track">
+
+                <div
+                  id="strengthBar"
+                  class="strength-bar"
+                ></div>
+
+              </div>
+
+              <span id="strengthText">
+                Password strength
+              </span>
+
+            </div>
+
+            <p class="field-hint">
+              Use at least 8 characters. A combination of letters, numbers and symbols is recommended.
+            </p>
+
+            <p
+              class="field-error"
+              id="passwordError"
+            ></p>
+
+          </div>
+
+
+          <!-- CONFIRM PASSWORD -->
+
+          <div class="field">
+
+            <label for="confirmPassword">
+              Confirm password
+            </label>
+
+            <div class="password-input">
+
+              <input
+                type="password"
+                id="confirmPassword"
+                name="confirmPassword"
+                autocomplete="new-password"
+                placeholder="Enter your password again"
+                maxlength="128"
+              >
+
+              <button
+                type="button"
+                class="password-toggle"
+                data-password-toggle="confirmPassword"
+                aria-label="Show password"
+              >
+                Show
+              </button>
+
+            </div>
+
+            <p
+              class="field-error"
+              id="confirmPasswordError"
+            ></p>
+
+          </div>
+
+        </section>
+
+
+        <!-- TERMS -->
+
+        <section class="terms-section">
+
+          <label class="terms-label">
+
+            <input
+              type="checkbox"
+              id="terms"
+              name="terms"
+            >
+
+            <span class="custom-checkbox"></span>
+
+            <span class="terms-text">
+
+              I agree to the
+              <a href="#">Terms of Service</a>
+              and
+              <a href="#">Privacy Policy</a>.
+
+            </span>
+
+          </label>
+
+          <p
+            class="field-error"
+            id="termsError"
+          ></p>
+
+        </section>
+
+
+        <!-- FORM MESSAGE -->
+
+        <div
+          id="formMessage"
+          class="form-message"
+          role="alert"
+          aria-live="polite"
+        ></div>
+
+
+        <!-- CREATE ACCOUNT -->
+
+        <button
+          type="submit"
+          id="createAccountButton"
+          class="create-account-button"
+        >
+
+          <span>
+            Create account
+          </span>
+
+          <span aria-hidden="true">
+            →
+          </span>
+
+        </button>
+
+
+        <!-- LOGIN -->
+
+        <p class="login-prompt">
+
+          Already have an account?
+
+          <a href="login.html">
+            Log in
+          </a>
+
+        </p>
+
+      </form>
+
+    </section>
+
+  </main>
+
+
+  <script
+    type="module"
+    src="js/signup.js"
+  ></script>
+
+</body>
+
+</html>

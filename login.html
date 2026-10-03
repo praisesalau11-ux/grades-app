@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="theme-color"
+        content="#11110f"
+    >
+
+    <meta
+        name="description"
+        content="Log in to your GradeFlow account."
+    >
+
+    <title>Log in — GradeFlow</title>
+
+    <link
+        rel="stylesheet"
+        href="css/login.css"
+    >
+
+</head>
+
+
+<body>
+
+
+    <!-- ==========================================
+         PAGE
+    =========================================== -->
+
+    <main class="login-page">
+
+
+        <section class="login-container">
+
+
+            <!-- ==========================================
+                 HEADER
+            =========================================== -->
+
+            <header class="login-header">
+
+
+                <a
+                    href="screen.html"
+                    class="back-link"
+                    id="backButton"
+                >
+
+                    <span aria-hidden="true">
+                        ←
+                    </span>
+
+                    Back
+
+                </a>
+
+
+                <div class="header-copy">
+
+                    <p class="eyebrow">
+                        WELCOME BACK
+                    </p>
+
+                    <h1>
+                        Log in to GradeFlow.
+                    </h1>
+
+                    <p class="subtitle">
+                        Continue tracking your grades and academic progress.
+                    </p>
+
+                </div>
+
+
+            </header>
+
+
+
+            <!-- ==========================================
+                 LOGIN FORM
+            =========================================== -->
+
+            <form
+                id="loginForm"
+                class="login-form"
+                novalidate
+            >
+
+
+                <!-- ==========================================
+                     EMAIL
+                =========================================== -->
+
+                <div class="field">
+
+                    <label for="email">
+                        Email address
+                    </label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        autocomplete="email"
+                        placeholder="you@example.com"
+                        maxlength="254"
+                    >
+
+                    <p
+                        class="field-error"
+                        id="emailError"
+                    ></p>
+
+                </div>
+
+
+
+                <!-- ==========================================
+                     PASSWORD
+                =========================================== -->
+
+                <div class="field">
+
+
+                    <div class="password-label-row">
+
+                        <label for="password">
+                            Password
+                        </label>
+
+                        <button type="button" id="forgotPassword">
+    Forgot password?
+                        </button>
+
+                    </div>
+
+
+                    <div class="password-input">
+
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            autocomplete="current-password"
+                            placeholder="Enter your password"
+                            maxlength="128"
+                        >
+
+                        <button
+                            type="button"
+                            class="password-toggle"
+                            id="passwordToggle"
+                            aria-label="Show password"
+                        >
+                            Show
+                        </button>
+
+                    </div>
+
+
+                    <p
+                        class="field-error"
+                        id="passwordError"
+                    ></p>
+
+                </div>
+
+
+
+                <!-- ==========================================
+                     LOGIN BUTTON
+                =========================================== -->
+
+                <button
+                    type="submit"
+                    id="loginButton"
+                    class="login-button"
+                >
+
+                    <span>
+                        Log in
+                    </span>
+
+                    <span aria-hidden="true">
+                        →
+                    </span>
+
+                </button>
+
+
+
+                <!-- ==========================================
+                     DIVIDER
+                =========================================== -->
+
+                <div class="divider">
+
+                    <span></span>
+
+                    <p>
+                        OR
+                    </p>
+
+                    <span></span>
+
+                </div>
+
+
+
+                <!-- ==========================================
+                     GOOGLE LOGIN
+                =========================================== -->
+
+                <button
+                    type="button"
+                    id="googleLogin"
+                    class="google-button"
+                >
+
+                    <span class="google-icon">
+                        G
+                    </span>
+
+                    <span class="google-content">
+
+                        <strong>
+                            Continue with Google
+                        </strong>
+
+                        <small>
+                            Use your Google account
+                        </small>
+
+                    </span>
+
+                    <span
+                        class="google-arrow"
+                        aria-hidden="true"
+                    >
+                        →
+                    </span>
+
+                </button>
+
+
+
+                <!-- ==========================================
+                     FORM MESSAGE
+                =========================================== -->
+
+                <div
+                    id="loginMessage"
+                    class="login-message"
+                    role="alert"
+                    aria-live="polite"
+                ></div>
+
+
+            </form>
+
+
+
+            <!-- ==========================================
+                 CREATE ACCOUNT
+            =========================================== -->
+
+            <p class="signup-prompt">
+
+                Don't have a GradeFlow account?
+
+                <a href="choice.html">
+                    Create an account
+                </a>
+
+            </p>
+
+
+        </section>
+
+
+    </main>
+
+
+
+    <!-- ==========================================
+         JAVASCRIPT
+    =========================================== -->
+
+    <script
+        type="module"
+        src="js/login.js"
+    ></script>
+
+
+</body>
+
+</html>
