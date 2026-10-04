@@ -31,7 +31,7 @@ const PORT =
     Number(process.env.PORT) || 10000;
 
 const FRONTEND_URL =
-    process.env.FRONTEND_URL;
+    process.env.FRONTEND_URL || "";
 
 
 /* ==========================================
@@ -51,45 +51,126 @@ app.use(
    CORS
 ========================================== */
 
-const allowedOrigins = FRONTEND_URL
-    ? FRONTEND_URL
-        .split(",")
-        .map(origin => origin.trim())
-        .filter(Boolean)
-    : [];
+/*
+   FRONTEND_URL can contain multiple origins:
+
+   FRONTEND_URL=https://grades-flow.netlify.app,http://127.0.0.1:5500,http://localhost:5500
+
+   This allows:
+   - Production Netlify site
+   - Local Live Server using 127.0.0.1
+   - Local Live Server using localhost
+*/
+
+const configuredOrigins = FRONTEND_URL
+    .split(",")
+    .map(origin => origin.trim())
+    .filter(Boolean);
+
+
+/*
+   Always allow these development origins.
+   This fixes local testing from Live Server.
+*/
+
+const developmentOrigins = [
+    "http://127.0.0.1:5500",
+    "http://localhost:5500"
+];
+
+
+/*
+   Combine configured + development origins
+   and remove duplicates.
+*/
+
+const allowedOrigins = [
+    ...new Set([
+        ...configuredOrigins,
+        ...developmentOrigins
+    ])
+];
+
+
+console.log(
+    "GradeFlow CORS allowed origins:",
+    allowedOrigins
+);
+
 
 app.use(
     cors({
         origin(origin, callback) {
 
-            // Allow requests with no Origin header.
-            // Useful for health checks/server tools.
+            /*
+               Requests without an Origin header are allowed.
+
+               Examples:
+               - Render health checks
+               - Server-to-server requests
+               - Some development tools
+            */
+
             if (!origin) {
                 return callback(null, true);
             }
 
-            if (
-                allowedOrigins.length === 0 ||
-                allowedOrigins.includes(origin)
-            ) {
+
+            /*
+               Check whether the browser's origin
+               is in our allowed list.
+            */
+
+            if (allowedOrigins.includes(origin)) {
                 return callback(null, true);
             }
+
+
+            /*
+               Reject unknown origins.
+            */
+
+            console.warn(
+                "GradeFlow CORS blocked origin:",
+                origin
+            );
 
             return callback(
                 new Error("CORS origin not allowed.")
             );
         },
 
+
+        /*
+           HTTP methods used by GradeFlow.
+        */
+
         methods: [
             "GET",
             "POST",
+            "PUT",
+            "PATCH",
+            "DELETE",
             "OPTIONS"
         ],
+
+
+        /*
+           Headers accepted by the backend.
+        */
 
         allowedHeaders: [
             "Content-Type",
             "Authorization"
-        ]
+        ],
+
+
+        /*
+           Explicitly handle browser
+           preflight requests.
+        */
+
+        optionsSuccessStatus: 204
     })
 );
 
@@ -112,8 +193,11 @@ app.use(
 const globalLimiter =
     rateLimit({
         windowMs: 15 * 60 * 1000,
+
         limit: 100,
+
         standardHeaders: "draft-7",
+
         legacyHeaders: false,
 
         message: {
@@ -122,6 +206,7 @@ const globalLimiter =
                 "Too many requests. Please try again later."
         }
     });
+
 
 app.use(globalLimiter);
 
@@ -133,8 +218,11 @@ app.use(globalLimiter);
 const aiLimiter =
     rateLimit({
         windowMs: 60 * 1000,
+
         limit: 20,
+
         standardHeaders: "draft-7",
+
         legacyHeaders: false,
 
         message: {
@@ -177,13 +265,18 @@ app.get("/api/health", (req, res) => {
 
 
 /* ==========================================
-   ROUTES
+   AUTH ROUTES
 ========================================== */
 
 app.use(
     "/api/auth",
     authRoutes
 );
+
+
+/* ==========================================
+   AI ROUTES
+========================================== */
 
 app.use(
     "/api/ai",
@@ -217,15 +310,27 @@ app.use((error, req, res, next) => {
         error
     );
 
+
+    /*
+       CORS error
+    */
+
     if (
         error?.message ===
         "CORS origin not allowed."
     ) {
+
         return res.status(403).json({
             success: false,
             message: "Origin not allowed."
         });
+
     }
+
+
+    /*
+       General server error
+    */
 
     res.status(500).json({
         success: false,
@@ -237,7 +342,7 @@ app.use((error, req, res, next) => {
 
 
 /* ==========================================
-   START
+   START SERVER
 ========================================== */
 
 app.listen(
@@ -247,6 +352,10 @@ app.listen(
 
         console.log(
             `GradeFlow server running on port ${PORT}`
+        );
+
+        console.log(
+            `GradeFlow frontend: ${FRONTEND_URL || "Not configured"}`
         );
 
     }
