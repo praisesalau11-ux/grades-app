@@ -11,13 +11,8 @@
     >
 
     <meta
-        name="theme-color"
-        content="#11110f"
-    >
-
-    <meta
         name="description"
-        content="Log in to your GradeFlow account."
+        content="Log in to GradeFlow"
     >
 
     <title>Log in — GradeFlow</title>
@@ -32,154 +27,152 @@
 
 <body>
 
-
-    <!-- ==========================================
-         PAGE
-    =========================================== -->
-
     <main class="login-page">
 
+        <section class="login-card">
 
-        <section class="login-container">
-
-
-            <!-- ==========================================
-                 HEADER
-            =========================================== -->
-
-            <header class="login-header">
-
-
-                <a
-                    href="screen.html"
-                    class="back-link"
-                    id="backButton"
-                >
-
-                    <span aria-hidden="true">
-                        ←
-                    </span>
-
-                    Back
-
-                </a>
+            <button
+                type="button"
+                id="backButton"
+                class="back-button"
+            >
+                ← Back
+            </button>
 
 
-                <div class="header-copy">
-
-                    <p class="eyebrow">
-                        WELCOME BACK
-                    </p>
-
-                    <h1>
-                        Log in to GradeFlow.
-                    </h1>
-
-                    <p class="subtitle">
-                        Continue tracking your grades and academic progress.
-                    </p>
-
-                </div>
+            <div class="brand">
+                GradeFlow
+            </div>
 
 
-            </header>
+            <div class="heading">
+
+                <h1>
+                    Welcome back
+                </h1>
+
+                <p>
+                    Log in to continue to GradeFlow.
+                </p>
+
+            </div>
 
 
+            <button
+                type="button"
+                id="googleLogin"
+                class="google-login"
+            >
 
-            <!-- ==========================================
-                 LOGIN FORM
-            =========================================== -->
+                <span class="google-icon">
+                    G
+                </span>
+
+                <span class="google-content">
+
+                    <strong>
+                        Continue with Google
+                    </strong>
+
+                    <small>
+                        Use your Google account
+                    </small>
+
+                </span>
+
+                <span class="google-arrow">
+                    →
+                </span>
+
+            </button>
+
+
+            <div class="divider">
+
+                <span></span>
+
+                <small>
+                    OR
+                </small>
+
+                <span></span>
+
+            </div>
+
 
             <form
                 id="loginForm"
-                class="login-form"
                 novalidate
             >
-
-
-                <!-- ==========================================
-                     EMAIL
-                =========================================== -->
 
                 <div class="field">
 
                     <label for="email">
-                        Email address
+                        Email
                     </label>
 
                     <input
-                        type="email"
                         id="email"
                         name="email"
+                        type="email"
                         autocomplete="email"
                         placeholder="you@example.com"
-                        maxlength="254"
                     >
 
-                    <p
-                        class="field-error"
+                    <small
                         id="emailError"
-                    ></p>
+                        class="field-error"
+                    ></small>
 
                 </div>
 
 
-
-                <!-- ==========================================
-                     PASSWORD
-                =========================================== -->
-
                 <div class="field">
 
+                    <label for="password">
+                        Password
+                    </label>
 
-                    <div class="password-label-row">
-
-                        <label for="password">
-                            Password
-                        </label>
-
-                        <button type="button" id="forgotPassword">
-    Forgot password?
-                        </button>
-
-                    </div>
-
-
-                    <div class="password-input">
+                    <div class="password-wrap">
 
                         <input
-                            type="password"
                             id="password"
                             name="password"
+                            type="password"
                             autocomplete="current-password"
                             placeholder="Enter your password"
-                            maxlength="128"
                         >
 
                         <button
                             type="button"
-                            class="password-toggle"
                             id="passwordToggle"
-                            aria-label="Show password"
+                            class="password-toggle"
                         >
                             Show
                         </button>
 
                     </div>
 
-
-                    <p
-                        class="field-error"
+                    <small
                         id="passwordError"
-                    ></p>
+                        class="field-error"
+                    ></small>
 
                 </div>
 
 
+                <div class="forgot-row">
 
-                <!-- ==========================================
-                     LOGIN BUTTON
-                =========================================== -->
+                    <button
+                        type="button"
+                        id="forgotPassword"
+                        class="forgot-password"
+                    >
+                        Forgot password?
+                    </button>
+
+                </div>
+
 
                 <button
                     type="submit"
@@ -191,92 +184,25 @@
                         Log in
                     </span>
 
-                    <span aria-hidden="true">
+                    <span>
                         →
                     </span>
 
                 </button>
 
-
-
-                <!-- ==========================================
-                     DIVIDER
-                =========================================== -->
-
-                <div class="divider">
-
-                    <span></span>
-
-                    <p>
-                        OR
-                    </p>
-
-                    <span></span>
-
-                </div>
-
-
-
-                <!-- ==========================================
-                     GOOGLE LOGIN
-                =========================================== -->
-
-                <button
-                    type="button"
-                    id="googleLogin"
-                    class="google-button"
-                >
-
-                    <span class="google-icon">
-                        G
-                    </span>
-
-                    <span class="google-content">
-
-                        <strong>
-                            Continue with Google
-                        </strong>
-
-                        <small>
-                            Use your Google account
-                        </small>
-
-                    </span>
-
-                    <span
-                        class="google-arrow"
-                        aria-hidden="true"
-                    >
-                        →
-                    </span>
-
-                </button>
-
-
-
-                <!-- ==========================================
-                     FORM MESSAGE
-                =========================================== -->
 
                 <div
                     id="loginMessage"
                     class="login-message"
-                    role="alert"
-                    aria-live="polite"
+                    role="status"
                 ></div>
-
 
             </form>
 
 
+            <p class="signup-link">
 
-            <!-- ==========================================
-                 CREATE ACCOUNT
-            =========================================== -->
-
-            <p class="signup-prompt">
-
-                Don't have a GradeFlow account?
+                Don't have an account?
 
                 <a href="choice.html">
                     Create an account
@@ -284,23 +210,15 @@
 
             </p>
 
-
         </section>
-
 
     </main>
 
-
-
-    <!-- ==========================================
-         JAVASCRIPT
-    =========================================== -->
 
     <script
         type="module"
         src="js/login.js"
     ></script>
-
 
 </body>
 
