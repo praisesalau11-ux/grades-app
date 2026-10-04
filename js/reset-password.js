@@ -1,962 +1,596 @@
 /* ==========================================
-GRADEFLOW
-File: js/reset-password.js
+   GRADEFLOW
+   File: js/reset-password.js
 
-Firebase Password Reset Handler
-
-Flow:
-
-login.html
-↓
-Firebase sends reset email
-↓
-Firebase reset link
-↓
-reset-password.html
-↓
-verify oobCode
-↓
-User creates new password
-↓
-Firebase updates password
-↓
-login.html
+   Firebase REST Password Reset
 ========================================== */
+
 
 /* ==========================================
-FIREBASE
+   FIREBASE
 ========================================== */
 
-import { auth } from "./firebase.js";
+const FIREBASE_API_KEY =
+    "AIzaSyDU7Pn3sURG2ggj1d7b4g4lsbbNqiHZG00";
 
-import {
-verifyPasswordResetCode,
-confirmPasswordReset
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 /* ==========================================
-DOM ELEMENTS
+   DOM
 ========================================== */
 
-const resetPasswordForm =
-document.getElementById(
-"resetPasswordForm"
-);
+const resetForm =
+    document.getElementById(
+        "resetForm"
+    );
 
-const newPasswordInput =
-document.getElementById(
-"newPassword"
-);
+const newPassword =
+    document.getElementById(
+        "newPassword"
+    );
 
-const confirmPasswordInput =
-document.getElementById(
-"confirmPassword"
-);
-
-const newPasswordToggle =
-document.getElementById(
-"newPasswordToggle"
-);
-
-const confirmPasswordToggle =
-document.getElementById(
-"confirmPasswordToggle"
-);
-
-const newPasswordError =
-document.getElementById(
-"newPasswordError"
-);
-
-const confirmPasswordError =
-document.getElementById(
-"confirmPasswordError"
-);
+const confirmPassword =
+    document.getElementById(
+        "confirmPassword"
+    );
 
 const resetButton =
-document.getElementById(
-"resetButton"
-);
+    document.getElementById(
+        "resetButton"
+    );
+
+const passwordToggle =
+    document.getElementById(
+        "passwordToggle"
+    );
+
+const confirmToggle =
+    document.getElementById(
+        "confirmToggle"
+    );
+
+const passwordError =
+    document.getElementById(
+        "passwordError"
+    );
+
+const confirmError =
+    document.getElementById(
+        "confirmError"
+    );
 
 const resetMessage =
-document.getElementById(
-"resetMessage"
-);
+    document.getElementById(
+        "resetMessage"
+    );
 
-const strengthBar =
-document.getElementById(
-"strengthBar"
-);
+const resetState =
+    document.getElementById(
+        "resetState"
+    );
 
-const strengthText =
-document.getElementById(
-"strengthText"
-);
+const successState =
+    document.getElementById(
+        "successState"
+    );
 
-/* ==========================================
-RESET CODE
-========================================== */
+const errorState =
+    document.getElementById(
+        "errorState"
+    );
 
-let resetCode = null;
+const errorText =
+    document.getElementById(
+        "errorText"
+    );
 
-let verifiedEmail = null;
-
-/* ==========================================
-PAGE INITIALIZATION
-========================================== */
-
-document.addEventListener(
-"DOMContentLoaded",
-() => {
-
-    initializePasswordToggles();
-
-    initializePasswordStrength();
-
-    initializeResetForm();
-
-    initializeResetCode();
-
-}
-
-);
 
 /* ==========================================
-GET FIREBASE RESET CODE
+   GET OOB CODE
 ========================================== */
-
-function initializeResetCode() {
-
-/*
- * Firebase normally sends:
- *
- * ?mode=resetPassword&oobCode=XXXXXXXX
- *
- * We need the oobCode.
- */
 
 const params =
     new URLSearchParams(
         window.location.search
     );
 
-
-const mode =
-    params.get("mode");
-
-
-resetCode =
+const oobCode =
     params.get("oobCode");
 
 
-/* ----------------------------------------
-   CHECK RESET MODE
----------------------------------------- */
-
-if (
-    mode !== "resetPassword"
-) {
-
-    showInvalidLink();
-
-    return;
-
-}
-
-
-/* ----------------------------------------
-   CHECK RESET CODE
----------------------------------------- */
-
-if (!resetCode) {
-
-    showInvalidLink();
-
-    return;
-
-}
-
-
-/* ----------------------------------------
-   VERIFY CODE WITH FIREBASE
----------------------------------------- */
-
-verifyResetCode();
-
-}
-
 /* ==========================================
-VERIFY RESET CODE
+   START
 ========================================== */
 
-async function verifyResetCode() {
-
-disableForm(true);
-
-showMessage(
-    "Verifying your password reset link...",
-    "info"
-);
-
-
-try {
-
-    verifiedEmail =
-        await verifyPasswordResetCode(
-            auth,
-            resetCode
-        );
-
-
-    /*
-     * The reset link is valid.
-     */
-
-    disableForm(false);
-
-    clearMessage();
-
-    newPasswordInput?.focus();
-
-
-} catch (error) {
-
-    console.error(
-        "Password reset verification error:",
-        error
-    );
-
-    console.error(
-        "Firebase error code:",
-        error?.code
-    );
-
-    console.error(
-        "Firebase error message:",
-        error?.message
-    );
-
-
-    disableForm(true);
-
-    showMessage(
-        getVerificationErrorMessage(
-            error
-        ),
-        "error"
-    );
-
-}
-
-}
-
-/* ==========================================
-PASSWORD TOGGLES
-========================================== */
-
-function initializePasswordToggles() {
-
-if (
-    newPasswordToggle &&
-    newPasswordInput
-) {
-
-    newPasswordToggle.addEventListener(
-        "click",
-        () => {
-
-            togglePassword(
-                newPasswordInput,
-                newPasswordToggle
-            );
-
-        }
-    );
-
-}
-
-
-if (
-    confirmPasswordToggle &&
-    confirmPasswordInput
-) {
-
-    confirmPasswordToggle.addEventListener(
-        "click",
-        () => {
-
-            togglePassword(
-                confirmPasswordInput,
-                confirmPasswordToggle
-            );
-
-        }
-    );
-
-}
-
-}
-
-function togglePassword(
-input,
-button
-) {
-
-const showing =
-    input.type === "text";
-
-
-input.type =
-    showing
-        ? "password"
-        : "text";
-
-
-button.textContent =
-    showing
-        ? "Show"
-        : "Hide";
-
-
-button.setAttribute(
-    "aria-label",
-    showing
-        ? "Show password"
-        : "Hide password"
-);
-
-}
-
-/* ==========================================
-PASSWORD STRENGTH
-========================================== */
-
-function initializePasswordStrength() {
-
-if (!newPasswordInput) {
-    return;
-}
-
-
-newPasswordInput.addEventListener(
-    "input",
+document.addEventListener(
+    "DOMContentLoaded",
     () => {
 
-        updatePasswordStrength(
-            newPasswordInput.value
+        initializePasswordToggle();
+
+        initializeConfirmToggle();
+
+        validateResetCode();
+
+        initializeForm();
+
+    }
+);
+
+
+/* ==========================================
+   CHECK RESET CODE
+========================================== */
+
+async function validateResetCode() {
+
+    if (!oobCode) {
+
+        showInvalidReset(
+            "This password reset link is missing its reset code."
+        );
+
+        return;
+
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                `https://identitytoolkit.googleapis.com/v1/accounts:resetPassword?key=${encodeURIComponent(FIREBASE_API_KEY)}`,
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        oobCode
+                    })
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            console.error(
+                "Reset code validation failed:",
+                data
+            );
+
+
+            showInvalidReset(
+                getResetErrorMessage(
+                    data?.error?.message
+                )
+            );
+
+
+            return;
+
+        }
+
+
+        /*
+         * Firebase has confirmed that the
+         * reset code is valid.
+         */
+
+        resetForm.dataset.valid =
+            "true";
+
+    } catch (error) {
+
+        console.error(
+            "Reset validation error:",
+            error
+        );
+
+
+        showInvalidReset(
+            "Could not verify this reset link. Check your internet connection and try again."
         );
 
     }
-);
 
 }
 
-function updatePasswordStrength(
-password
-) {
-
-if (!strengthBar || !strengthText) {
-    return;
-}
-
-
-if (!password) {
-
-    strengthBar.style.width =
-        "0%";
-
-    strengthText.textContent =
-        "Enter a password";
-
-    return;
-
-}
-
-
-let score = 0;
-
-
-/* Length */
-
-if (password.length >= 6) {
-    score++;
-}
-
-
-if (password.length >= 10) {
-    score++;
-}
-
-
-/* Lowercase */
-
-if (/[a-z]/.test(password)) {
-    score++;
-}
-
-
-/* Uppercase */
-
-if (/[A-Z]/.test(password)) {
-    score++;
-}
-
-
-/* Number */
-
-if (/[0-9]/.test(password)) {
-    score++;
-}
-
-
-/* Special character */
-
-if (/[^A-Za-z0-9]/.test(password)) {
-    score++;
-}
-
-
-const percentage =
-    Math.min(
-        score / 6 * 100,
-        100
-    );
-
-
-strengthBar.style.width =
-    `${percentage}%`;
-
-
-if (score <= 2) {
-
-    strengthText.textContent =
-        "Weak password";
-
-} else if (score <= 4) {
-
-    strengthText.textContent =
-        "Moderate password";
-
-} else {
-
-    strengthText.textContent =
-        "Strong password";
-
-}
-
-}
 
 /* ==========================================
-RESET FORM
+   FORM
 ========================================== */
 
-function initializeResetForm() {
+function initializeForm() {
 
-if (!resetPasswordForm) {
-    return;
+    if (!resetForm) {
+        return;
+    }
+
+
+    resetForm.addEventListener(
+        "submit",
+        async (event) => {
+
+            event.preventDefault();
+
+            clearErrors();
+
+
+            const password =
+                newPassword?.value || "";
+
+
+            const confirmation =
+                confirmPassword?.value || "";
+
+
+            if (
+                resetForm.dataset.valid !==
+                "true"
+            ) {
+
+                showMessage(
+                    "This password reset link is invalid or expired.",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            let valid = true;
+
+
+            if (password.length < 6) {
+
+                if (passwordError) {
+
+                    passwordError.textContent =
+                        "Password must be at least 6 characters.";
+
+                }
+
+                valid = false;
+
+            }
+
+
+            if (
+                confirmation !==
+                password
+            ) {
+
+                if (confirmError) {
+
+                    confirmError.textContent =
+                        "Passwords do not match.";
+
+                }
+
+                valid = false;
+
+            }
+
+
+            if (!valid) {
+                return;
+            }
+
+
+            setLoading(true);
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        `https://identitytoolkit.googleapis.com/v1/accounts:resetPassword?key=${encodeURIComponent(FIREBASE_API_KEY)}`,
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body: JSON.stringify({
+                                oobCode,
+                                newPassword:
+                                    password
+                            })
+                        }
+                    );
+
+
+                const data =
+                    await response.json();
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        data?.error?.message ||
+                        "PASSWORD_RESET_FAILED"
+                    );
+
+                }
+
+
+                showSuccess();
+
+
+            } catch (error) {
+
+                console.error(
+                    "Password reset error:",
+                    error
+                );
+
+
+                showMessage(
+                    getResetErrorMessage(
+                        error?.message
+                    ),
+                    "error"
+                );
+
+
+                setLoading(false);
+
+            }
+
+        }
+    );
+
 }
 
 
-resetPasswordForm.addEventListener(
-    "submit",
-    async (event) => {
+/* ==========================================
+   PASSWORD TOGGLE
+========================================== */
 
-        event.preventDefault();
+function initializePasswordToggle() {
 
+    passwordToggle?.addEventListener(
+        "click",
+        () => {
 
-        clearErrors();
-
-        clearMessage();
-
-
-        const newPassword =
-            newPasswordInput?.value || "";
-
-
-        const confirmPassword =
-            confirmPasswordInput?.value || "";
+            const hidden =
+                newPassword.type ===
+                "password";
 
 
-        /* ----------------------------------------
-           VALIDATION
-        ---------------------------------------- */
+            newPassword.type =
+                hidden
+                    ? "text"
+                    : "password";
 
-        let valid = true;
 
-
-        if (
-            newPassword.length < 6
-        ) {
-
-            showFieldError(
-                newPasswordInput,
-                newPasswordError,
-                "Password must be at least 6 characters."
-            );
-
-            valid = false;
+            passwordToggle.textContent =
+                hidden
+                    ? "Hide"
+                    : "Show";
 
         }
+    );
+
+}
 
 
-        if (
-            !confirmPassword
-        ) {
+/* ==========================================
+   CONFIRM TOGGLE
+========================================== */
 
-            showFieldError(
-                confirmPasswordInput,
-                confirmPasswordError,
-                "Confirm your new password."
-            );
+function initializeConfirmToggle() {
 
-            valid = false;
+    confirmToggle?.addEventListener(
+        "click",
+        () => {
 
-        } else if (
-            newPassword !== confirmPassword
-        ) {
-
-            showFieldError(
-                confirmPasswordInput,
-                confirmPasswordError,
-                "Passwords do not match."
-            );
-
-            valid = false;
-
-        }
+            const hidden =
+                confirmPassword.type ===
+                "password";
 
 
-        if (!valid) {
-            return;
-        }
+            confirmPassword.type =
+                hidden
+                    ? "text"
+                    : "password";
 
 
-        /* ----------------------------------------
-           LOADING
-        ---------------------------------------- */
-
-        setResetLoading(true);
-
-
-        try {
-
-            /*
-             * Firebase securely changes
-             * the password associated
-             * with the reset code.
-             */
-
-            await confirmPasswordReset(
-                auth,
-                resetCode,
-                newPassword
-            );
-
-
-            /* ----------------------------------------
-               SUCCESS
-            ---------------------------------------- */
-
-            showMessage(
-                "Your password has been reset successfully. Redirecting to login...",
-                "success"
-            );
-
-
-            resetPasswordForm.reset();
-
-
-            updatePasswordStrength("");
-
-
-            setTimeout(
-                () => {
-
-                    window.location.href =
-                        "login.html";
-
-                },
-                1800
-            );
-
-
-        } catch (error) {
-
-            console.error(
-                "Password reset error:",
-                error
-            );
-
-            console.error(
-                "Firebase error code:",
-                error?.code
-            );
-
-            console.error(
-                "Firebase error message:",
-                error?.message
-            );
-
-
-            showMessage(
-                getResetErrorMessage(
-                    error
-                ),
-                "error"
-            );
-
-
-            setResetLoading(false);
+            confirmToggle.textContent =
+                hidden
+                    ? "Hide"
+                    : "Show";
 
         }
+    );
+
+}
+
+
+/* ==========================================
+   LOADING
+========================================== */
+
+function setLoading(
+    loading
+) {
+
+    if (!resetButton) {
+        return;
+    }
+
+
+    resetButton.disabled =
+        loading;
+
+
+    if (loading) {
+
+        resetButton.innerHTML = `
+            <span>Updating password...</span>
+            <span>…</span>
+        `;
+
+    } else {
+
+        resetButton.innerHTML = `
+            <span>Reset password</span>
+            <span>→</span>
+        `;
 
     }
-);
 
 }
 
+
 /* ==========================================
-FIELD ERROR
+   SUCCESS
 ========================================== */
 
-function showFieldError(
-input,
-errorElement,
-message
-) {
+function showSuccess() {
 
-if (input) {
+    resetState?.classList.add(
+        "hidden"
+    );
 
-    input.classList.add(
-        "input-error"
+    errorState?.classList.add(
+        "hidden"
+    );
+
+    successState?.classList.remove(
+        "hidden"
     );
 
 }
 
-
-if (errorElement) {
-
-    errorElement.textContent =
-        message;
-
-}
-
-}
-
-function clearErrors() {
-
-if (newPasswordInput) {
-
-    newPasswordInput.classList.remove(
-        "input-error"
-    );
-
-}
-
-
-if (confirmPasswordInput) {
-
-    confirmPasswordInput.classList.remove(
-        "input-error"
-    );
-
-}
-
-
-if (newPasswordError) {
-
-    newPasswordError.textContent =
-        "";
-
-}
-
-
-if (confirmPasswordError) {
-
-    confirmPasswordError.textContent =
-        "";
-
-}
-
-}
 
 /* ==========================================
-MESSAGE
+   INVALID RESET
+========================================== */
+
+function showInvalidReset(
+    message
+) {
+
+    resetState?.classList.add(
+        "hidden"
+    );
+
+    successState?.classList.add(
+        "hidden"
+    );
+
+    errorState?.classList.remove(
+        "hidden"
+    );
+
+
+    if (errorText) {
+        errorText.textContent =
+            message;
+    }
+
+}
+
+
+/* ==========================================
+   MESSAGE
 ========================================== */
 
 function showMessage(
-message,
-type = "info"
+    message,
+    type = "info"
 ) {
 
-if (!resetMessage) {
-    return;
-}
+    if (!resetMessage) {
+        return;
+    }
 
 
-resetMessage.textContent =
-    message;
+    resetMessage.textContent =
+        message;
 
 
-resetMessage.className =
-    "reset-message";
+    resetMessage.className =
+        "reset-message";
 
 
-resetMessage.classList.add(
-    type
-);
-
-}
-
-function clearMessage() {
-
-if (!resetMessage) {
-    return;
-}
-
-
-resetMessage.textContent =
-    "";
-
-resetMessage.className =
-    "reset-message";
+    resetMessage.classList.add(
+        type
+    );
 
 }
+
 
 /* ==========================================
-LOADING
+   CLEAR ERRORS
 ========================================== */
 
-function setResetLoading(
-loading
-) {
+function clearErrors() {
 
-if (!resetButton) {
-    return;
-}
+    if (passwordError) {
+        passwordError.textContent = "";
+    }
 
 
-resetButton.disabled =
-    loading;
+    if (confirmError) {
+        confirmError.textContent = "";
+    }
 
 
-if (loading) {
+    if (resetMessage) {
 
-    resetButton.innerHTML = `
-        <span>
-            Resetting password...
-        </span>
+        resetMessage.textContent = "";
 
-        <span>
-            …
-        </span>
-    `;
+        resetMessage.className =
+            "reset-message";
 
-} else {
-
-    resetButton.innerHTML = `
-        <span>
-            Reset password
-        </span>
-
-        <span aria-hidden="true">
-            →
-        </span>
-    `;
+    }
 
 }
 
-}
 
 /* ==========================================
-FORM DISABLED
-========================================== */
-
-function disableForm(
-disabled
-) {
-
-if (newPasswordInput) {
-
-    newPasswordInput.disabled =
-        disabled;
-
-}
-
-
-if (confirmPasswordInput) {
-
-    confirmPasswordInput.disabled =
-        disabled;
-
-}
-
-
-if (newPasswordToggle) {
-
-    newPasswordToggle.disabled =
-        disabled;
-
-}
-
-
-if (confirmPasswordToggle) {
-
-    confirmPasswordToggle.disabled =
-        disabled;
-
-}
-
-
-if (resetButton) {
-
-    resetButton.disabled =
-        disabled;
-
-}
-
-}
-
-/* ==========================================
-INVALID LINK
-========================================== */
-
-function showInvalidLink() {
-
-disableForm(true);
-
-
-showMessage(
-    "This password reset link is missing or invalid. Please request a new password reset email.",
-    "error"
-);
-
-}
-
-/* ==========================================
-VERIFICATION ERRORS
-========================================== */
-
-function getVerificationErrorMessage(
-error
-) {
-
-switch (error?.code) {
-
-    case "auth/expired-action-code":
-
-        return (
-            "This password reset link has expired. Please request a new one."
-        );
-
-
-    case "auth/invalid-action-code":
-
-        return (
-            "This password reset link is invalid or has already been used."
-        );
-
-
-    case "auth/user-disabled":
-
-        return (
-            "This GradeFlow account has been disabled."
-        );
-
-
-    case "auth/user-not-found":
-
-        return (
-            "The GradeFlow account associated with this link could not be found."
-        );
-
-
-    case "auth/network-request-failed":
-
-        return (
-            "Network error. Check your internet connection and try again."
-        );
-
-
-    default:
-
-        return (
-            "This password reset link could not be verified. Please request a new one."
-        );
-
-}
-
-}
-
-/* ==========================================
-RESET ERRORS
+   FIREBASE ERRORS
 ========================================== */
 
 function getResetErrorMessage(
-error
+    code
 ) {
 
-switch (error?.code) {
+    switch (code) {
 
-    case "auth/expired-action-code":
+        case "EXPIRED_OOB_CODE":
+            return "This password reset link has expired. Request a new one.";
 
-        return (
-            "This password reset link has expired. Please request a new one."
-        );
+        case "INVALID_OOB_CODE":
+            return "This password reset link is invalid or has already been used.";
 
+        case "USER_DISABLED":
+            return "This GradeFlow account has been disabled.";
 
-    case "auth/invalid-action-code":
+        case "WEAK_PASSWORD":
+            return "Choose a stronger password.";
 
-        return (
-            "This password reset link is invalid or has already been used."
-        );
+        case "OPERATION_NOT_ALLOWED":
+            return "Password sign-in is not enabled for this account.";
 
+        case "TOO_MANY_ATTEMPTS_TRY_LATER":
+            return "Too many attempts. Please wait and try again.";
 
-    case "auth/weak-password":
+        default:
+            return "The password reset link is invalid or expired.";
 
-        return (
-            "This password is too weak. Use at least 6 characters."
-        );
-
-
-    case "auth/user-disabled":
-
-        return (
-            "This GradeFlow account has been disabled."
-        );
-
-
-    case "auth/user-not-found":
-
-        return (
-            "The GradeFlow account could not be found."
-        );
-
-
-    case "auth/network-request-failed":
-
-        return (
-            "Network error. Check your internet connection and try again."
-        );
-
-
-    case "auth/too-many-requests":
-
-        return (
-            "Too many requests. Please wait and try again."
-        );
-
-
-    default:
-
-        return (
-            "Password reset failed: " +
-            (
-                error?.code ||
-                "unknown error"
-            )
-        );
-
-}
+    }
 
 }
