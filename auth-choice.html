@@ -1,0 +1,223 @@
+<!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8">
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<meta
+    name="description"
+    content="Create your TrustNet account with Google or email."
+>
+
+<meta
+    name="theme-color"
+    content="#020617"
+>
+
+<title>Join TrustNet</title>
+
+<link
+    rel="stylesheet"
+    href="/css/auth-choice.css"
+>
+</head> <body>
+<div class="page-background">
+    <div class="background-grid"></div>
+
+    <div class="background-glow glow-one"></div>
+    <div class="background-glow glow-two"></div>
+    <div class="background-glow glow-three"></div>
+</div>
+
+<header class="site-header">
+
+    <div class="header-inner">
+
+        <a
+            href="/"
+            class="brand"
+            aria-label="TrustNet home"
+        >
+            <span class="brand-mark">
+                <span class="brand-mark-core"></span>
+                <span class="brand-mark-ring"></span>
+            </span>
+
+            <span class="brand-name">
+                TrustNet
+            </span>
+        </a>
+
+        <a
+            href="/login.html"
+            class="login-link"
+        >
+            Already have an account?
+            <span>Log in</span>
+        </a>
+
+    </div>
+
+</header>
+
+<main class="auth-main">
+
+    <section class="auth-section">
+
+        <div class="auth-card">
+
+            <div class="card-glow"></div>
+
+            <div class="auth-content">
+
+                <div class="auth-badge">
+                    <span class="badge-dot"></span>
+                    Secure account setup
+                </div>
+
+                <h1>
+                    Join
+                    <span>TrustNet</span>
+                </h1>
+
+                <p class="auth-description">
+                    Create your TrustNet account using
+                    Google or your email address.
+                </p>
+
+                <div class="auth-options">
+
+                    <button
+                        type="button"
+                        class="google-button"
+                        id="googleSignUpButton"
+                    >
+
+                        <span class="google-icon">
+                            <svg
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    fill="#4285F4"
+                                    d="M21.35 12.27c0-.71-.06-1.4-.18-2.05H12v3.88h5.24a4.48 4.48 0 0 1-1.94 2.94v2.44h3.14c1.84-1.7 2.91-4.2 2.91-7.21Z"
+                                ></path>
+
+                                <path
+                                    fill="#34A853"
+                                    d="M12 21.75c2.63 0 4.84-.87 6.45-2.37l-3.14-2.44c-.87.58-1.98.92-3.31.92-2.54 0-4.69-1.72-5.46-4.03H3.3v2.52A9.75 9.75 0 0 0 12 21.75Z"
+                                ></path>
+
+                                <path
+                                    fill="#FBBC05"
+                                    d="M6.54 13.83A5.86 5.86 0 0 1 6.23 12c0-.64.11-1.26.31-1.83V7.65H3.3A9.75 9.75 0 0 0 2.25 12c0 1.57.38 3.06 1.05 4.35l3.24-2.52Z"
+                                ></path>
+
+                                <path
+                                    fill="#EA4335"
+                                    d="M12 6.14c1.43 0 2.72.49 3.73 1.45l2.8-2.8C16.83 3.18 14.62 2.25 12 2.25A9.75 9.75 0 0 0 3.3 7.65l3.24 2.52c.77-2.31 2.92-4.03 5.46-4.03Z"
+                                ></path>
+                            </svg>
+                        </span>
+
+                        <span class="button-text">
+                            Continue with Google
+                        </span>
+
+                        <span class="button-arrow">
+                            →
+                        </span>
+
+                    </button>
+
+                    <a
+                        href="/signup.html"
+                        class="email-button"
+                    >
+
+                        <span class="email-icon">
+                            <svg
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    d="M4 5.5h16A2.5 2.5 0 0 1 22.5 8v8a2.5 2.5 0 0 1-2.5 2.5H4A2.5 2.5 0 0 1 1.5 16V8A2.5 2.5 0 0 1 4 5.5Zm0 2A.5.5 0 0 0 3.5 8v.3l8.5 5.67 8.5-5.67V8a.5.5 0 0 0-.5-.5H4Zm16.5 3.2-7.95 5.3a1 1 0 0 1-1.1 0L3.5 10.7V16c0 .28.22.5.5.5h16a.5.5 0 0 0 .5-.5v-5.3Z"
+                                ></path>
+                            </svg>
+                        </span>
+
+                        <span class="button-text">
+                            Continue with Email
+                        </span>
+
+                        <span class="button-arrow">
+                            →
+                        </span>
+
+                    </a>
+
+                </div>
+
+                <div
+                    class="auth-message"
+                    id="authMessage"
+                    role="status"
+                    aria-live="polite"
+                ></div>
+
+                <div class="security-note">
+
+                    <span class="security-icon">
+                        <svg
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+                            <path
+                                d="M12 2.5 20 6v5.65c0 4.75-3.1 8.88-8 10.35-4.9-1.47-8-5.6-8-10.35V6l8-3.5Zm0 2.2L6 7.32v4.33c0 3.62 2.26 6.85 6 8.18 3.74-1.33 6-4.56 6-8.18V7.32l-6-2.62Zm-1.05 9.8-2.2-2.2 1.42-1.42.78.78 2.88-2.88 1.42 1.42-4.3 4.3Z"
+                            ></path>
+                        </svg>
+                    </span>
+
+                    <span>
+                        Secure authentication powered by Firebase.
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+<footer class="site-footer">
+
+    <div class="footer-inner">
+
+        <p>
+            © 2026 TrustNet. All rights reserved.
+        </p>
+
+        <div class="footer-links">
+
+            <a href="/login.html">
+                Log in
+            </a>
+
+            <a href="/">
+                Home
+            </a>
+
+        </div>
+
+    </div>
+
+</footer>
+
+<script
+    type="module"
+    src="/js/auth-choice.js"
+></script>
+</body> </html>

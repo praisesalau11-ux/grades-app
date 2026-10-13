@@ -1,663 +1,833 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html> <html lang="en"> <head>
+<meta charset="UTF-8">
 
-<head>
-  <meta charset="UTF-8">
-
-  <meta
+<meta
     name="viewport"
     content="width=device-width, initial-scale=1.0"
-  >
+>
 
-  <meta
-    name="theme-color"
-    content="#11110f"
-  >
-
-  <meta
+<meta
     name="description"
-    content="Create your GradeFlow account."
-  >
+    content="Create your TrustNet account with your email address."
+>
 
-  <title>Create your GradeFlow account</title>
+<meta
+    name="theme-color"
+    content="#020617"
+>
 
-  <link
+<title>Create Account — TrustNet</title>
+
+<link
     rel="stylesheet"
-    href="css/signup.css"
-  >
-</head>
+    href="/css/signup.css"
+>
+</head> <body>
+<div class="page-background">
 
-<body>
+    <div class="background-grid"></div>
 
-  <main class="signup-page">
+    <div class="background-glow glow-one"></div>
+    <div class="background-glow glow-two"></div>
+    <div class="background-glow glow-three"></div>
 
-    <section class="signup-container">
+</div>
 
-      <!-- HEADER -->
 
-      <header class="signup-header">
+<header class="site-header">
+
+    <div class="header-inner">
 
         <a
-          href="choice.html"
-          class="back-link"
-          aria-label="Go back"
+            href="/"
+            class="brand"
+            aria-label="TrustNet home"
         >
-          <span aria-hidden="true">←</span>
-          Back
+
+            <span class="brand-mark">
+
+                <span class="brand-mark-ring"></span>
+
+                <span class="brand-mark-core"></span>
+
+            </span>
+
+            <span class="brand-name">
+                TrustNet
+            </span>
+
         </a>
 
-        <div class="header-copy">
 
-          <p class="eyebrow">
-            CREATE YOUR ACCOUNT
-          </p>
+        <a
+            href="/login.html"
+            class="login-link"
+        >
+            Already have an account?
+        </a>
 
-          <h1>
-            Create your GradeFlow account.
-          </h1>
+    </div>
 
-          <p class="subtitle">
-            Enter your details to get started.
-          </p>
+</header>
+
+
+<main class="signup-page">
+
+    <div class="signup-container">
+
+
+        <section class="signup-intro">
+
+            <div class="signup-badge">
+
+                <span class="signup-badge-dot"></span>
+
+                Secure account creation
+
+            </div>
+
+
+            <h1 class="signup-title">
+
+                Create your
+                <span class="signup-title-gradient">
+                    TrustNet account.
+                </span>
+
+            </h1>
+
+
+            <p class="signup-description">
+
+                Create your account with your email address
+                and start building your trusted identity on TrustNet.
+
+            </p>
+
+        </section>
+
+
+
+        <section class="signup-card">
+
+
+            <div class="signup-progress">
+
+                <div class="progress-line">
+
+                    <div
+                        class="progress-fill"
+                        id="progressFill"
+                    ></div>
+
+                </div>
+
+
+                <div
+                    class="progress-step active"
+                    data-step="1"
+                >
+
+                    <span class="progress-number">
+                        1
+                    </span>
+
+                    <span>
+                        Profile
+                    </span>
+
+                </div>
+
+
+                <div
+                    class="progress-step"
+                    data-step="2"
+                >
+
+                    <span class="progress-number">
+                        2
+                    </span>
+
+                    <span>
+                        Contact
+                    </span>
+
+                </div>
+
+
+                <div
+                    class="progress-step"
+                    data-step="3"
+                >
+
+                    <span class="progress-number">
+                        3
+                    </span>
+
+                    <span>
+                        Security
+                    </span>
+
+                </div>
+
+            </div>
+
+
+
+            <form
+                id="signupForm"
+                novalidate
+            >
+
+
+                <!-- ==========================
+                     STEP 1
+                =========================== -->
+
+                <div
+                    class="form-step active"
+                    data-step="1"
+                >
+
+                    <div class="step-header">
+
+                        <h2 class="step-title">
+                            Tell us about yourself
+                        </h2>
+
+                        <p class="step-description">
+                            Enter the name and username you want
+                            to use on TrustNet.
+                        </p>
+
+                    </div>
+
+
+                    <div class="form-grid">
+
+
+                        <div class="form-group full-width">
+
+                            <label
+                                class="form-label"
+                                for="fullName"
+                            >
+                                Full name
+                            </label>
+
+                            <input
+                                type="text"
+                                id="fullName"
+                                name="fullName"
+                                class="form-input"
+                                placeholder="Enter your full name"
+                                autocomplete="name"
+                                maxlength="100"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="form-group full-width">
+
+                            <label
+                                class="form-label"
+                                for="username"
+                            >
+                                Username
+                            </label>
+
+                            <input
+                                type="text"
+                                id="username"
+                                name="username"
+                                class="form-input"
+                                placeholder="Choose a username"
+                                autocomplete="username"
+                                maxlength="30"
+                                spellcheck="false"
+                                required
+                            >
+
+                            <p class="form-helper">
+                                3–30 characters. Letters, numbers,
+                                dots, underscores, and hyphens are allowed.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-actions">
+
+                        <span></span>
+
+                        <button
+                            type="button"
+                            class="form-button next-button"
+                            data-next="2"
+                        >
+
+                            <span class="button-text">
+                                Continue
+                            </span>
+
+                            <span class="button-arrow">
+                                →
+                            </span>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- ==========================
+                     STEP 2
+                =========================== -->
+
+                <div
+                    class="form-step"
+                    data-step="2"
+                >
+
+                    <div class="step-header">
+
+                        <h2 class="step-title">
+                            Your contact details
+                        </h2>
+
+                        <p class="step-description">
+                            Add your email, country, and phone number.
+                        </p>
+
+                    </div>
+
+
+                    <div class="form-grid">
+
+
+                        <div class="form-group full-width">
+
+                            <label
+                                class="form-label"
+                                for="email"
+                            >
+                                Email address
+                            </label>
+
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                class="form-input"
+                                placeholder="Enter your email address"
+                                autocomplete="email"
+                                maxlength="254"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="form-group full-width">
+
+                            <label
+                                class="form-label"
+                                for="country"
+                            >
+                                Country
+                            </label>
+
+                            <select
+                                id="country"
+                                name="country"
+                                class="form-select"
+                                autocomplete="country"
+                                required
+                            >
+
+                                <option value="">
+                                    Select your country
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="form-group full-width">
+
+                            <label
+                                class="form-label"
+                                for="phone"
+                            >
+                                Phone number
+                            </label>
+
+
+                            <div class="phone-row">
+
+                                <select
+                                    id="dialCode"
+                                    name="dialCode"
+                                    class="form-select"
+                                    autocomplete="tel-country-code"
+                                    required
+                                >
+
+                                    <option value="">
+                                        Code
+                                    </option>
+
+                                </select>
+
+
+                                <input
+                                    type="tel"
+                                    id="phone"
+                                    name="phone"
+                                    class="form-input"
+                                    placeholder="Phone number"
+                                    autocomplete="tel"
+                                    maxlength="20"
+                                    inputmode="tel"
+                                    required
+                                >
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-actions">
+
+                        <button
+                            type="button"
+                            class="form-button back-button"
+                            data-back="1"
+                        >
+                            ← Back
+                        </button>
+
+
+                        <button
+                            type="button"
+                            class="form-button next-button"
+                            data-next="3"
+                        >
+
+                            <span class="button-text">
+                                Continue
+                            </span>
+
+                            <span class="button-arrow">
+                                →
+                            </span>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- ==========================
+                     STEP 3
+                =========================== -->
+
+                <div
+                    class="form-step"
+                    data-step="3"
+                >
+
+                    <div class="step-header">
+
+                        <h2 class="step-title">
+                            Secure your account
+                        </h2>
+
+                        <p class="step-description">
+                            Choose a strong password and complete
+                            your profile information.
+                        </p>
+
+                    </div>
+
+
+                    <div class="form-grid">
+
+
+                        <div class="form-group full-width">
+
+                            <label
+                                class="form-label"
+                                for="password"
+                            >
+                                Password
+                            </label>
+
+
+                            <div class="password-wrapper">
+
+                                <input
+                                    type="password"
+                                    id="password"
+                                    name="password"
+                                    class="form-input"
+                                    placeholder="Create a password"
+                                    autocomplete="new-password"
+                                    minlength="8"
+                                    maxlength="128"
+                                    required
+                                >
+
+
+                                <button
+                                    type="button"
+                                    class="password-toggle"
+                                    data-target="password"
+                                    aria-label="Show password"
+                                >
+
+                                    <svg
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="1.8"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        aria-hidden="true"
+                                    >
+
+                                        <path
+                                            d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"
+                                        ></path>
+
+                                        <circle
+                                            cx="12"
+                                            cy="12"
+                                            r="2.8"
+                                        ></circle>
+
+                                    </svg>
+
+                                </button>
+
+                            </div>
+
+
+                            <p class="form-helper">
+                                Use at least 8 characters,
+                                including a letter and a number.
+                            </p>
+
+                        </div>
+
+
+
+                        <div class="form-group full-width">
+
+                            <label
+                                class="form-label"
+                                for="confirmPassword"
+                            >
+                                Confirm password
+                            </label>
+
+
+                            <div class="password-wrapper">
+
+                                <input
+                                    type="password"
+                                    id="confirmPassword"
+                                    name="confirmPassword"
+                                    class="form-input"
+                                    placeholder="Enter your password again"
+                                    autocomplete="new-password"
+                                    minlength="8"
+                                    maxlength="128"
+                                    required
+                                >
+
+
+                                <button
+                                    type="button"
+                                    class="password-toggle"
+                                    data-target="confirmPassword"
+                                    aria-label="Show password"
+                                >
+
+                                    <svg
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="1.8"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        aria-hidden="true"
+                                    >
+
+                                        <path
+                                            d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"
+                                        ></path>
+
+                                        <circle
+                                            cx="12"
+                                            cy="12"
+                                            r="2.8"
+                                        ></circle>
+
+                                    </svg>
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <div class="form-group full-width">
+
+                            <label
+                                class="form-label"
+                                for="gender"
+                            >
+                                Gender
+                            </label>
+
+                            <select
+                                id="gender"
+                                name="gender"
+                                class="form-select"
+                                required
+                            >
+
+                                <option value="">
+                                    Select your gender
+                                </option>
+
+                                <option value="male">
+                                    Male
+                                </option>
+
+                                <option value="female">
+                                    Female
+                                </option>
+
+                                <option value="other">
+                                    Other
+                                </option>
+
+                                <option value="prefer-not-to-say">
+                                    Prefer not to say
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+
+                        <div class="form-group full-width">
+
+                            <label class="form-label">
+                                Date of birth
+                            </label>
+
+
+                            <div class="birth-date-grid">
+
+                                <select
+                                    id="birthDay"
+                                    name="birthDay"
+                                    class="form-select"
+                                    aria-label="Birth day"
+                                    required
+                                >
+
+                                    <option value="">
+                                        Day
+                                    </option>
+
+                                </select>
+
+
+                                <select
+                                    id="birthMonth"
+                                    name="birthMonth"
+                                    class="form-select"
+                                    aria-label="Birth month"
+                                    required
+                                >
+
+                                    <option value="">
+                                        Month
+                                    </option>
+
+                                </select>
+
+
+                                <select
+                                    id="birthYear"
+                                    name="birthYear"
+                                    class="form-select"
+                                    aria-label="Birth year"
+                                    required
+                                >
+
+                                    <option value="">
+                                        Year
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <div class="checkbox-group">
+
+                            <input
+                                type="checkbox"
+                                id="terms"
+                                name="terms"
+                            >
+
+                            <label
+                                class="checkbox-label"
+                                for="terms"
+                            >
+                                I agree to create a TrustNet account
+                                and provide accurate information.
+                            </label>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        id="signupMessage"
+                        class="signup-message"
+                        role="status"
+                        aria-live="polite"
+                    ></div>
+
+
+                    <div class="form-actions">
+
+                        <button
+                            type="button"
+                            class="form-button back-button"
+                            data-back="2"
+                        >
+                            ← Back
+                        </button>
+
+
+                        <button
+                            type="submit"
+                            id="createAccountButton"
+                            class="form-button create-account-button"
+                        >
+
+                            <span class="button-text">
+                                Create Account
+                            </span>
+
+                            <span class="button-arrow">
+                                →
+                            </span>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+
+            <div class="security-note">
+
+                <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                >
+
+                    <rect
+                        x="4"
+                        y="10"
+                        width="16"
+                        height="11"
+                        rx="2"
+                    ></rect>
+
+                    <path
+                        d="M8 10V7a4 4 0 0 1 8 0v3"
+                    ></path>
+
+                </svg>
+
+                Secure authentication powered by Firebase.
+
+            </div>
+
+        </section>
+
+    </div>
+
+</main>
+
+
+<footer class="site-footer">
+
+    <div class="footer-inner">
+
+        <p class="footer-copy">
+            © 2026 TrustNet. All rights reserved.
+        </p>
+
+
+        <div class="footer-links">
+
+            <a href="/login.html">
+                Log in
+            </a>
+
+            <a href="/signup.html">
+                Sign up
+            </a>
+
+            <a href="/">
+                Home
+            </a>
 
         </div>
 
-      </header>
+    </div>
 
+</footer>
 
-      <!-- SIGNUP FORM -->
 
-      <form
-        id="signupForm"
-        class="signup-form"
-        novalidate
-      >
-
-        <!-- PERSONAL INFORMATION -->
-
-        <section class="form-section">
-
-          <div class="section-heading">
-
-            <span class="section-number">
-              01
-            </span>
-
-            <div>
-              <h2>Personal information</h2>
-
-              <p>
-                Tell us a little about yourself.
-              </p>
-            </div>
-
-          </div>
-
-
-          <!-- FULL NAME -->
-
-          <div class="field">
-
-            <label for="fullName">
-              Full name
-            </label>
-
-            <input
-              type="text"
-              id="fullName"
-              name="fullName"
-              autocomplete="name"
-              placeholder="Enter your full name"
-              maxlength="100"
-            >
-
-            <p
-              class="field-error"
-              id="fullNameError"
-            ></p>
-
-          </div>
-
-
-          <!-- DATE OF BIRTH -->
-
-          <div class="field">
-
-            <label for="dateOfBirth">
-              Date of birth
-            </label>
-
-            <input
-              type="date"
-              id="dateOfBirth"
-              name="dateOfBirth"
-              autocomplete="bday"
-            >
-
-            <p
-              class="field-error"
-              id="dateOfBirthError"
-            ></p>
-
-          </div>
-
-
-          <!-- GENDER -->
-
-          <div class="field">
-
-            <label for="gender">
-              Gender
-            </label>
-
-            <select
-              id="gender"
-              name="gender"
-            >
-
-              <option value="">
-                Select your gender
-              </option>
-
-              <option value="male">
-                Male
-              </option>
-
-              <option value="female">
-                Female
-              </option>
-
-              <option value="non-binary">
-                Non-binary
-              </option>
-
-              <option value="prefer-not-to-say">
-                Prefer not to say
-              </option>
-
-            </select>
-
-            <p
-              class="field-error"
-              id="genderError"
-            ></p>
-
-          </div>
-
-        </section>
-
-
-        <!-- ACCOUNT INFORMATION -->
-
-        <section class="form-section">
-
-          <div class="section-heading">
-
-            <span class="section-number">
-              02
-            </span>
-
-            <div>
-
-              <h2>
-                Account information
-              </h2>
-
-              <p>
-                Choose how you will be identified on GradeFlow.
-              </p>
-
-            </div>
-
-          </div>
-
-
-          <!-- EMAIL -->
-
-          <div class="field">
-
-            <label for="email">
-              Email address
-            </label>
-
-            <input
-              type="email"
-              id="email"
-              name="email"
-              autocomplete="email"
-              placeholder="you@example.com"
-              maxlength="254"
-            >
-
-            <p class="field-hint">
-              This will be used to sign in to GradeFlow.
-            </p>
-
-            <p
-              class="field-error"
-              id="emailError"
-            ></p>
-
-          </div>
-
-
-          <!-- USERNAME -->
-
-          <div class="field">
-
-            <label for="username">
-              Username
-            </label>
-
-            <div class="input-with-prefix">
-
-              <span>@</span>
-
-              <input
-                type="text"
-                id="username"
-                name="username"
-                autocomplete="username"
-                placeholder="yourusername"
-                maxlength="20"
-                spellcheck="false"
-                autocapitalize="none"
-              >
-
-            </div>
-
-            <p class="field-hint">
-              3–20 letters, numbers or underscores.
-            </p>
-
-            <p
-              class="username-status"
-              id="usernameStatus"
-              aria-live="polite"
-            ></p>
-
-            <p
-              class="field-error"
-              id="usernameError"
-            ></p>
-
-          </div>
-
-        </section>
-
-
-        <!-- EDUCATION -->
-
-        <section class="form-section">
-
-          <div class="section-heading">
-
-            <span class="section-number">
-              03
-            </span>
-
-            <div>
-
-              <h2>
-                Education
-              </h2>
-
-              <p>
-                Set your current education level.
-              </p>
-
-            </div>
-
-          </div>
-
-
-          <!-- CLASS -->
-
-          <div class="field">
-
-            <label for="class">
-              Class / education level
-            </label>
-
-            <select
-              id="class"
-              name="class"
-            >
-
-              <option value="">
-                Select your class
-              </option>
-
-            </select>
-
-            <p class="field-hint">
-              GradeFlow supports education systems worldwide.
-            </p>
-
-            <p
-              class="field-error"
-              id="classError"
-            ></p>
-
-          </div>
-
-        </section>
-
-
-        <!-- LOCATION -->
-
-        <section class="form-section">
-
-          <div class="section-heading">
-
-            <span class="section-number">
-              04
-            </span>
-
-            <div>
-
-              <h2>
-                Location
-              </h2>
-
-              <p>
-                Choose your country and phone number.
-              </p>
-
-            </div>
-
-          </div>
-
-
-          <!-- COUNTRY -->
-
-          <div class="field">
-
-            <label for="country">
-              Country
-            </label>
-
-            <select
-              id="country"
-              name="country"
-              autocomplete="country"
-            >
-
-              <option value="">
-                Select your country
-              </option>
-
-            </select>
-
-            <p
-              class="field-error"
-              id="countryError"
-            ></p>
-
-          </div>
-
-
-          <!-- PHONE -->
-
-          <div class="field">
-
-            <label for="phone">
-              Phone number
-            </label>
-
-            <div class="phone-input">
-
-              <div
-                class="phone-country"
-                aria-hidden="true"
-              >
-
-                <span id="countryFlag">
-                  🌐
-                </span>
-
-                <span id="countryDialCode">
-                  +
-                </span>
-
-              </div>
-
-              <input
-                type="tel"
-                id="phone"
-                name="phone"
-                autocomplete="tel-national"
-                placeholder="Phone number"
-                inputmode="tel"
-                maxlength="20"
-              >
-
-            </div>
-
-            <p class="field-hint">
-              Your country code will be added automatically.
-            </p>
-
-            <p
-              class="field-error"
-              id="phoneError"
-            ></p>
-
-          </div>
-
-        </section>
-
-
-        <!-- SECURITY -->
-
-        <section class="form-section">
-
-          <div class="section-heading">
-
-            <span class="section-number">
-              05
-            </span>
-
-            <div>
-
-              <h2>
-                Secure your account
-              </h2>
-
-              <p>
-                Create a strong password.
-              </p>
-
-            </div>
-
-          </div>
-
-
-          <!-- PASSWORD -->
-
-          <div class="field">
-
-            <label for="password">
-              Password
-            </label>
-
-            <div class="password-input">
-
-              <input
-                type="password"
-                id="password"
-                name="password"
-                autocomplete="new-password"
-                placeholder="Create a password"
-                maxlength="128"
-              >
-
-              <button
-                type="button"
-                class="password-toggle"
-                data-password-toggle="password"
-                aria-label="Show password"
-              >
-                Show
-              </button>
-
-            </div>
-
-            <div class="password-strength">
-
-              <div class="strength-track">
-
-                <div
-                  id="strengthBar"
-                  class="strength-bar"
-                ></div>
-
-              </div>
-
-              <span id="strengthText">
-                Password strength
-              </span>
-
-            </div>
-
-            <p class="field-hint">
-              Use at least 8 characters. A combination of letters, numbers and symbols is recommended.
-            </p>
-
-            <p
-              class="field-error"
-              id="passwordError"
-            ></p>
-
-          </div>
-
-
-          <!-- CONFIRM PASSWORD -->
-
-          <div class="field">
-
-            <label for="confirmPassword">
-              Confirm password
-            </label>
-
-            <div class="password-input">
-
-              <input
-                type="password"
-                id="confirmPassword"
-                name="confirmPassword"
-                autocomplete="new-password"
-                placeholder="Enter your password again"
-                maxlength="128"
-              >
-
-              <button
-                type="button"
-                class="password-toggle"
-                data-password-toggle="confirmPassword"
-                aria-label="Show password"
-              >
-                Show
-              </button>
-
-            </div>
-
-            <p
-              class="field-error"
-              id="confirmPasswordError"
-            ></p>
-
-          </div>
-
-        </section>
-
-
-        <!-- TERMS -->
-
-        <section class="terms-section">
-
-          <label class="terms-label">
-
-            <input
-              type="checkbox"
-              id="terms"
-              name="terms"
-            >
-
-            <span class="custom-checkbox"></span>
-
-            <span class="terms-text">
-
-              I agree to the
-              <a href="#">Terms of Service</a>
-              and
-              <a href="#">Privacy Policy</a>.
-
-            </span>
-
-          </label>
-
-          <p
-            class="field-error"
-            id="termsError"
-          ></p>
-
-        </section>
-
-
-        <!-- FORM MESSAGE -->
-
-        <div
-          id="formMessage"
-          class="form-message"
-          role="alert"
-          aria-live="polite"
-        ></div>
-
-
-        <!-- CREATE ACCOUNT -->
-
-        <button
-          type="submit"
-          id="createAccountButton"
-          class="create-account-button"
-        >
-
-          <span>
-            Create account
-          </span>
-
-          <span aria-hidden="true">
-            →
-          </span>
-
-        </button>
-
-
-        <!-- LOGIN -->
-
-        <p class="login-prompt">
-
-          Already have an account?
-
-          <a href="login.html">
-            Log in
-          </a>
-
-        </p>
-
-      </form>
-
-    </section>
-
-  </main>
-
-
-  <script
+<script
     type="module"
-    src="js/signup.js"
-  ></script>
-
-</body>
-
-</html>
+    src="/js/signup.js"
+></script>
+</body> </html>

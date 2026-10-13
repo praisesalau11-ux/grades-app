@@ -1,445 +1,750 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
+<!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-  >
-
-  <meta
-    name="theme-color"
-    content="#11110f"
-  >
-
-  <meta
+<meta
     name="description"
-    content="GradeFlow helps students calculate, understand, and track their academic progress."
-  >
+    content="TrustNet helps you understand who, what, and which information you can trust."
+>
 
-  <title>GradeFlow — Your Academic Progress</title>
+<meta name="theme-color" content="#020617">
 
-  <link rel="stylesheet" href="css/index.css">
-</head>
+<title>TrustNet — Know What to Trust</title>
 
-<body>
+<link rel="stylesheet" href="/css/index.css">
+</head> <body>
+<div class="page-background">
+    <div class="background-grid"></div>
 
-  <!-- ==========================================
-       PAGE LOADER
-       ========================================== -->
+    <div class="background-glow glow-one"></div>
+    <div class="background-glow glow-two"></div>
+    <div class="background-glow glow-three"></div>
+</div>
 
-  <div class="page-loader" id="pageLoader">
-    <div class="loader-mark">
-      <span>G</span>
+
+<header class="site-header" id="siteHeader">
+
+    <div class="header-inner">
+
+        <a href="/" class="brand" aria-label="TrustNet home">
+
+            <span class="brand-mark">
+                <span class="brand-mark-ring"></span>
+                <span class="brand-mark-core"></span>
+            </span>
+
+            <span class="brand-name">
+                Trust<span>Net</span>
+            </span>
+
+        </a>
+
+
+        <nav class="main-navigation">
+
+            <a href="#how-it-works">
+                How It Works
+            </a>
+
+            <a href="#signals">
+                Trust Signals
+            </a>
+
+            <a href="#areas">
+                Explore
+            </a>
+
+        </nav>
+
+
+        <div class="header-actions">
+
+            <a href="/login.html" class="login-link">
+                Log in
+            </a>
+
+            <a href="/auth-choice.html" class="header-button">
+                Get Started
+            </a>
+
+        </div>
+
+
+        <button
+            class="menu-button"
+            id="menuButton"
+            type="button"
+            aria-label="Open navigation"
+            aria-expanded="false"
+        >
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
     </div>
 
-    <p>GradeFlow</p>
-  </div>
+
+    <nav
+        class="mobile-navigation"
+        id="mobileNavigation"
+        aria-hidden="true"
+    >
+
+        <a href="#how-it-works">
+            How It Works
+        </a>
+
+        <a href="#signals">
+            Trust Signals
+        </a>
+
+        <a href="#areas">
+            Explore
+        </a>
+
+        <a href="/login.html" class="mobile-login">
+            Log in
+        </a>
+
+        <a href="/auth-choice.html" class="mobile-signup">
+            Get Started
+        </a>
+
+    </nav>
+
+</header>
 
 
-  <!-- ==========================================
-       MAIN APP
-       ========================================== -->
-
-  <main class="landing-page">
-
-    <!-- ========================================
-         NAVIGATION
-         ======================================== -->
-
-    <header class="top-nav">
-
-      <a
-        href="index.html"
-        class="brand"
-        aria-label="GradeFlow home"
-      >
-        <span class="brand-symbol">G</span>
-
-        <span class="brand-name">
-          GradeFlow
-        </span>
-      </a>
-
-      <button
-        class="nav-explore"
-        id="navExplore"
-        type="button"
-      >
-        Explore
-        <span>↗</span>
-      </button>
-
-    </header>
-
-
-    <!-- ========================================
-         HERO
-         ======================================== -->
+<main>
 
     <section class="hero-section">
 
-      <div class="hero-copy">
+        <div class="section-container hero-container">
 
-        <p class="eyebrow">
-          A clearer way to understand your grades
-        </p>
+            <div class="hero-content">
 
-        <h1>
-          Your grades.
-          <span>Your progress.</span>
-        </h1>
-
-        <p class="hero-description">
-          GradeFlow gives you a simple place to calculate,
-          understand, and keep track of your academic progress.
-        </p>
-
-        <div class="hero-actions">
-
-          <a
-            href="screen.html"
-            class="primary-button"
-            id="continueButton"
-          >
-            <span>Continue with GradeFlow</span>
-            <span class="button-arrow">→</span>
-          </a>
-
-          <button
-            type="button"
-            class="secondary-button"
-            id="exploreButton"
-          >
-            <span>Explore GradeFlow</span>
-            <span>↓</span>
-          </button>
-
-        </div>
-
-        <div class="hero-note">
-          <span class="status-dot"></span>
-          Built for students who want clarity, not clutter.
-        </div>
-
-      </div>
+                <div class="hero-badge">
+                    <span class="badge-dot"></span>
+                    <span>Trust intelligence for the real world</span>
+                </div>
 
 
-      <!-- ========================================
-           3D VISUAL AREA
-           ======================================== -->
-
-      <div
-        class="hero-visual"
-        id="heroVisual"
-        aria-hidden="true"
-      >
-
-        <div class="visual-orbit orbit-one"></div>
-        <div class="visual-orbit orbit-two"></div>
-
-        <div class="depth-floor"></div>
+                <h1 class="hero-title">
+                    Know what
+                    <span class="hero-title-gradient">
+                        to trust.
+                    </span>
+                </h1>
 
 
-        <!-- Main grade card -->
+                <p class="hero-description">
+                    TrustNet helps you evaluate people, businesses,
+                    products, information, opportunities, and decisions
+                    using meaningful trust signals and explainable AI.
+                </p>
 
-        <div
-          class="grade-card main-card"
-          data-depth="18"
-        >
 
-          <div class="card-top">
-            <div>
-              <span class="mini-label">CURRENT TERM</span>
-              <strong>Academic Progress</strong>
+                <div class="hero-actions">
+
+                    <a
+                        href="/auth-choice.html"
+                        class="primary-button"
+                    >
+                        <span>Get Started</span>
+                        <span class="button-arrow">→</span>
+                    </a>
+
+                    <a
+                        href="#how-it-works"
+                        class="secondary-button"
+                    >
+                        See how it works
+                    </a>
+
+                </div>
+
+
+                <p class="hero-note">
+                    Free to create an account. No credit card required.
+                </p>
+
             </div>
 
-            <span class="card-menu">•••</span>
-          </div>
 
-          <div class="grade-number">
-            <span>3.82</span>
-            <small>/ 4.00</small>
-          </div>
+            <div class="hero-visual" aria-hidden="true">
 
-          <div class="progress-track">
-            <div class="progress-fill"></div>
-          </div>
-
-          <div class="card-bottom">
-            <span>GPA</span>
-            <span class="positive">+0.24</span>
-          </div>
-
-        </div>
+                <div class="visual-orbit orbit-one"></div>
+                <div class="visual-orbit orbit-two"></div>
+                <div class="visual-orbit orbit-three"></div>
 
 
-        <!-- Floating subject card -->
+                <div class="trust-core">
 
-        <div
-          class="floating-card subject-card"
-          data-depth="28"
-        >
+                    <div class="trust-core-inner">
+                        <span class="trust-core-check">✓</span>
+                        <span class="trust-core-label">TRUST</span>
+                    </div>
 
-          <div class="subject-icon">
-            A
-          </div>
-
-          <div class="subject-info">
-            <strong>Mathematics</strong>
-            <span>Excellent progress</span>
-          </div>
-
-          <div class="subject-grade">
-            A
-          </div>
-
-        </div>
+                </div>
 
 
-        <!-- Floating result card -->
+                <div class="floating-card card-top">
 
-        <div
-          class="floating-card result-card"
-          data-depth="38"
-        >
+                    <div class="floating-card-icon">
+                        ✓
+                    </div>
 
-          <span class="result-label">
-            LAST RESULT
-          </span>
+                    <div>
+                        <strong>Identity</strong>
+                        <span>Verified</span>
+                    </div>
 
-          <strong>
-            86%
-          </strong>
-
-          <span>
-            Overall score
-          </span>
-
-        </div>
+                </div>
 
 
-        <!-- Floating graph -->
+                <div class="floating-card card-right">
 
-        <div
-          class="floating-card graph-card"
-          data-depth="32"
-        >
+                    <div class="floating-card-icon">
+                        ↗
+                    </div>
 
-          <div class="graph-heading">
-            <span>Progress</span>
-            <span>2026</span>
-          </div>
+                    <div>
+                        <strong>Evidence</strong>
+                        <span>Strong signal</span>
+                    </div>
 
-          <div class="mini-graph">
+                </div>
 
-            <span class="graph-line line-one"></span>
-            <span class="graph-line line-two"></span>
 
-            <i></i>
-            <i></i>
-            <i></i>
-            <i></i>
-            <i></i>
+                <div class="floating-card card-bottom">
 
-          </div>
+                    <div class="floating-card-icon">
+                        ◈
+                    </div>
+
+                    <div>
+                        <strong>Analysis</strong>
+                        <span>AI evaluated</span>
+                    </div>
+
+                </div>
+
+
+                <span class="visual-particle particle-one"></span>
+                <span class="visual-particle particle-two"></span>
+                <span class="visual-particle particle-three"></span>
+                <span class="visual-particle particle-four"></span>
+
+            </div>
 
         </div>
-
-
-        <!-- Small decorative blocks -->
-
-        <div
-          class="floating-block block-one"
-          data-depth="45"
-        >
-          +
-        </div>
-
-        <div
-          class="floating-block block-two"
-          data-depth="52"
-        >
-          A
-        </div>
-
-      </div>
 
     </section>
 
 
-    <!-- ========================================
-         TRUST / INTRO STRIP
-         ======================================== -->
+    <section class="statement-section">
 
-    <section class="intro-strip">
+        <div class="section-container statement-container">
 
-      <div class="strip-item">
-        <strong>01</strong>
-        <span>Calculate</span>
-      </div>
+            <p class="section-label">
+                THE TRUST PROBLEM
+            </p>
 
-      <div class="strip-line"></div>
+            <h2>
+                The internet gives you
+                <span>more choices than certainty.</span>
+            </h2>
 
-      <div class="strip-item">
-        <strong>02</strong>
-        <span>Understand</span>
-      </div>
+            <p>
+                A rating alone does not tell the whole story.
+                TrustNet looks deeper, connecting signals and evidence
+                to help you make better-informed decisions.
+            </p>
 
-      <div class="strip-line"></div>
-
-      <div class="strip-item">
-        <strong>03</strong>
-        <span>Track</span>
-      </div>
+        </div>
 
     </section>
 
 
-    <!-- ========================================
-         EXPLORE SECTION
-         ======================================== -->
+    <section class="how-section" id="how-it-works">
 
-    <section
-      class="explore-section"
-      id="exploreSection"
-    >
+        <div class="section-container">
 
-      <div class="section-heading">
+            <div class="section-header">
 
-        <p class="eyebrow">
-          Explore GradeFlow
-        </p>
+                <div>
 
-        <h2>
-          Everything you need to
-          <span>see your progress clearly.</span>
-        </h2>
+                    <p class="section-label">
+                        HOW IT WORKS
+                    </p>
 
-        <p>
-          GradeFlow is being designed around one simple idea:
-          your academic information should be easy to understand
-          and easy to act on.
-        </p>
+                    <h2>
+                        From uncertainty
+                        <span>to clarity.</span>
+                    </h2>
 
-      </div>
+                </div>
+
+                <p class="section-header-description">
+                    TrustNet turns scattered information into
+                    understandable trust intelligence.
+                </p>
+
+            </div>
 
 
-      <div class="feature-grid">
+            <div class="process-grid">
 
-        <article class="feature-card">
+                <article class="process-card">
 
-          <span class="feature-number">01</span>
+                    <span class="process-number">
+                        01
+                    </span>
 
-          <div class="feature-icon">
-            %
-          </div>
+                    <div class="process-icon">
+                        ◉
+                    </div>
 
-          <h3>
-            Calculate
-          </h3>
+                    <h3>
+                        Find
+                    </h3>
 
-          <p>
-            Enter your subjects and scores and get your
-            academic results without unnecessary complexity.
-          </p>
+                    <p>
+                        Search for a person, business, product,
+                        opportunity, service, or information.
+                    </p>
 
-        </article>
-
-
-        <article class="feature-card">
-
-          <span class="feature-number">02</span>
-
-          <div class="feature-icon">
-            ↗
-          </div>
-
-          <h3>
-            Understand
-          </h3>
-
-          <p>
-            See how individual subjects affect your overall
-            performance and identify where you are improving.
-          </p>
-
-        </article>
+                </article>
 
 
-        <article class="feature-card">
+                <article class="process-card featured">
 
-          <span class="feature-number">03</span>
+                    <span class="process-number">
+                        02
+                    </span>
 
-          <div class="feature-icon">
-            ◷
-          </div>
+                    <div class="process-icon">
+                        ◈
+                    </div>
 
-          <h3>
-            Track
-          </h3>
+                    <h3>
+                        Analyze
+                    </h3>
 
-          <p>
-            Keep your academic history organized so your
-            progress does not disappear after one calculation.
-          </p>
+                    <p>
+                        TrustNet examines relevant signals,
+                        patterns, evidence, and available history.
+                    </p>
 
-        </article>
-
-      </div>
+                </article>
 
 
-      <div class="explore-cta">
+                <article class="process-card">
 
-        <div>
-          <span class="mini-label">
-            READY WHEN YOU ARE
-          </span>
+                    <span class="process-number">
+                        03
+                    </span>
 
-          <h3>
-            Start building your academic record.
-          </h3>
+                    <div class="process-icon">
+                        ✓
+                    </div>
+
+                    <h3>
+                        Understand
+                    </h3>
+
+                    <p>
+                        Get a clear explanation of what looks
+                        trustworthy, uncertain, or risky.
+                    </p>
+
+                </article>
+
+            </div>
+
         </div>
 
-        <a
-          href="screen.html"
-          class="primary-button small-button"
-        >
-          Continue
-          <span class="button-arrow">→</span>
+    </section>
+
+
+    <section class="signals-section" id="signals">
+
+        <div class="section-container">
+
+            <div class="signals-layout">
+
+                <div class="signals-content">
+
+                    <p class="section-label">
+                        TRUST SIGNALS
+                    </p>
+
+                    <h2>
+                        Trust should be
+                        <span>explainable.</span>
+                    </h2>
+
+                    <p>
+                        TrustNet is designed to go beyond a simple
+                        number. Instead, it can show the signals behind
+                        an assessment so you can understand why something
+                        appears trustworthy or uncertain.
+                    </p>
+
+
+                    <a
+                        href="/auth-choice.html"
+                        class="text-button"
+                    >
+                        Explore TrustNet
+                        <span>→</span>
+                    </a>
+
+                </div>
+
+
+                <div class="signal-panel">
+
+                    <div class="signal-panel-header">
+
+                        <div>
+                            <span>Trust analysis</span>
+                            <strong>Example assessment</strong>
+                        </div>
+
+                        <span class="analysis-status">
+                            ANALYZED
+                        </span>
+
+                    </div>
+
+
+                    <div class="score-area">
+
+                        <div class="score-circle">
+
+                            <div>
+                                <strong>86</strong>
+                                <span>/100</span>
+                            </div>
+
+                        </div>
+
+
+                        <div class="score-description">
+
+                            <span class="score-status">
+                                Strong signals
+                            </span>
+
+                            <p>
+                                Multiple positive indicators found.
+                                Always review the evidence before making
+                                an important decision.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="signal-list">
+
+                        <div class="signal-row">
+
+                            <span class="signal-name">
+                                Identity verification
+                            </span>
+
+                            <span class="signal-value positive">
+                                Verified
+                            </span>
+
+                        </div>
+
+
+                        <div class="signal-row">
+
+                            <span class="signal-name">
+                                Account history
+                            </span>
+
+                            <span class="signal-value positive">
+                                Strong
+                            </span>
+
+                        </div>
+
+
+                        <div class="signal-row">
+
+                            <span class="signal-name">
+                                Transaction pattern
+                            </span>
+
+                            <span class="signal-value positive">
+                                Healthy
+                            </span>
+
+                        </div>
+
+
+                        <div class="signal-row">
+
+                            <span class="signal-name">
+                                Evidence confidence
+                            </span>
+
+                            <span class="signal-value neutral">
+                                High
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <section class="areas-section" id="areas">
+
+        <div class="section-container">
+
+            <div class="section-header centered">
+
+                <p class="section-label">
+                    TRUSTNET
+                </p>
+
+                <h2>
+                    One platform.
+                    <span>Many trust decisions.</span>
+                </h2>
+
+                <p class="section-header-description">
+                    Built to help people navigate the parts of
+                    the digital world where trust matters.
+                </p>
+
+            </div>
+
+
+            <div class="areas-grid">
+
+                <article class="area-card">
+
+                    <div class="area-icon">
+                        ◉
+                    </div>
+
+                    <h3>
+                        People
+                    </h3>
+
+                    <p>
+                        Understand profiles, identity signals,
+                        reputation, and activity.
+                    </p>
+
+                </article>
+
+
+                <article class="area-card">
+
+                    <div class="area-icon">
+                        ◆
+                    </div>
+
+                    <h3>
+                        Businesses
+                    </h3>
+
+                    <p>
+                        Evaluate businesses using available
+                        reputation and activity signals.
+                    </p>
+
+                </article>
+
+
+                <article class="area-card">
+
+                    <div class="area-icon">
+                        ◇
+                    </div>
+
+                    <h3>
+                        Products
+                    </h3>
+
+                    <p>
+                        Investigate listings, pricing patterns,
+                        evidence, and product signals.
+                    </p>
+
+                </article>
+
+
+                <article class="area-card">
+
+                    <div class="area-icon">
+                        ◎
+                    </div>
+
+                    <h3>
+                        Information
+                    </h3>
+
+                    <p>
+                        Examine claims and available evidence
+                        before relying on information.
+                    </p>
+
+                </article>
+
+
+                <article class="area-card">
+
+                    <div class="area-icon">
+                        ↗
+                    </div>
+
+                    <h3>
+                        Opportunities
+                    </h3>
+
+                    <p>
+                        Evaluate jobs, services, offers,
+                        and other opportunities.
+                    </p>
+
+                </article>
+
+
+                <article class="area-card">
+
+                    <div class="area-icon">
+                        ✦
+                    </div>
+
+                    <h3>
+                        Decisions
+                    </h3>
+
+                    <p>
+                        Bring relevant signals together when
+                        an important decision needs clarity.
+                    </p>
+
+                </article>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <section class="final-cta-section">
+
+        <div class="final-cta-glow"></div>
+
+        <div class="section-container">
+
+            <div class="final-cta">
+
+                <span class="final-cta-badge">
+                    Build with trust
+                </span>
+
+                <h2>
+                    Make better decisions
+                    <span>with better information.</span>
+                </h2>
+
+                <p>
+                    Create your TrustNet account and start exploring
+                    a smarter way to evaluate trust.
+                </p>
+
+
+                <div class="final-cta-actions">
+
+                    <a
+                        href="/auth-choice.html"
+                        class="primary-button large"
+                    >
+                        <span>Create your account</span>
+                        <span class="button-arrow">→</span>
+                    </a>
+
+                    <a
+                        href="/login.html"
+                        class="final-login"
+                    >
+                        Already have an account?
+                        <span>Log in</span>
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<footer class="site-footer">
+
+    <div class="section-container footer-inner">
+
+        <a href="/" class="brand">
+
+            <span class="brand-mark">
+                <span class="brand-mark-ring"></span>
+                <span class="brand-mark-core"></span>
+            </span>
+
+            <span class="brand-name">
+                Trust<span>Net</span>
+            </span>
+
         </a>
 
-      </div>
 
-    </section>
-
-
-    <!-- ========================================
-         FOOTER
-         ======================================== -->
-
-    <footer class="landing-footer">
-
-      <div class="footer-brand">
-        <span class="brand-symbol">G</span>
-        <span>GradeFlow</span>
-      </div>
-
-      <p>
-        Calculate. Understand. Track.
-      </p>
-
-      <span class="footer-year">
-        © <span id="currentYear"></span> GradeFlow
-      </span>
-
-    </footer>
-
-  </main>
+        <p>
+            © 2026 TrustNet. Built for better trust decisions.
+        </p>
 
 
-  <script type="module" src="js/index.js"></script>
+        <div class="footer-links">
 
-</body>
-</html>
+            <a href="/terms.html">
+                Terms
+            </a>
+
+            <a href="/privacy.html">
+                Privacy
+            </a>
+
+        </div>
+
+    </div>
+
+</footer>
+
+
+<script
+    type="module"
+    src="/js/index.js"
+></script>
+</body> </html>

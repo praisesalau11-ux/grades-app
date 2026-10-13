@@ -1,224 +1,387 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
 
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
 
-    <meta
-        name="description"
-        content="Log in to GradeFlow"
-    >
+<meta
+    name="theme-color"
+    content="#1E3A8A"
+>
 
-    <title>Log in — GradeFlow</title>
+<meta
+    name="description"
+    content="Log in to your TrustNet account."
+>
 
-    <link
-        rel="stylesheet"
-        href="css/login.css"
-    >
+<title>Login | TrustNet</title>
+
+<link
+    rel="stylesheet"
+    href="/css/login.css"
+>
 
 </head>
 
-
 <body>
 
-    <main class="login-page">
+<!-- ==========================================
+     BACKGROUND
+=========================================== -->
 
-        <section class="login-card">
+<div class="page-background">
 
-            <button
-                type="button"
-                id="backButton"
-                class="back-button"
-            >
-                ← Back
-            </button>
+    <div class="background-orb orb-one"></div>
+
+    <div class="background-orb orb-two"></div>
+
+    <div class="background-orb orb-three"></div>
+
+</div>
 
 
-            <div class="brand">
-                GradeFlow
+<!-- ==========================================
+     HEADER
+=========================================== -->
+
+<header class="auth-header">
+
+    <a
+        href="/"
+        class="brand"
+    >
+
+        <div class="brand-icon">
+            T
+        </div>
+
+        <span class="brand-name">
+            TrustNet
+        </span>
+
+    </a>
+
+
+    <a
+        href="/signup.html"
+        class="header-signup"
+    >
+        Create account
+    </a>
+
+</header>
+
+
+<!-- ==========================================
+     MAIN
+=========================================== -->
+
+<main class="login-container">
+
+
+    <!-- ======================================
+         LOGIN CARD
+    ======================================= -->
+
+    <section class="login-card">
+
+
+        <!-- Card Header -->
+
+        <div class="login-header">
+
+            <div class="login-icon">
+                T
+            </div>
+
+            <h1>
+                Welcome back
+            </h1>
+
+            <p>
+                Log in to your TrustNet account
+                and continue building your
+                trusted identity.
+            </p>
+
+        </div>
+
+
+        <!-- ==================================
+             LOGIN FORM
+        =================================== -->
+
+        <form
+            id="loginForm"
+            class="login-form"
+            novalidate
+        >
+
+
+            <!-- Email -->
+
+            <div class="form-group">
+
+                <label
+                    for="email"
+                >
+                    Email address
+                </label>
+
+                <div class="input-wrapper">
+
+                    <span class="input-icon">
+                        @
+                    </span>
+
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="Enter your email"
+                        autocomplete="email"
+                        required
+                    >
+
+                </div>
+
+                <small
+                    class="field-error"
+                    id="emailError"
+                ></small>
+
             </div>
 
 
-            <div class="heading">
+            <!-- Password -->
 
-                <h1>
-                    Welcome back
-                </h1>
+            <div class="form-group">
 
-                <p>
-                    Log in to continue to GradeFlow.
-                </p>
+                <div class="password-label-row">
+
+                    <label
+                        for="password"
+                    >
+                        Password
+                    </label>
+
+                </div>
+
+
+                <div class="input-wrapper">
+
+                    <span class="input-icon">
+                        •
+                    </span>
+
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Enter your password"
+                        autocomplete="current-password"
+                        required
+                    >
+
+                    <button
+                        type="button"
+                        class="password-toggle"
+                        id="passwordToggle"
+                        aria-label="Show password"
+                    >
+                        Show
+                    </button>
+
+                </div>
+
+                <small
+                    class="field-error"
+                    id="passwordError"
+                ></small>
 
             </div>
 
 
+            <!-- Forgot Password -->
+
+            <div class="form-options">
+
+                <label class="remember-option">
+
+                    <input
+                        type="checkbox"
+                        id="rememberMe"
+                    >
+
+                    <span>
+                        Remember me
+                    </span>
+
+                </label>
+
+
+                <a
+                    href="#"
+                    id="forgotPassword"
+                    class="forgot-password"
+                >
+                    Forgot password?
+                </a>
+
+            </div>
+
+
+            <!-- Message -->
+
+            <div
+                id="loginMessage"
+                class="login-message"
+                role="alert"
+                aria-live="polite"
+            ></div>
+
+
+            <!-- Login Button -->
+
             <button
-                type="button"
-                id="googleLogin"
-                class="google-login"
+                type="submit"
+                id="loginButton"
+                class="login-button"
             >
 
-                <span class="google-icon">
-                    G
+                <span
+                    class="button-text"
+                >
+                    Log in
                 </span>
 
-                <span class="google-content">
-
-                    <strong>
-                        Continue with Google
-                    </strong>
-
-                    <small>
-                        Use your Google account
-                    </small>
-
-                </span>
-
-                <span class="google-arrow">
+                <span
+                    class="button-arrow"
+                >
                     →
                 </span>
 
             </button>
 
 
-            <div class="divider">
-
-                <span></span>
-
-                <small>
-                    OR
-                </small>
-
-                <span></span>
-
-            </div>
+        </form>
 
 
-            <form
-                id="loginForm"
-                novalidate
-            >
+        <!-- ==================================
+             DIVIDER
+        =================================== -->
 
-                <div class="field">
+        <div class="auth-divider">
 
-                    <label for="email">
-                        Email
-                    </label>
+            <span></span>
 
-                    <input
-                        id="email"
-                        name="email"
-                        type="email"
-                        autocomplete="email"
-                        placeholder="you@example.com"
-                    >
-
-                    <small
-                        id="emailError"
-                        class="field-error"
-                    ></small>
-
-                </div>
-
-
-                <div class="field">
-
-                    <label for="password">
-                        Password
-                    </label>
-
-                    <div class="password-wrap">
-
-                        <input
-                            id="password"
-                            name="password"
-                            type="password"
-                            autocomplete="current-password"
-                            placeholder="Enter your password"
-                        >
-
-                        <button
-                            type="button"
-                            id="passwordToggle"
-                            class="password-toggle"
-                        >
-                            Show
-                        </button>
-
-                    </div>
-
-                    <small
-                        id="passwordError"
-                        class="field-error"
-                    ></small>
-
-                </div>
-
-
-                <div class="forgot-row">
-
-                    <button
-                        type="button"
-                        id="forgotPassword"
-                        class="forgot-password"
-                    >
-                        Forgot password?
-                    </button>
-
-                </div>
-
-
-                <button
-                    type="submit"
-                    id="loginButton"
-                    class="login-button"
-                >
-
-                    <span>
-                        Log in
-                    </span>
-
-                    <span>
-                        →
-                    </span>
-
-                </button>
-
-
-                <div
-                    id="loginMessage"
-                    class="login-message"
-                    role="status"
-                ></div>
-
-            </form>
-
-
-            <p class="signup-link">
-
-                Don't have an account?
-
-                <a href="choice.html">
-                    Create an account
-                </a>
-
+            <p>
+                or
             </p>
 
-        </section>
+            <span></span>
 
-    </main>
+        </div>
 
 
-    <script
-        type="module"
-        src="js/login.js"
-    ></script>
+        <!-- ==================================
+             GOOGLE LOGIN
+        =================================== -->
+
+        <button
+            type="button"
+            id="googleLoginButton"
+            class="google-button"
+        >
+
+            <span class="google-icon">
+                G
+            </span>
+
+            <span>
+                Continue with Google
+            </span>
+
+        </button>
+
+
+        <!-- ==================================
+             SIGNUP
+        =================================== -->
+
+        <div class="signup-prompt">
+
+            <span>
+                Don't have a TrustNet account?
+            </span>
+
+            <a href="/signup.html">
+                Create one
+            </a>
+
+        </div>
+
+
+    </section>
+
+
+    <!-- ======================================
+         TRUST MESSAGE
+    ======================================= -->
+
+    <div class="security-note">
+
+        <span class="security-icon">
+            ✓
+        </span>
+
+        <p>
+            Your account information is protected
+            by Firebase Authentication.
+        </p>
+
+    </div>
+
+
+</main>
+
+
+<!-- ==========================================
+     FOOTER
+=========================================== -->
+
+<footer class="auth-footer">
+
+    <p>
+        © 2026 TrustNet. All rights reserved.
+    </p>
+
+    <div class="footer-links">
+
+        <a href="/">
+            Home
+        </a>
+
+    </div>
+
+</footer>
+
+
+<!-- ==========================================
+     JAVASCRIPT
+=========================================== -->
+
+<script
+    type="module"
+    src="/js/login.js"
+></script>
 
 </body>
 
