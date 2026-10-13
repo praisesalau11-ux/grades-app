@@ -1,1607 +1,474 @@
-<!DOCTYPE html> <html lang="en"> <head>
-<meta charset="UTF-8">
-
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
->
-
-<meta
-    name="theme-color"
-    content="#1E3A8A"
->
-
-<meta
-    name="description"
-    content="TrustNet — Your intelligent trust and discovery platform."
->
-
-<title>TrustNet — Dashboard</title>
-
-<link
-    rel="stylesheet"
-    href="/css/dashboard.css"
->
-</head> <body>
-<!-- ==========================================
-     TRUSTNET DASHBOARD
-=========================================== -->
-
-<div class="dashboard-app">
-
-
-    <!-- ======================================
-         SIDEBAR
-    ======================================= -->
-
-    <aside
-        class="sidebar"
-        id="sidebar"
-    >
-
-        <!-- BRAND -->
-
-        <div class="sidebar-brand">
-
-            <a
-                href="/dashboard.html"
-                class="brand-link"
-            >
-
-                <div class="brand-symbol">
-                    T
-                </div>
-
-                <div class="brand-text">
-
-                    <span class="brand-name">
-                        TrustNet
-                    </span>
-
-                    <span class="brand-tagline">
-                        Trust Intelligence
-                    </span>
-
-                </div>
-
-            </a>
-
-
-            <button
-                type="button"
-                class="sidebar-close"
-                id="sidebarClose"
-                aria-label="Close navigation"
-            >
-                ×
-            </button>
-
-        </div>
-
-
-        <!-- ==================================
-             MAIN NAVIGATION
-        =================================== -->
-
-        <nav
-            class="sidebar-navigation"
-            aria-label="Main navigation"
-        >
-
-            <div class="navigation-section">
-
-                <span class="navigation-label">
-                    OVERVIEW
-                </span>
-
-
-                <a
-                    href="/dashboard.html"
-                    class="navigation-item active"
-                    data-page="dashboard"
-                >
-
-                    <span class="navigation-icon">
-                        ◈
-                    </span>
-
-                    <span class="navigation-text">
-                        Dashboard
-                    </span>
-
-                </a>
-
-
-                <a
-                    href="/pages/trust-score.html"
-                    class="navigation-item"
-                    data-page="trust-score"
-                >
-
-                    <span class="navigation-icon">
-                        ◇
-                    </span>
-
-                    <span class="navigation-text">
-                        Trust Score
-                    </span>
-
-                </a>
-
-
-                <a
-                    href="/pages/notifications.html"
-                    class="navigation-item"
-                    data-page="notifications"
-                >
-
-                    <span class="navigation-icon">
-                        ♢
-                    </span>
-
-                    <span class="navigation-text">
-                        Notifications
-                    </span>
-
-                    <span
-                        class="navigation-badge"
-                        id="notificationBadge"
-                    >
-                        0
-                    </span>
-
-                </a>
-
-            </div>
-
-
-            <div class="navigation-section">
-
-                <span class="navigation-label">
-                    DISCOVER
-                </span>
-
-
-                <a
-                    href="/pages/marketplace.html"
-                    class="navigation-item"
-                    data-page="marketplace"
-                >
-
-                    <span class="navigation-icon">
-                        ◫
-                    </span>
-
-                    <span class="navigation-text">
-                        Marketplace
-                    </span>
-
-                </a>
-
-
-                <a
-                    href="/pages/businesses.html"
-                    class="navigation-item"
-                    data-page="businesses"
-                >
-
-                    <span class="navigation-icon">
-                        ▣
-                    </span>
-
-                    <span class="navigation-text">
-                        Businesses
-                    </span>
-
-                </a>
-
-
-                <a
-                    href="/pages/people.html"
-                    class="navigation-item"
-                    data-page="people"
-                >
-
-                    <span class="navigation-icon">
-                        ◉
-                    </span>
-
-                    <span class="navigation-text">
-                        People
-                    </span>
-
-                </a>
-
-
-                <a
-                    href="/pages/products.html"
-                    class="navigation-item"
-                    data-page="products"
-                >
-
-                    <span class="navigation-icon">
-                        ◇
-                    </span>
-
-                    <span class="navigation-text">
-                        Products
-                    </span>
-
-                </a>
-
-
-                <a
-                    href="/pages/services.html"
-                    class="navigation-item"
-                    data-page="services"
-                >
-
-                    <span class="navigation-icon">
-                        ✦
-                    </span>
-
-                    <span class="navigation-text">
-                        Services
-                    </span>
-
-                </a>
-
-            </div>
-
-
-            <div class="navigation-section">
-
-                <span class="navigation-label">
-                    OPPORTUNITIES
-                </span>
-
-
-                <a
-                    href="/pages/jobs.html"
-                    class="navigation-item"
-                    data-page="jobs"
-                >
-
-                    <span class="navigation-icon">
-                        ▤
-                    </span>
-
-                    <span class="navigation-text">
-                        Jobs
-                    </span>
-
-                </a>
-
-
-                <a
-                    href="/pages/opportunities.html"
-                    class="navigation-item"
-                    data-page="opportunities"
-                >
-
-                    <span class="navigation-icon">
-                        ↗
-                    </span>
-
-                    <span class="navigation-text">
-                        Opportunities
-                    </span>
-
-                </a>
-
-
-                <a
-                    href="/pages/information.html"
-                    class="navigation-item"
-                    data-page="information"
-                >
-
-                    <span class="navigation-icon">
-                        i
-                    </span>
-
-                    <span class="navigation-text">
-                        Information
-                    </span>
-
-                </a>
-
-            </div>
-
-
-            <div class="navigation-section">
-
-                <span class="navigation-label">
-                    CONNECT
-                </span>
-
-
-                <a
-                    href="/pages/messages.html"
-                    class="navigation-item"
-                    data-page="messages"
-                >
-
-                    <span class="navigation-icon">
-                        ◌
-                    </span>
-
-                    <span class="navigation-text">
-                        Messages
-                    </span>
-
-                    <span
-                        class="navigation-badge"
-                        id="messageBadge"
-                    >
-                        0
-                    </span>
-
-                </a>
-
-
-                <a
-                    href="/pages/communities.html"
-                    class="navigation-item"
-                    data-page="communities"
-                >
-
-                    <span class="navigation-icon">
-                        ◎
-                    </span>
-
-                    <span class="navigation-text">
-                        Communities
-                    </span>
-
-                </a>
-
-
-                <a
-                    href="/pages/social.html"
-                    class="navigation-item"
-                    data-page="social"
-                >
-
-                    <span class="navigation-icon">
-                        ✧
-                    </span>
-
-                    <span class="navigation-text">
-                        Social
-                    </span>
-
-                </a>
-
-            </div>
-
-
-            <div class="navigation-section">
-
-                <span class="navigation-label">
-                    INTELLIGENCE
-                </span>
-
-
-                <a
-                    href="/pages/decisions.html"
-                    class="navigation-item"
-                    data-page="decisions"
-                >
-
-                    <span class="navigation-icon">
-                        ◈
-                    </span>
-
-                    <span class="navigation-text">
-                        Decisions
-                    </span>
-
-                </a>
-
-
-                <a
-                    href="/pages/ai-agents.html"
-                    class="navigation-item"
-                    data-page="ai-agents"
-                >
-
-                    <span class="navigation-icon">
-                        ✦
-                    </span>
-
-                    <span class="navigation-text">
-                        AI Agents
-                    </span>
-
-                    <span class="coming-badge">
-                        AI
-                    </span>
-
-                </a>
-
-            </div>
-
-        </nav>
-
-
-        <!-- ==================================
-             SIDEBAR FOOTER
-        =================================== -->
-
-        <div class="sidebar-footer">
-
-            <a
-                href="/pages/profile.html"
-                class="sidebar-profile"
-                id="sidebarProfile"
-            >
-
-                <div
-                    class="profile-avatar"
-                    id="sidebarAvatar"
-                >
-                    ?
-                </div>
-
-                <div class="sidebar-profile-info">
-
-                    <strong
-                        id="sidebarUserName"
-                    >
-                        Loading...
-                    </strong>
-
-                    <span>
-                        View profile
-                    </span>
-
-                </div>
-
-                <span class="profile-arrow">
-                    →
-                </span>
-
-            </a>
-
-
-            <a
-                href="/pages/settings.html"
-                class="navigation-item settings-link"
-            >
-
-                <span class="navigation-icon">
-                    ⚙
-                </span>
-
-                <span class="navigation-text">
-                    Settings
-                </span>
-
-            </a>
-
-        </div>
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#171714">
+  <meta name="description" content="Your GradeFlow academic dashboard">
+  <title>Dashboard | GradeFlow</title>
+
+  <link rel="stylesheet" href="css/dashboard.css">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <div class="app-shell">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <a href="dashboard.html" class="brand">
+        <span class="brand-mark">G</span>
+        <span class="brand-name">Grade<span>Flow</span></span>
+      </a>
+
+      <p class="sidebar-label">WORKSPACE</p>
+
+      <nav class="nav-list">
+        <a class="nav-link active" href="dashboard.html" aria-current="page">
+          <span class="nav-icon">▦</span>
+          <span>Dashboard</span>
+        </a>
+
+        <a class="nav-link" href="pages/calculator.html">
+          <span class="nav-icon">∑</span>
+          <span>Calculator</span>
+        </a>
+
+        <a class="nav-link" href="pages/subjects.html">
+          <span class="nav-icon">▤</span>
+          <span>Subjects &amp; Semesters</span>
+        </a>
+
+        <a class="nav-link" href="pages/history.html">
+          <span class="nav-icon">◷</span>
+          <span>History</span>
+        </a>
+
+        <a class="nav-link" href="pages/analytics.html">
+          <span class="nav-icon">⌁</span>
+          <span>Analytics</span>
+        </a>
+
+        <a class="nav-link" href="pages/goals.html">
+          <span class="nav-icon">◎</span>
+          <span>Goals</span>
+        </a>
+
+        <a class="nav-link" href="pages/reports.html">
+          <span class="nav-icon">▧</span>
+          <span>Reports</span>
+        </a>
+      </nav>
+
+      <p class="sidebar-label">LEARNING COMMUNITY</p>
+
+      <nav class="nav-list">
+        <a class="nav-link" href="pages/community.html">
+          <span class="nav-icon">◌</span>
+          <span>Community</span>
+        </a>
+
+        <a class="nav-link" href="pages/messages.html">
+          <span class="nav-icon">▱</span>
+          <span>Messages</span>
+        </a>
+
+        <a class="nav-link" href="pages/study-groups.html">
+          <span class="nav-icon">♧</span>
+          <span>Study Groups</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-spacer"></div>
+
+      <div class="sidebar-note">
+        <span class="sidebar-note-icon">✦</span>
+        <p class="sidebar-note-title">Small steps. Better results.</p>
+        <p class="sidebar-note-copy">
+          Build a clearer picture of your academic progress.
+        </p>
+      </div>
+
+      <p class="sidebar-label">PERSONAL</p>
+
+      <nav class="nav-list">
+        <a class="nav-link" href="pages/ai-assistant.html">
+          <span class="nav-icon">✧</span>
+          <span>AI Academic Assistant</span>
+        </a>
+
+        <a class="nav-link" href="pages/notifications.html">
+          <span class="nav-icon">♧</span>
+          <span>Notifications</span>
+          <span class="nav-count" id="notificationCount" hidden>0</span>
+        </a>
+
+        <a class="nav-link" href="pages/settings.html">
+          <span class="nav-icon">⚙</span>
+          <span>Settings</span>
+        </a>
+      </nav>
+
+      <button class="account-switcher" id="accountSwitcher" type="button">
+        <span class="avatar" id="sidebarAvatar">G</span>
+
+        <span class="account-text">
+          <span class="account-name" id="sidebarUserName">Your account</span>
+          <span class="account-role" id="sidebarUserRole">Student workspace</span>
+        </span>
+
+        <span class="account-menu-icon">⋯</span>
+      </button>
     </aside>
 
+    <!-- MOBILE SIDEBAR BACKDROP -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop" hidden></div>
 
-    <!-- ======================================
-         SIDEBAR OVERLAY
-    ======================================= -->
-
-    <div
-        class="sidebar-overlay"
-        id="sidebarOverlay"
-    ></div>
-
-
-    <!-- ======================================
-         MAIN CONTENT
-    ======================================= -->
-
+    <!-- MAIN DASHBOARD AREA -->
     <main class="main-content">
 
-
-        <!-- ==================================
-             TOP HEADER
-        =================================== -->
-
-        <header class="dashboard-header">
-
-            <div class="header-left">
-
-                <button
-                    type="button"
-                    class="menu-button"
-                    id="menuButton"
-                    aria-label="Open navigation"
-                >
-                    ☰
-                </button>
-
-
-                <div class="header-search">
-
-                    <span class="search-icon">
-                        ⌕
-                    </span>
-
-                    <input
-                        type="search"
-                        id="globalSearch"
-                        placeholder="Search TrustNet..."
-                        autocomplete="off"
-                    >
-
-                    <span class="search-shortcut">
-                        /
-                    </span>
-
-                </div>
-
-            </div>
-
-
-            <div class="header-actions">
-
-                <button
-                    type="button"
-                    class="header-action"
-                    id="quickCheckButton"
-                    aria-label="Quick trust check"
-                >
-
-                    <span>
-                        ✦
-                    </span>
-
-                    <span class="quick-check-text">
-                        Quick Check
-                    </span>
-
-                </button>
-
-
-                <a
-                    href="/pages/notifications.html"
-                    class="header-icon-button"
-                    aria-label="Notifications"
-                >
-
-                    <span>
-                        ♢
-                    </span>
-
-                    <span
-                        class="header-notification-dot"
-                        id="headerNotificationDot"
-                    ></span>
-
-                </a>
-
-
-                <a
-                    href="/pages/messages.html"
-                    class="header-icon-button"
-                    aria-label="Messages"
-                >
-
-                    <span>
-                        ◌
-                    </span>
-
-                </a>
-
-
-                <a
-                    href="/pages/profile.html"
-                    class="header-user"
-                    id="headerUser"
-                >
-
-                    <div
-                        class="header-avatar"
-                        id="headerAvatar"
-                    >
-                        ?
-                    </div>
-
-                    <div class="header-user-info">
-
-                        <strong
-                            id="headerUserName"
-                        >
-                            Loading...
-                        </strong>
-
-                        <span>
-                            Account
-                        </span>
-
-                    </div>
-
-                </a>
-
-            </div>
-
-        </header>
-
-
-        <!-- ==================================
-             DASHBOARD BODY
-        =================================== -->
-
-        <div class="dashboard-content">
-
-
-            <!-- =================================
-                 WELCOME HERO
-            ================================== -->
-
-            <section class="welcome-section">
-
-                <div class="welcome-content">
-
-                    <span class="welcome-eyebrow">
-                        YOUR TRUST INTELLIGENCE HUB
-                    </span>
-
-                    <h1>
-                        Welcome back,
-                        <span
-                            id="welcomeName"
-                            class="gradient-text"
-                        >
-                            there
-                        </span>
-                    </h1>
-
-                    <p>
-                        Explore information, people,
-                        businesses, products and
-                        opportunities with greater
-                        confidence.
-                    </p>
-
-                </div>
-
-
-                <div class="welcome-visual">
-
-                    <div class="orb orb-one"></div>
-
-                    <div class="orb orb-two"></div>
-
-                    <div class="orb orb-three"></div>
-
-                    <div class="trust-core">
-
-                        <div class="trust-core-ring"></div>
-
-                        <span class="trust-core-symbol">
-                            T
-                        </span>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-
-            <!-- =================================
-                 QUICK ACTIONS
-            ================================== -->
-
-            <section class="section-block">
-
-                <div class="section-heading">
-
-                    <div>
-
-                        <span class="section-kicker">
-                            QUICK ACTIONS
-                        </span>
-
-                        <h2>
-                            What do you want to check?
-                        </h2>
-
-                    </div>
-
-                </div>
-
-
-                <div class="quick-actions-grid">
-
-
-                    <a
-                        href="/pages/information.html"
-                        class="quick-action-card"
-                    >
-
-                        <div class="quick-action-icon">
-                            ◈
-                        </div>
-
-                        <div>
-
-                            <strong>
-                                Check Information
-                            </strong>
-
-                            <span>
-                                Examine claims, sources
-                                and content.
-                            </span>
-
-                        </div>
-
-                        <span class="card-arrow">
-                            →
-                        </span>
-
-                    </a>
-
-
-                    <a
-                        href="/pages/products.html"
-                        class="quick-action-card"
-                    >
-
-                        <div class="quick-action-icon">
-                            ◇
-                        </div>
-
-                        <div>
-
-                            <strong>
-                                Check a Product
-                            </strong>
-
-                            <span>
-                                Explore product and
-                                listing signals.
-                            </span>
-
-                        </div>
-
-                        <span class="card-arrow">
-                            →
-                        </span>
-
-                    </a>
-
-
-                    <a
-                        href="/pages/businesses.html"
-                        class="quick-action-card"
-                    >
-
-                        <div class="quick-action-icon">
-                            ▣
-                        </div>
-
-                        <div>
-
-                            <strong>
-                                Check a Business
-                            </strong>
-
-                            <span>
-                                Review business
-                                trust signals.
-                            </span>
-
-                        </div>
-
-                        <span class="card-arrow">
-                            →
-                        </span>
-
-                    </a>
-
-
-                    <a
-                        href="/pages/decisions.html"
-                        class="quick-action-card"
-                    >
-
-                        <div class="quick-action-icon">
-                            ✦
-                        </div>
-
-                        <div>
-
-                            <strong>
-                                Analyze a Decision
-                            </strong>
-
-                            <span>
-                                Compare evidence,
-                                risks and options.
-                            </span>
-
-                        </div>
-
-                        <span class="card-arrow">
-                            →
-                        </span>
-
-                    </a>
-
-                </div>
-
-            </section>
-
-
-            <!-- =================================
-                 TRUST OVERVIEW
-            ================================== -->
-
-            <section class="section-block">
-
-                <div class="section-heading">
-
-                    <div>
-
-                        <span class="section-kicker">
-                            YOUR TRUSTNET
-                        </span>
-
-                        <h2>
-                            Account overview
-                        </h2>
-
-                    </div>
-
-                    <a
-                        href="/pages/trust-score.html"
-                        class="section-link"
-                    >
-                        View details →
-                    </a>
-
-                </div>
-
-
-                <div class="overview-grid">
-
-
-                    <article class="overview-card">
-
-                        <div class="overview-card-top">
-
-                            <span class="overview-icon">
-                                ◈
-                            </span>
-
-                            <span class="overview-status">
-                                ACCOUNT
-                            </span>
-
-                        </div>
-
-                        <strong
-                            id="accountStatus"
-                            class="overview-value"
-                        >
-                            Active
-                        </strong>
-
-                        <span class="overview-label">
-                            Account status
-                        </span>
-
-                    </article>
-
-
-                    <article class="overview-card">
-
-                        <div class="overview-card-top">
-
-                            <span class="overview-icon">
-                                ✓
-                            </span>
-
-                            <span class="overview-status">
-                                PROFILE
-                            </span>
-
-                        </div>
-
-                        <strong
-                            id="profileStatus"
-                            class="overview-value"
-                        >
-                            Started
-                        </strong>
-
-                        <span class="overview-label">
-                            Profile completion
-                        </span>
-
-                    </article>
-
-
-                    <article class="overview-card">
-
-                        <div class="overview-card-top">
-
-                            <span class="overview-icon">
-                                ◇
-                            </span>
-
-                            <span class="overview-status">
-                                ACTIVITY
-                            </span>
-
-                        </div>
-
-                        <strong
-                            id="activityCount"
-                            class="overview-value"
-                        >
-                            0
-                        </strong>
-
-                        <span class="overview-label">
-                            Recent activities
-                        </span>
-
-                    </article>
-
-
-                    <article class="overview-card">
-
-                        <div class="overview-card-top">
-
-                            <span class="overview-icon">
-                                ♢
-                            </span>
-
-                            <span class="overview-status">
-                                ALERTS
-                            </span>
-
-                        </div>
-
-                        <strong
-                            id="alertCount"
-                            class="overview-value"
-                        >
-                            0
-                        </strong>
-
-                        <span class="overview-label">
-                            Important alerts
-                        </span>
-
-                    </article>
-
-                </div>
-
-            </section>
-
-
-            <!-- =================================
-                 DISCOVER
-            ================================== -->
-
-            <section class="section-block">
-
-                <div class="section-heading">
-
-                    <div>
-
-                        <span class="section-kicker">
-                            DISCOVER
-                        </span>
-
-                        <h2>
-                            Explore TrustNet
-                        </h2>
-
-                    </div>
-
-                </div>
-
-
-                <div class="discover-grid">
-
-
-                    <a
-                        href="/pages/marketplace.html"
-                        class="discover-card featured"
-                    >
-
-                        <div class="discover-card-glow"></div>
-
-                        <span class="discover-icon">
-                            ◫
-                        </span>
-
-                        <div class="discover-content">
-
-                            <span class="discover-category">
-                                MARKETPLACE
-                            </span>
-
-                            <h3>
-                                Buy and discover
-                                with more confidence.
-                            </h3>
-
-                            <p>
-                                Explore listings,
-                                sellers, products
-                                and trust signals.
-                            </p>
-
-                        </div>
-
-                        <span class="discover-arrow">
-                            →
-                        </span>
-
-                    </a>
-
-
-                    <a
-                        href="/pages/businesses.html"
-                        class="discover-card"
-                    >
-
-                        <span class="discover-icon">
-                            ▣
-                        </span>
-
-                        <div class="discover-content">
-
-                            <span class="discover-category">
-                                BUSINESSES
-                            </span>
-
-                            <h3>
-                                Understand who
-                                you're dealing with.
-                            </h3>
-
-                            <p>
-                                Explore business
-                                profiles and signals.
-                            </p>
-
-                        </div>
-
-                        <span class="discover-arrow">
-                            →
-                        </span>
-
-                    </a>
-
-
-                    <a
-                        href="/pages/people.html"
-                        class="discover-card"
-                    >
-
-                        <span class="discover-icon">
-                            ◉
-                        </span>
-
-                        <div class="discover-content">
-
-                            <span class="discover-category">
-                                PEOPLE
-                            </span>
-
-                            <h3>
-                                Discover people
-                                and profiles.
-                            </h3>
-
-                            <p>
-                                Understand available
-                                trust information.
-                            </p>
-
-                        </div>
-
-                        <span class="discover-arrow">
-                            →
-                        </span>
-
-                    </a>
-
-
-                    <a
-                        href="/pages/services.html"
-                        class="discover-card"
-                    >
-
-                        <span class="discover-icon">
-                            ✦
-                        </span>
-
-                        <div class="discover-content">
-
-                            <span class="discover-category">
-                                SERVICES
-                            </span>
-
-                            <h3>
-                                Find services
-                                with confidence.
-                            </h3>
-
-                            <p>
-                                Explore providers and
-                                relevant signals.
-                            </p>
-
-                        </div>
-
-                        <span class="discover-arrow">
-                            →
-                        </span>
-
-                    </a>
-
-
-                    <a
-                        href="/pages/jobs.html"
-                        class="discover-card"
-                    >
-
-                        <span class="discover-icon">
-                            ▤
-                        </span>
-
-                        <div class="discover-content">
-
-                            <span class="discover-category">
-                                JOBS
-                            </span>
-
-                            <h3>
-                                Explore opportunities.
-                            </h3>
-
-                            <p>
-                                Review job and
-                                opportunity information.
-                            </p>
-
-                        </div>
-
-                        <span class="discover-arrow">
-                            →
-                        </span>
-
-                    </a>
-
-
-                    <a
-                        href="/pages/information.html"
-                        class="discover-card"
-                    >
-
-                        <span class="discover-icon">
-                            i
-                        </span>
-
-                        <div class="discover-content">
-
-                            <span class="discover-category">
-                                INFORMATION
-                            </span>
-
-                            <h3>
-                                Investigate information.
-                            </h3>
-
-                            <p>
-                                Examine claims,
-                                sources and evidence.
-                            </p>
-
-                        </div>
-
-                        <span class="discover-arrow">
-                            →
-                        </span>
-
-                    </a>
-
-                </div>
-
-            </section>
-
-
-            <!-- =================================
-                 ACTIVITY + NOTIFICATIONS
-            ================================== -->
-
-            <section class="split-section">
-
-
-                <!-- RECENT ACTIVITY -->
-
-                <div class="panel-card">
-
-                    <div class="panel-heading">
-
-                        <div>
-
-                            <span class="section-kicker">
-                                ACTIVITY
-                            </span>
-
-                            <h2>
-                                Recent activity
-                            </h2>
-
-                        </div>
-
-                        <span class="panel-live">
-                            LIVE
-                        </span>
-
-                    </div>
-
-
-                    <div
-                        class="activity-list"
-                        id="activityList"
-                    >
-
-                        <div class="empty-state">
-
-                            <div class="empty-icon">
-                                ◇
-                            </div>
-
-                            <strong>
-                                No activity yet
-                            </strong>
-
-                            <p>
-                                Your TrustNet activity
-                                will appear here as
-                                you use the platform.
-                            </p>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <!-- NOTIFICATIONS -->
-
-                <div class="panel-card">
-
-                    <div class="panel-heading">
-
-                        <div>
-
-                            <span class="section-kicker">
-                                UPDATES
-                            </span>
-
-                            <h2>
-                                Notifications
-                            </h2>
-
-                        </div>
-
-                        <a
-                            href="/pages/notifications.html"
-                            class="panel-link"
-                        >
-                            View all
-                        </a>
-
-                    </div>
-
-
-                    <div
-                        class="notification-list"
-                        id="notificationList"
-                    >
-
-                        <div class="empty-state">
-
-                            <div class="empty-icon">
-                                ♢
-                            </div>
-
-                            <strong>
-                                You're all caught up
-                            </strong>
-
-                            <p>
-                                Important TrustNet
-                                updates will appear here.
-                            </p>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-
-            <!-- =================================
-                 AI / DECISION FEATURE
-            ================================== -->
-
-            <section class="intelligence-card">
-
-                <div class="intelligence-background">
-
-                    <div class="intelligence-orb orb-a"></div>
-                    <div class="intelligence-orb orb-b"></div>
-
-                </div>
-
-
-                <div class="intelligence-content">
-
-                    <span class="section-kicker">
-                        TRUST INTELLIGENCE
-                    </span>
-
-                    <h2>
-                        Have something you're
-                        unsure about?
-                    </h2>
-
-                    <p>
-                        TrustNet can help organize
-                        evidence, identify signals,
-                        compare information and
-                        surface questions worth
-                        investigating.
-                    </p>
-
-
-                    <div class="intelligence-actions">
-
-                        <a
-                            href="/pages/decisions.html"
-                            class="primary-button"
-                        >
-                            Analyze something
-                            <span>→</span>
-                        </a>
-
-                        <a
-                            href="/pages/information.html"
-                            class="secondary-button"
-                        >
-                            Explore information
-                        </a>
-
-                    </div>
-
-                </div>
-
-
-                <div class="intelligence-visual">
-
-                    <div class="intelligence-ring ring-one"></div>
-
-                    <div class="intelligence-ring ring-two"></div>
-
-                    <div class="intelligence-ring ring-three"></div>
-
-                    <div class="intelligence-center">
-                        T
-                    </div>
-
-                </div>
-
-            </section>
-
-
-            <!-- =================================
-                 FOOTER
-            ================================== -->
-
-            <footer class="dashboard-footer">
-
-                <div class="footer-brand">
-
-                    <span class="footer-symbol">
-                        T
-                    </span>
-
-                    <span>
-                        TrustNet
-                    </span>
-
-                </div>
-
-
-                <div class="footer-links">
-
-                    <a href="/pages/profile.html">
-                        Profile
-                    </a>
-
-                    <a href="/pages/settings.html">
-                        Settings
-                    </a>
-
-                    <a href="/pages/information.html">
-                        Help
-                    </a>
-
-                </div>
-
-
-                <span class="footer-copy">
-                    Trust intelligence for the connected world.
-                </span>
-
-            </footer>
-
-
-        </div>
-
-    </main>
-
-</div>
-
-
-<!-- ==========================================
-     QUICK CHECK MODAL
-=========================================== -->
-
-<div
-    class="modal-overlay"
-    id="quickCheckModal"
-    aria-hidden="true"
->
-
-    <div
-        class="quick-check-modal"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="quickCheckTitle"
-    >
-
-        <button
+      <!-- HEADER -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button
+            class="icon-button menu-toggle"
+            id="menuToggle"
             type="button"
-            class="modal-close"
-            id="quickCheckClose"
-            aria-label="Close"
-        >
-            ×
-        </button>
+            aria-label="Open navigation"
+            aria-expanded="false">
+            ☰
+          </button>
 
+          <div class="breadcrumb">
+            <span>Workspace</span>
+            <span>/</span>
+            <strong>Dashboard</strong>
+          </div>
+        </div>
 
-        <span class="modal-icon">
-            ✦
-        </span>
+        <div class="topbar-actions">
+          <span class="today-label" id="todayLabel">
+            Your academic overview
+          </span>
 
+          <a
+            class="icon-button notification-button"
+            href="pages/notifications.html"
+            aria-label="Notifications">
+            ♧
+            <span class="notification-dot" id="notificationDot" hidden></span>
+          </a>
 
-        <span class="section-kicker">
-            QUICK CHECK
-        </span>
+          <button
+            class="profile-button"
+            id="profileButton"
+            type="button"
+            aria-label="Open profile">
+            <span class="avatar avatar-small" id="headerAvatar">G</span>
+            <span class="profile-button-name" id="headerUserName">My profile</span>
+            <span>⌄</span>
+          </button>
+        </div>
+      </header>
 
+      <!-- DASHBOARD CONTENT -->
+      <div class="dashboard-content">
 
-        <h2 id="quickCheckTitle">
-            What do you want to check?
-        </h2>
+        <!-- WELCOME -->
+        <section class="welcome-row">
+          <div>
+            <p class="eyebrow">YOUR ACADEMIC WORKSPACE</p>
 
+            <h1 id="welcomeTitle">
+              Welcome back<span id="welcomeName"></span>.
+            </h1>
 
-        <p>
-            Choose what you want TrustNet to
-            help you investigate.
-        </p>
+            <p class="welcome-copy">
+              Your progress, organized in one place.
+              Keep moving toward your goals.
+            </p>
+          </div>
 
+          <a class="primary-button" href="pages/calculator.html">
+            <span>＋</span>
+            New calculation
+          </a>
+        </section>
 
-        <div class="quick-check-options">
+        <!-- ACADEMIC SUMMARY -->
+        <section class="metric-grid" aria-label="Academic summary">
 
+          <article class="metric-card">
+            <div class="metric-topline">
+              <span class="metric-label">Current GPA</span>
+              <span class="metric-symbol">◈</span>
+            </div>
 
-            <a
-                href="/pages/information.html"
-                class="quick-check-option"
-            >
+            <div class="metric-value" id="currentGpa">—</div>
+
+            <p class="metric-footnote" id="currentGpaNote">
+              Add or calculate grades to see your GPA.
+            </p>
+          </article>
+
+          <article class="metric-card">
+            <div class="metric-topline">
+              <span class="metric-label">Overall average</span>
+              <span class="metric-symbol">％</span>
+            </div>
+
+            <div class="metric-value" id="overallAverage">—</div>
+
+            <p class="metric-footnote" id="overallAverageNote">
+              Your average will appear when data is available.
+            </p>
+          </article>
+
+          <article class="metric-card">
+            <div class="metric-topline">
+              <span class="metric-label">Subjects tracked</span>
+              <span class="metric-symbol">▤</span>
+            </div>
+
+            <div class="metric-value" id="subjectsTracked">0</div>
+
+            <p class="metric-footnote" id="subjectsTrackedNote">
+              Subjects in your academic workspace.
+            </p>
+          </article>
+
+          <article class="metric-card metric-card-accent">
+            <div class="metric-topline">
+              <span class="metric-label">Active goals</span>
+              <span class="metric-symbol">◎</span>
+            </div>
+
+            <div class="metric-value" id="activeGoals">0</div>
+
+            <p class="metric-footnote" id="activeGoalsNote">
+              Set an academic goal to get started.
+            </p>
+          </article>
+
+        </section>
+
+        <!-- DASHBOARD PANELS -->
+        <div class="dashboard-grid">
+
+          <!-- PERFORMANCE -->
+          <section class="panel performance-panel">
+            <div class="panel-header">
+              <div>
+                <p class="eyebrow">YOUR PROGRESS</p>
+                <h2>Academic performance</h2>
+                <p class="panel-description">
+                  Your saved results over time.
+                </p>
+              </div>
+
+              <a class="text-link" href="pages/analytics.html">
+                View analytics →
+              </a>
+            </div>
+
+            <div
+              class="chart-area"
+              id="performanceChart"
+              role="img"
+              aria-label="Academic performance chart">
+
+              <div class="chart-empty-state" id="performanceEmptyState">
+                <span class="empty-state-icon">⌁</span>
+
+                <strong>Your progress will appear here</strong>
 
                 <span>
-                    ◈
+                  Save your first calculation to start tracking performance.
                 </span>
 
-                <strong>
-                    Information
-                </strong>
+                <a class="text-link" href="pages/calculator.html">
+                  Calculate grades →
+                </a>
+              </div>
 
-                <small>
-                    Claims, articles and sources
-                </small>
+            </div>
+          </section>
 
-            </a>
+          <!-- GOALS -->
+          <section class="panel goals-panel">
+            <div class="panel-header">
+              <div>
+                <p class="eyebrow">STAY ON TRACK</p>
+                <h2>Your goals</h2>
+              </div>
 
+              <a class="icon-text-link" href="pages/goals.html" aria-label="View goals">
+                ↗
+              </a>
+            </div>
 
-            <a
-                href="/pages/products.html"
-                class="quick-check-option"
-            >
+            <div class="goal-list" id="goalPreviewList">
+              <div class="list-empty-state">
+                <span class="empty-state-icon">◎</span>
+
+                <strong>No goals yet</strong>
 
                 <span>
-                    ◇
+                  Create an academic goal and track your progress here.
                 </span>
 
-                <strong>
-                    Product
-                </strong>
+                <a class="secondary-button" href="pages/goals.html">
+                  Create a goal
+                </a>
+              </div>
+            </div>
+          </section>
 
-                <small>
-                    Products and listings
-                </small>
+          <!-- RECENT CALCULATIONS -->
+          <section class="panel activity-panel">
+            <div class="panel-header">
+              <div>
+                <p class="eyebrow">RECENT WORK</p>
+                <h2>Recent calculations</h2>
+              </div>
 
-            </a>
+              <a class="text-link" href="pages/history.html">
+                View history →
+              </a>
+            </div>
 
+            <div class="activity-list" id="recentCalculations">
+              <div class="list-empty-state compact-empty-state">
+                <span class="empty-state-icon">◷</span>
 
-            <a
-                href="/pages/businesses.html"
-                class="quick-check-option"
-            >
+                <strong>No saved calculations</strong>
 
                 <span>
-                    ▣
+                  Your recent work will appear here after you save a result.
                 </span>
+              </div>
+            </div>
+          </section>
 
-                <strong>
-                    Business
-                </strong>
+          <!-- QUICK ACTIONS -->
+          <section class="panel quick-actions-panel">
+            <div class="panel-header">
+              <div>
+                <p class="eyebrow">GET STARTED</p>
+                <h2>Quick actions</h2>
+              </div>
+            </div>
 
-                <small>
-                    Businesses and providers
-                </small>
+            <div class="quick-action-list">
 
-            </a>
-
-
-            <a
-                href="/pages/decisions.html"
-                class="quick-check-option"
-            >
+              <a class="quick-action" href="pages/calculator.html">
+                <span class="quick-action-icon">∑</span>
 
                 <span>
-                    ✦
+                  <strong>Calculate grades</strong>
+                  <small>Work out an average or GPA</small>
                 </span>
 
-                <strong>
-                    Decision
-                </strong>
+                <span class="quick-action-arrow">→</span>
+              </a>
 
-                <small>
-                    Compare options and evidence
-                </small>
+              <a class="quick-action" href="pages/subjects.html">
+                <span class="quick-action-icon">＋</span>
 
-            </a>
+                <span>
+                  <strong>Add a subject</strong>
+                  <small>Organize your courses and terms</small>
+                </span>
+
+                <span class="quick-action-arrow">→</span>
+              </a>
+
+              <a class="quick-action" href="pages/reports.html">
+                <span class="quick-action-icon">▧</span>
+
+                <span>
+                  <strong>View reports</strong>
+                  <small>Review or prepare a report</small>
+                </span>
+
+                <span class="quick-action-arrow">→</span>
+              </a>
+
+              <a class="quick-action" href="pages/ai-assistant.html">
+                <span class="quick-action-icon">✧</span>
+
+                <span>
+                  <strong>Ask the AI assistant</strong>
+                  <small>Get help understanding your work</small>
+                </span>
+
+                <span class="quick-action-arrow">→</span>
+              </a>
+
+            </div>
+          </section>
 
         </div>
 
-    </div>
+        <footer class="dashboard-footer">
+          <span>
+            GradeFlow · Your academic progress, clearly organized.
+          </span>
 
-</div>
+          <a href="pages/settings.html">Privacy &amp; settings</a>
+        </footer>
 
+      </div>
+    </main>
+  </div>
 
-<!-- ==========================================
-     DASHBOARD JAVASCRIPT
-=========================================== -->
+  <!-- MOBILE BOTTOM NAVIGATION -->
+  <nav class="mobile-bottom-nav" aria-label="Mobile navigation">
 
-<script
-    type="module"
-    src="/js/dashboard.js"
-></script>
-</body> </html>
+    <a class="mobile-nav-item active" href="dashboard.html" aria-current="page">
+      <span>▦</span>
+      <span>Home</span>
+    </a>
+
+    <a class="mobile-nav-item" href="pages/calculator.html">
+      <span>∑</span>
+      <span>Calculator</span>
+    </a>
+
+    <a class="mobile-nav-item" href="pages/history.html">
+      <span>◷</span>
+      <span>History</span>
+    </a>
+
+    <button
+      class="mobile-nav-item"
+      id="mobileMoreButton"
+      type="button"
+      aria-expanded="false"
+      aria-controls="mobileMoreMenu">
+      <span>•••</span>
+      <span>More</span>
+    </button>
+
+  </nav>
+
+  <!-- MOBILE MORE MENU -->
+  <div class="mobile-more-menu" id="mobileMoreMenu" hidden>
+    <a href="pages/subjects.html">Subjects &amp; Semesters</a>
+    <a href="pages/analytics.html">Analytics</a>
+    <a href="pages/goals.html">Goals</a>
+    <a href="pages/reports.html">Reports</a>
+    <a href="pages/community.html">Learning Community</a>
+    <a href="pages/messages.html">Messages</a>
+    <a href="pages/ai-assistant.html">AI Academic Assistant</a>
+    <a href="pages/notifications.html">Notifications</a>
+    <a href="pages/settings.html">Settings</a>
+  </div>
+
+  <!-- Dashboard logic will be implemented in this separate file. -->
+  <script type="module" src="js/dashboard.js"></script>
+</body>
+</html>
