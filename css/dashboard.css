@@ -1435,3 +1435,96 @@ h2 {
     transition-duration: 0.01ms !important;
   }
 }
+
+
+/* ============================================
+   CURRENT GOALS — DASHBOARD PREVIEW
+============================================ */
+
+.goal-preview-item {
+  min-width: 0;
+  padding: 15px;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  background: var(--surface-raised);
+}
+
+.goal-preview-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.goal-preview-top h3 {
+  min-width: 0;
+  margin: 0;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.6;
+}
+
+.goal-target {
+  flex: 0 0 auto;
+  color: var(--gold-light);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.goal-preview-current {
+  margin: 9px 0 0;
+  color: var(--text-soft);
+  font-size: 11px;
+}
+
+.goal-preview-progress {
+  height: 7px;
+  margin-top: 12px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: #34352e;
+}
+
+.goal-preview-progress-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--gold);
+  transition: width 250ms ease;
+}
+
+.goal-preview-meta {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.goal-preview-link {
+  display: inline-flex;
+  margin-top: 12px;
+  color: var(--gold);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.goal-preview-link:hover {
+  color: var(--gold-light);
+}
+
+@media (max-width: 480px) {
+  .goal-preview-top {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .goal-preview-meta {
+    flex-direction: column;
+    gap: 3px;
+  }
+}
