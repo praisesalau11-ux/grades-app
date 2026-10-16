@@ -1,0 +1,220 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#171714">
+  <title>Reports | GradeFlow</title>
+  <link rel="stylesheet" href="../css/reports.css">
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+      <a href="../dashboard.html" class="brand">
+        <span class="brand-mark">G</span>
+        <span>Grade<span class="gold">Flow</span></span>
+      </a>
+
+      <div class="nav-label">WORKSPACE</div>
+      <nav class="nav-links">
+        <a href="../dashboard.html"><span>⌂</span> Dashboard</a>
+        <a href="../calculator.html"><span>▤</span> Calculator</a>
+        <a href="subjects.html"><span>▦</span> Subjects</a>
+        <a href="history.html"><span>◷</span> History</a>
+        <a href="performance.html"><span>↗</span> Performance</a>
+        <a href="reports.html" class="active"><span>▥</span> Reports</a>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="sidebar-note">
+          <span class="note-icon">✦</span>
+          <p>Your academic journey, organised.</p>
+        </div>
+        <button id="signOutBtn" class="signout-btn" type="button">
+          <span>↪</span> Sign out
+        </button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <button id="menuBtn" class="menu-btn" type="button"
+          aria-label="Toggle navigation">☰</button>
+        <div class="breadcrumb">Workspace <span>/</span> Reports</div>
+        <div class="topbar-right">
+          <span class="status-dot"></span>
+          <span id="userLabel">Your reports</span>
+        </div>
+      </header>
+
+      <section class="page-content">
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">ACADEMIC OVERVIEW</p>
+            <h1>Your <span class="gold">reports.</span></h1>
+            <p class="subtitle">
+              Review saved calculations and export a summary of your results.
+            </p>
+          </div>
+          <div class="heading-actions">
+            <button class="btn btn-secondary" id="exportBtn" type="button">
+              <span>↓</span> Export CSV
+            </button>
+            <button class="btn btn-primary" id="printBtn" type="button">
+              <span>▤</span> Print / PDF
+            </button>
+          </div>
+        </div>
+
+        <div id="notice" class="notice" role="status" hidden></div>
+
+        <section class="report-intro">
+          <div>
+            <p class="eyebrow">REPORT SUMMARY</p>
+            <h2>Progress at a glance</h2>
+            <p id="reportPeriod">All available saved calculations</p>
+          </div>
+          <div class="report-date">
+            <span>GENERATED</span>
+            <strong id="generatedDate">—</strong>
+          </div>
+        </section>
+
+        <section class="stats-grid">
+          <article class="stat-card">
+            <div class="stat-top">
+              <span class="stat-label">Saved reports</span>
+              <span class="stat-icon">▤</span>
+            </div>
+            <div class="stat-value" id="totalReports">—</div>
+            <p class="stat-foot">Calculations in selected period</p>
+          </article>
+
+          <article class="stat-card">
+            <div class="stat-top">
+              <span class="stat-label">Average GPA</span>
+              <span class="stat-icon">✦</span>
+            </div>
+            <div class="stat-value" id="averageGpa">—</div>
+            <p class="stat-foot">Across saved calculations</p>
+          </article>
+
+          <article class="stat-card">
+            <div class="stat-top">
+              <span class="stat-label">Average percentage</span>
+              <span class="stat-icon">％</span>
+            </div>
+            <div class="stat-value" id="averagePercentage">—</div>
+            <p class="stat-foot">Across records with percentages</p>
+          </article>
+
+          <article class="stat-card">
+            <div class="stat-top">
+              <span class="stat-label">Highest GPA</span>
+              <span class="stat-icon">↗</span>
+            </div>
+            <div class="stat-value" id="highestGpa">—</div>
+            <p class="stat-foot" id="highestGpaDate">Your highest saved result</p>
+          </article>
+        </section>
+
+        <section class="panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">CUSTOM REPORT</p>
+              <h2>Choose a date range</h2>
+              <p class="panel-subtitle">
+                Filter the summary and saved records by calculation date.
+              </p>
+            </div>
+            <button id="resetFilterBtn" class="text-btn" type="button">
+              Reset dates
+            </button>
+          </div>
+
+          <div class="filter-grid">
+            <label class="field">
+              <span>From date</span>
+              <input id="startDate" type="date">
+            </label>
+            <label class="field">
+              <span>To date</span>
+              <input id="endDate" type="date">
+            </label>
+            <div class="filter-help">
+              <span class="filter-dot"></span>
+              <span id="filterStatus">Showing all saved calculations</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel records-panel">
+          <div class="panel-heading records-heading">
+            <div>
+              <p class="eyebrow">RECORDS</p>
+              <h2>Saved calculation reports</h2>
+              <p class="panel-subtitle">
+                Results are read from your GradeFlow calculation history.
+              </p>
+            </div>
+            <span class="record-count" id="recordCount">0 records</span>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>DATE</th>
+                  <th>GPA</th>
+                  <th>PERCENTAGE</th>
+                  <th>SUBJECTS</th>
+                  <th>DETAILS</th>
+                </tr>
+              </thead>
+              <tbody id="reportTableBody">
+                <tr>
+                  <td colspan="5" class="empty-cell">Loading reports…</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div id="emptyState" class="empty-state" hidden>
+            <div class="empty-symbol">▤</div>
+            <h3>No reports found</h3>
+            <p id="emptyMessage">
+              Save a calculation first, and it will appear here.
+            </p>
+            <a class="btn btn-primary" href="../calculator.html">
+              Open calculator
+            </a>
+          </div>
+        </section>
+
+        <footer class="page-footer">
+          <span>GradeFlow Reports</span>
+          <span>Generated from your saved calculation history</span>
+        </footer>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="detailModal" hidden>
+    <section class="detail-modal" role="dialog"
+      aria-modal="true" aria-labelledby="detailTitle">
+      <div class="modal-heading">
+        <div>
+          <p class="eyebrow">REPORT DETAILS</p>
+          <h2 id="detailTitle">Calculation details</h2>
+        </div>
+        <button id="closeModalBtn" class="close-btn" type="button"
+          aria-label="Close details">×</button>
+      </div>
+      <div id="detailContent"></div>
+    </section>
+  </div>
+
+  <script type="module" src="../js/reports.js"></script>
+</body>
+</html>

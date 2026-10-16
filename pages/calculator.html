@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#171717">
+    <title>GradeFlow — Grade Calculator</title>
+    <link rel="stylesheet" href="../css/calculator.css">
+</head>
+<body>
+    <div class="app-shell">
+        <header class="topbar">
+            <a class="brand" href="../dashboard.html">
+                <span class="brand-mark">G</span>
+                <span>GradeFlow</span>
+            </a>
+
+            <a class="back-link" href="../dashboard.html">
+                ← Dashboard
+            </a>
+        </header>
+
+        <main class="calculator-page">
+            <section class="page-heading">
+                <p class="eyebrow">ACADEMIC TOOLS</p>
+                <h1>Grade calculator</h1>
+                <p class="subtitle">
+                    Enter your subjects and scores to calculate your
+                    average, grades, and estimated GPA.
+                </p>
+            </section>
+
+            <section class="calculator-layout">
+                <div class="panel subjects-panel">
+                    <div class="section-heading">
+                        <div>
+                            <h2>Your subjects</h2>
+                            <p>Add every subject you want to calculate.</p>
+                        </div>
+                        <span id="subjectCount" class="count-badge">0 subjects</span>
+                    </div>
+
+                    <form id="calculatorForm">
+                        <div class="subject-table">
+                            <div class="subject-table-head">
+                                <span>Subject name</span>
+                                <span>Score / 100</span>
+                                <span>Grade</span>
+                                <span></span>
+                            </div>
+
+                            <div id="subjectRows"></div>
+                        </div>
+
+                        <button type="button" id="addSubject" class="button button-secondary add-button">
+                            <span>＋</span> Add subject
+                        </button>
+
+                        <div class="form-error" id="formError" role="alert" hidden></div>
+
+                        <div class="form-actions">
+                            <button type="button" id="resetButton" class="button button-quiet">
+                                Clear all
+                            </button>
+                            <button type="submit" class="button button-primary">
+                                Calculate results
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <aside class="results-column">
+                    <section class="panel results-panel">
+                        <div class="section-heading">
+                            <div>
+                                <p class="eyebrow">YOUR RESULTS</p>
+                                <h2>Calculation summary</h2>
+                            </div>
+                            <span class="result-status" id="resultStatus">Not calculated</span>
+                        </div>
+
+                        <div class="main-result">
+                            <span class="result-label">Average percentage</span>
+                            <div class="result-number">
+                                <span id="averageResult">—</span><small>%</small>
+                            </div>
+                            <div class="progress-track">
+                                <div id="averageProgress" class="progress-fill"></div>
+                            </div>
+                        </div>
+
+                        <div class="result-metrics">
+                            <div class="result-metric">
+                                <span>Estimated GPA</span>
+                                <strong id="gpaResult">—</strong>
+                                <small>Out of 5.00</small>
+                            </div>
+                            <div class="result-metric">
+                                <span>Total score</span>
+                                <strong id="totalResult">—</strong>
+                                <small id="totalCaption">Across all subjects</small>
+                            </div>
+                        </div>
+
+                        <div class="grade-summary">
+                            <h3>Subject grades</h3>
+                            <div id="gradeBreakdown" class="grade-breakdown">
+                                <p class="muted">Your grade breakdown will appear here.</p>
+                            </div>
+                        </div>
+
+                        <button type="button" id="saveButton" class="button button-primary save-button" disabled>
+                            Save calculation
+                        </button>
+
+                        <p id="saveMessage" class="save-message" role="status">
+                            Calculate your results before saving.
+                        </p>
+                    </section>
+
+                    <section class="panel grading-panel">
+                        <h3>Default grading scale</h3>
+                        <p class="muted">
+                            This calculator uses a percentage-based estimate.
+                            Confirm your school's official grading rules before
+                            relying on the GPA.
+                        </p>
+                        <div class="scale-row"><span>70–100</span><strong>A</strong></div>
+                        <div class="scale-row"><span>60–69.99</span><strong>B</strong></div>
+                        <div class="scale-row"><span>50–59.99</span><strong>C</strong></div>
+                        <div class="scale-row"><span>45–49.99</span><strong>D</strong></div>
+                        <div class="scale-row"><span>40–44.99</span><strong>E</strong></div>
+                        <div class="scale-row"><span>Below 40</span><strong>F</strong></div>
+                    </section>
+                </aside>
+            </section>
+        </main>
+
+        <footer class="footer">
+            GradeFlow · Your academic progress, organized.
+        </footer>
+    </div>
+
+    <script type="module" src="../js/calculator.js"></script>
+</body>
+</html>

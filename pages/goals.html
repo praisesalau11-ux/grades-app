@@ -1,0 +1,278 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#171714">
+  <title>Goals | GradeFlow</title>
+  <link rel="stylesheet" href="../css/goals.css">
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+      <a href="../dashboard.html" class="brand">
+        <span class="brand-mark">G</span>
+        <span>Grade<span class="gold">Flow</span></span>
+      </a>
+
+      <p class="nav-label">WORKSPACE</p>
+      <nav class="nav-links">
+        <a href="../dashboard.html"><span>⌂</span> Dashboard</a>
+        <a href="../calculator.html"><span>▤</span> Calculator</a>
+        <a href="subjects.html"><span>▦</span> Subjects</a>
+        <a href="history.html"><span>◷</span> History</a>
+        <a href="performance.html"><span>↗</span> Performance</a>
+        <a href="reports.html"><span>▥</span> Reports</a>
+        <a href="goals.html" class="active"><span>◎</span> Goals</a>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="sidebar-note">
+          <span class="note-icon">✦</span>
+          <p>Small steps. Consistent progress.</p>
+        </div>
+        <button id="signOutBtn" class="signout-btn" type="button">
+          <span>↪</span> Sign out
+        </button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <button id="menuBtn" class="menu-btn" type="button"
+          aria-label="Toggle navigation">☰</button>
+        <div class="breadcrumb">Workspace <span>/</span> Goals</div>
+        <div class="topbar-right">
+          <span class="status-dot"></span>
+          <span id="userLabel">Your goals</span>
+        </div>
+      </header>
+
+      <section class="page-content">
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">YOUR ACADEMIC FUTURE</p>
+            <h1>Set your <span class="gold">goals.</span></h1>
+            <p class="subtitle">
+              Turn your academic targets into measurable progress.
+            </p>
+          </div>
+          <button id="newGoalBtn" class="btn btn-primary" type="button">
+            <span>＋</span> Create a goal
+          </button>
+        </div>
+
+        <div id="notice" class="notice" role="status" hidden></div>
+
+        <section class="hero-panel">
+          <div class="hero-copy">
+            <p class="eyebrow">STAY ON TRACK</p>
+            <h2>Your next achievement starts with a target.</h2>
+            <p>
+              Create a GPA or percentage goal. GradeFlow will compare it
+              with your saved calculation results.
+            </p>
+            <button id="heroCreateBtn" class="btn btn-light" type="button">
+              Set a target <span>→</span>
+            </button>
+          </div>
+          <div class="hero-art" aria-hidden="true">
+            <div class="orbit orbit-one"></div>
+            <div class="orbit orbit-two"></div>
+            <div class="target-circle">
+              <span>◎</span>
+            </div>
+            <div class="floating-star star-one">✦</div>
+            <div class="floating-star star-two">✧</div>
+          </div>
+        </section>
+
+        <section class="stats-grid">
+          <article class="stat-card">
+            <div class="stat-top">
+              <span class="stat-label">Total goals</span>
+              <span class="stat-icon">◎</span>
+            </div>
+            <div class="stat-value" id="totalGoals">0</div>
+            <p class="stat-foot">Goals you have created</p>
+          </article>
+
+          <article class="stat-card">
+            <div class="stat-top">
+              <span class="stat-label">In progress</span>
+              <span class="stat-icon">↗</span>
+            </div>
+            <div class="stat-value" id="activeGoals">0</div>
+            <p class="stat-foot">Targets still being pursued</p>
+          </article>
+
+          <article class="stat-card">
+            <div class="stat-top">
+              <span class="stat-label">Achieved</span>
+              <span class="stat-icon">✓</span>
+            </div>
+            <div class="stat-value" id="completedGoals">0</div>
+            <p class="stat-foot">Goals marked as complete</p>
+          </article>
+
+          <article class="stat-card">
+            <div class="stat-top">
+              <span class="stat-label">Current average GPA</span>
+              <span class="stat-icon">✦</span>
+            </div>
+            <div class="stat-value" id="currentGpa">—</div>
+            <p class="stat-foot">From saved GPA calculations</p>
+          </article>
+        </section>
+
+        <section class="progress-overview panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">OVERVIEW</p>
+              <h2>Your goal progress</h2>
+            </div>
+            <span class="overview-badge" id="overallProgressLabel">0% achieved</span>
+          </div>
+
+          <div class="overall-track">
+            <div id="overallProgressBar" class="overall-fill"></div>
+          </div>
+          <p class="overview-foot" id="overallProgressText">
+            Create your first goal to start tracking progress.
+          </p>
+        </section>
+
+        <section class="goals-section">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">YOUR TARGETS</p>
+              <h2>Academic goals</h2>
+            </div>
+
+            <div class="filter-control">
+              <label for="goalFilter">Show</label>
+              <select id="goalFilter">
+                <option value="all">All goals</option>
+                <option value="active">In progress</option>
+                <option value="completed">Completed</option>
+                <option value="overdue">Overdue</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="goalsGrid" class="goals-grid">
+            <div class="loading-card">Loading your goals…</div>
+          </div>
+
+          <div id="goalsEmpty" class="empty-state" hidden>
+            <div class="empty-symbol">◎</div>
+            <h3 id="emptyTitle">No goals yet</h3>
+            <p id="emptyText">
+              Create your first academic goal and track your progress here.
+            </p>
+            <button id="emptyCreateBtn" class="btn btn-primary" type="button">
+              Create your first goal
+            </button>
+          </div>
+        </section>
+
+        <footer class="page-footer">
+          <span>GradeFlow Goals</span>
+          <span>Your progress is based on your saved calculations.</span>
+        </footer>
+      </section>
+    </main>
+  </div>
+
+  <!-- Create / edit goal dialog -->
+  <div class="modal-backdrop" id="goalModal" hidden>
+    <section class="goal-modal" role="dialog" aria-modal="true"
+      aria-labelledby="modalTitle">
+      <div class="modal-heading">
+        <div>
+          <p class="eyebrow">GOAL SETUP</p>
+          <h2 id="modalTitle">Create a goal</h2>
+          <p class="modal-subtitle">
+            Choose a target you want to work towards.
+          </p>
+        </div>
+        <button id="closeModalBtn" class="close-btn" type="button"
+          aria-label="Close dialog">×</button>
+      </div>
+
+      <form id="goalForm">
+        <label class="field">
+          <span>Goal name</span>
+          <input id="goalTitle" name="title" type="text"
+            maxlength="70" placeholder="e.g. Reach my GPA target"
+            required>
+        </label>
+
+        <label class="field">
+          <span>Goal type</span>
+          <select id="goalType" name="type" required>
+            <option value="gpa">GPA target</option>
+            <option value="percentage">Percentage target</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span id="targetLabel">Target GPA</span>
+          <input id="goalTarget" name="target" type="number"
+            min="0.01" max="5" step="0.01" placeholder="e.g. 4.50"
+            required>
+          <small id="targetHelp">
+            Enter a target GPA that matches your grading scale.
+          </small>
+        </label>
+
+        <label class="field">
+          <span>Deadline</span>
+          <input id="goalDeadline" name="deadline" type="date" required>
+        </label>
+
+        <label class="field">
+          <span>Description (optional)</span>
+          <textarea id="goalDescription" name="description"
+            rows="3" maxlength="250"
+            placeholder="What will help you achieve this goal?"></textarea>
+        </label>
+
+        <p class="form-error" id="formError" hidden></p>
+
+        <div class="modal-actions">
+          <button id="cancelModalBtn" class="btn btn-secondary"
+            type="button">Cancel</button>
+          <button id="saveGoalBtn" class="btn btn-primary"
+            type="submit">Save goal</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <!-- Goal actions dialog -->
+  <div class="modal-backdrop" id="confirmModal" hidden>
+    <section class="confirm-modal" role="dialog" aria-modal="true"
+      aria-labelledby="confirmTitle">
+      <div class="modal-heading">
+        <div>
+          <p class="eyebrow">GOAL MANAGEMENT</p>
+          <h2 id="confirmTitle">Confirm action</h2>
+        </div>
+        <button id="closeConfirmBtn" class="close-btn" type="button"
+          aria-label="Close dialog">×</button>
+      </div>
+      <p id="confirmMessage" class="confirm-message"></p>
+      <div class="modal-actions">
+        <button id="cancelConfirmBtn" class="btn btn-secondary"
+          type="button">Cancel</button>
+        <button id="confirmActionBtn" class="btn btn-primary"
+          type="button">Confirm</button>
+      </div>
+    </section>
+  </div>
+
+  <script type="module" src="../js/goals.js"></script>
+</body>
+</html>

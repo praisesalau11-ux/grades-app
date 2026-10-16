@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#20211f">
+  <meta name="description" content="View, search, and manage your saved GradeFlow calculations.">
+
+  <title>Calculation History | GradeFlow</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../css/history.css">
+</head>
+
+<body>
+  <div class="app-layout">
+
+<!-- SIDEBAR BACKDROP -->
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+
+  <a href="../dashboard.html" class="brand" aria-label="GradeFlow Dashboard">
+    <span class="brand-icon">G</span>
+    <span class="brand-name">Grade<span>Flow</span></span>
+  </a>
+
+  <div class="sidebar-section-label">Workspace</div>
+
+  <nav class="sidebar-nav" aria-label="Main navigation">
+
+    <a href="../dashboard.html" class="nav-link">
+      <span aria-hidden="true">⌂</span>
+      <span>Dashboard</span>
+    </a>
+
+    <a href="calculator.html" class="nav-link">
+      <span aria-hidden="true">▦</span>
+      <span>Grade Calculator</span>
+    </a>
+
+    <a href="history.html" class="nav-link active" aria-current="page">
+      <span aria-hidden="true">◷</span>
+      <span>Calculation History</span>
+    </a>
+
+    <a href="performance.html" class="nav-link">
+      <span aria-hidden="true">↗</span>
+      <span>Performance</span>
+    </a>
+
+  </nav>
+
+  <div class="sidebar-section-label" style="margin-top: 32px;">
+    Account
+  </div>
+
+  <nav class="sidebar-nav" aria-label="Account navigation">
+
+    <a href="profile.html" class="nav-link">
+      <span aria-hidden="true">◎</span>
+      <span>My Profile</span>
+    </a>
+
+    <a href="settings.html" class="nav-link">
+      <span aria-hidden="true">⚙</span>
+      <span>Settings</span>
+    </a>
+
+    <a href="help.html" class="nav-link">
+      <span aria-hidden="true">?</span>
+      <span>Help & Support</span>
+    </a>
+
+  </nav>
+
+  <div class="sidebar-bottom">
+    <div class="sidebar-divider"></div>
+
+    <button
+      type="button"
+      class="account-switcher"
+      id="accountSwitcher"
+      aria-label="Account information"
+    >
+      <span class="avatar" id="sidebarAvatar">G</span>
+
+      <span class="account-details">
+        <span class="account-name" id="sidebarUserName">Loading account...</span>
+        <span class="account-plan" id="sidebarUserEmail">GradeFlow account</span>
+      </span>
+
+      <span class="account-chevron" aria-hidden="true">⌄</span>
+    </button>
+  </div>
+
+</aside>
+
+<!-- MAIN CONTENT -->
+<main class="main-content">
+  <div class="page-container">
+
+    <!-- TOP BAR -->
+    <header class="topbar">
+
+      <div class="topbar-left">
+
+        <button
+          type="button"
+          class="icon-button menu-toggle"
+          id="menuToggle"
+          aria-label="Open navigation menu"
+          aria-controls="sidebar"
+          aria-expanded="false"
+        >
+          ☰
+        </button>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="../dashboard.html">Dashboard</a>
+          <span class="breadcrumb-separator">/</span>
+          <span class="breadcrumb-current">History</span>
+        </nav>
+
+      </div>
+
+      <div class="topbar-right">
+
+        <button
+          type="button"
+          class="icon-button"
+          id="refreshHistory"
+          aria-label="Refresh calculation history"
+          title="Refresh history"
+        >
+          ↻
+        </button>
+
+        <a
+          href="profile.html"
+          class="profile-button"
+          id="profileButton"
+          aria-label="Open profile"
+        >
+          <span class="avatar" id="headerAvatar">G</span>
+          <span class="profile-name" id="headerUserName">My Account</span>
+        </a>
+
+      </div>
+
+    </header>
+
+    <!-- PAGE INTRODUCTION -->
+    <section class="page-intro">
+
+      <div>
+        <div class="page-eyebrow">Your academic records</div>
+
+        <h1 class="page-title">Calculation History</h1>
+
+        <p class="page-description">
+          Review your saved calculations, track your academic results,
+          and find previous GPA and percentage scores.
+        </p>
+      </div>
+
+      <div class="today-label" id="todayLabel">
+        Loading date...
+      </div>
+
+    </section>
+
+    <!-- SUMMARY CARDS -->
+    <section class="summary-grid" aria-label="History summary">
+
+      <article class="summary-card">
+        <div class="summary-card-top">
+          <span class="summary-label">Total Calculations</span>
+          <span class="summary-icon" aria-hidden="true">▤</span>
+        </div>
+
+        <div class="summary-value" id="totalCalculations">—</div>
+
+        <p class="summary-footnote">
+          Saved calculation records
+        </p>
+      </article>
+
+      <article class="summary-card">
+        <div class="summary-card-top">
+          <span class="summary-label">Average GPA</span>
+          <span class="summary-icon" aria-hidden="true">★</span>
+        </div>
+
+        <div class="summary-value" id="averageGpa">—</div>
+
+        <p class="summary-footnote">
+          Average across saved calculations
+        </p>
+      </article>
+
+      <article class="summary-card">
+        <div class="summary-card-top">
+          <span class="summary-label">Average Percentage</span>
+          <span class="summary-icon" aria-hidden="true">％</span>
+        </div>
+
+        <div class="summary-value" id="averagePercentage">—</div>
+
+        <p class="summary-footnote">
+          Average recorded percentage
+        </p>
+      </article>
+
+    </section>
+
+    <!-- HISTORY PANEL -->
+    <section class="history-panel" aria-labelledby="historyPanelTitle">
+
+      <!-- PANEL HEADER -->
+      <div class="panel-header">
+
+        <div>
+          <h2 class="panel-title" id="historyPanelTitle">
+            All Calculations
+          </h2>
+
+          <p class="panel-subtitle">
+            Your saved academic calculation records
+          </p>
+        </div>
+
+        <span class="result-count" id="resultCount">0 records</span>
+
+      </div>
+
+      <!-- FILTERS -->
+      <form class="filters" id="historyFilters">
+
+        <div class="filter-group">
+          <label class="filter-label" for="historySearch">
+            Search calculations
+          </label>
+
+          <div class="filter-input-wrap">
+            <span class="search-icon" aria-hidden="true">⌕</span>
+
+            <input
+              type="search"
+              class="filter-input"
+              id="historySearch"
+              name="search"
+              placeholder="Search by subject or grade..."
+              autocomplete="off"
+            >
+          </div>
+        </div>
+
+        <div class="filter-group">
+          <label class="filter-label" for="dateFrom">
+            From date
+          </label>
+
+          <input
+            type="date"
+            class="filter-input"
+            id="dateFrom"
+            name="dateFrom"
+          >
+        </div>
+
+        <div class="filter-group">
+          <label class="filter-label" for="dateTo">
+            To date
+          </label>
+
+          <input
+            type="date"
+            class="filter-input"
+            id="dateTo"
+            name="dateTo"
+          >
+        </div>
+
+        <button
+          type="button"
+          class="clear-filters"
+          id="clearFilters"
+        >
+          <span aria-hidden="true">↺</span>
+          Clear filters
+        </button>
+
+      </form>
+
+      <!-- STATUS MESSAGE -->
+      <div
+        class="history-message"
+        id="historyMessage"
+        role="status"
+        aria-live="polite"
+        hidden
+      ></div>
+
+      <!-- CALCULATION LIST -->
+      <div class="history-list" id="historyList" aria-live="polite">
+
+        <div class="loading-state" id="historyLoading">
+          <span class="loading-spinner" aria-hidden="true"></span>
+          <span>Loading your calculations...</span>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- FOOTER -->
+    <footer style="padding: 25px 0 5px; text-align: center;">
+      <p style="color: #92938a; font-size: 11px;">
+        GradeFlow · Your academic progress, organized.
+      </p>
+    </footer>
+
+  </div>
+</main>
+
+<!-- MOBILE MORE MENU -->
+<div class="mobile-more-menu" id="mobileMoreMenu">
+
+  <a href="performance.html">
+    <span aria-hidden="true">↗</span>
+    Performance
+  </a>
+
+  <a href="profile.html">
+    <span aria-hidden="true">◎</span>
+    My Profile
+  </a>
+
+  <a href="settings.html">
+    <span aria-hidden="true">⚙</span>
+    Settings
+  </a>
+
+  <a href="help.html">
+    <span aria-hidden="true">?</span>
+    Help & Support
+  </a>
+
+</div>
+
+<!-- MOBILE BOTTOM NAVIGATION -->
+<nav class="mobile-bottom-nav" aria-label="Mobile navigation">
+
+  <a href="../dashboard.html" class="mobile-nav-link">
+    <span aria-hidden="true">⌂</span>
+    <span>Home</span>
+  </a>
+
+  <a href="calculator.html" class="mobile-nav-link">
+    <span aria-hidden="true">▦</span>
+    <span>Calculator</span>
+  </a>
+
+  <a href="history.html" class="mobile-nav-link active" aria-current="page">
+    <span aria-hidden="true">◷</span>
+    <span>History</span>
+  </a>
+
+  <a href="performance.html" class="mobile-nav-link">
+    <span aria-hidden="true">↗</span>
+    <span>Progress</span>
+  </a>
+
+  <button
+    type="button"
+    class="mobile-nav-link"
+    id="mobileMoreButton"
+    aria-controls="mobileMoreMenu"
+    aria-expanded="false"
+  >
+    <span aria-hidden="true">•••</span>
+    <span>More</span>
+  </button>
+
+</nav>
+
+  </div>
+
+  <!-- HISTORY PAGE JAVASCRIPT -->
+
+  <script type="module" src="../js/history.js"></script>
+
+</body>
+</html>

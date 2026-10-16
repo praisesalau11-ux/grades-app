@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#11110f">
+  <title>Subjects | GradeFlow</title>
+  <link rel="stylesheet" href="../css/subjects.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="../dashboard.html">
+        <span class="brand-mark">G</span>
+        <span>Grade<span class="gold-text">Flow</span></span>
+      </a>
+
+      <div class="sidebar-label">WORKSPACE</div>
+      <nav class="navigation">
+        <a class="nav-link" href="../dashboard.html">⌂ <span>Dashboard</span></a>
+        <a class="nav-link" href="calculator.html">＋ <span>GPA Calculator</span></a>
+        <a class="nav-link active" href="subjects.html">▤ <span>My Subjects</span></a>
+        <a class="nav-link" href="history.html">◷ <span>History</span></a>
+        <a class="nav-link" href="performance.html">↗ <span>Performance</span></a>
+        <a class="nav-link" href="reports.html">▧ <span>Reports</span></a>
+        <a class="nav-link" href="goals.html">◎ <span>Goals</span></a>
+        <a class="nav-link" href="analytics.html">▥ <span>Analytics</span></a>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="sidebar-user">
+          <div class="avatar" id="userAvatar">S</div>
+          <div class="user-details">
+            <strong id="userName">Student</strong>
+            <span id="userEmail">Loading account...</span>
+          </div>
+        </div>
+        <button class="signout-button" id="signOutButton" type="button">
+          ↪ Sign out
+        </button>
+      </div>
+    </aside>
+
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    <main class="main-content">
+      <header class="topbar">
+        <button class="menu-button" id="menuToggle" type="button"
+          aria-label="Open navigation">☰</button>
+
+        <div class="breadcrumb">
+          <span>Workspace</span><span>/</span><strong>My Subjects</strong>
+        </div>
+
+        <div class="topbar-right">
+          <span class="today-label" id="todayLabel"></span>
+          <a class="profile-link" href="../dashboard.html">My workspace ↗</a>
+        </div>
+      </header>
+
+      <div class="page-content">
+        <section class="page-heading">
+          <div>
+            <p class="eyebrow">ACADEMIC ORGANIZATION</p>
+            <h1>My Subjects<span class="gold-text">.</span></h1>
+            <p class="page-description">
+              Organize your courses, credit units, and scores in one place.
+            </p>
+          </div>
+          <button class="primary-button" id="addSubjectButton" type="button">
+            <span>＋</span> Add subject
+          </button>
+        </section>
+
+        <div class="status-message" id="pageMessage" role="status" hidden></div>
+
+        <section class="stats-grid" aria-label="Subject summary">
+          <article class="stat-card">
+            <span class="stat-label">TOTAL SUBJECTS</span>
+            <strong class="stat-value" id="totalSubjects">—</strong>
+            <span class="stat-foot">Saved courses</span>
+          </article>
+          <article class="stat-card">
+            <span class="stat-label">TOTAL CREDIT UNITS</span>
+            <strong class="stat-value" id="totalCredits">—</strong>
+            <span class="stat-foot">Across all subjects</span>
+          </article>
+          <article class="stat-card">
+            <span class="stat-label">AVERAGE SCORE</span>
+            <strong class="stat-value" id="averageScore">—</strong>
+            <span class="stat-foot">Subjects with scores</span>
+          </article>
+          <article class="stat-card highlight-card">
+            <span class="stat-label">ESTIMATED GPA</span>
+            <strong class="stat-value" id="estimatedGpa">—</strong>
+            <span class="stat-foot">Estimated on a 5-point scale</span>
+          </article>
+        </section>
+
+        <section class="content-card" id="subjectFormSection">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">SUBJECT DETAILS</p>
+              <h2 id="formTitle">Add a subject</h2>
+              <p class="section-description">
+                Enter your course details below.
+              </p>
+            </div>
+            <span class="form-badge" id="formBadge">NEW ENTRY</span>
+          </div>
+
+          <form id="subjectForm">
+            <input type="hidden" id="subjectId">
+
+            <div class="form-grid">
+              <label class="field field-wide">
+                <span>Subject name <b>*</b></span>
+                <input id="subjectName" name="subjectName" type="text"
+                  maxlength="100" placeholder="e.g. Mathematics" required>
+              </label>
+
+              <label class="field">
+                <span>Course code</span>
+                <input id="courseCode" name="courseCode" type="text"
+                  maxlength="30" placeholder="e.g. MTH101">
+              </label>
+
+              <label class="field">
+                <span>Credit units <b>*</b></span>
+                <input id="creditUnits" name="creditUnits" type="number"
+                  min="1" max="30" step="1" value="3" required>
+              </label>
+
+              <label class="field">
+                <span>Semester <b>*</b></span>
+                <select id="semester" name="semester" required>
+                  <option value="First Semester">First Semester</option>
+                  <option value="Second Semester">Second Semester</option>
+                  <option value="Third Semester">Third Semester</option>
+                  <option value="Summer">Summer</option>
+                  <option value="Other">Other</option>
+                </select>
+              </label>
+
+              <label class="field">
+                <span>Score (%)</span>
+                <input id="score" name="score" type="number"
+                  min="0" max="100" step="0.01" placeholder="e.g. 78">
+                <small>Leave blank if you do not have a score yet.</small>
+              </label>
+            </div>
+
+            <div class="form-actions">
+              <button class="secondary-button" id="cancelEditButton"
+                type="button" hidden>Cancel</button>
+              <button class="primary-button" id="saveSubjectButton"
+                type="submit">Save subject</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="content-card subjects-card">
+          <div class="section-heading list-heading">
+            <div>
+              <p class="eyebrow">YOUR COURSE LIST</p>
+              <h2>Saved subjects</h2>
+              <p class="section-description">
+                Review, update, or remove your subjects.
+              </p>
+            </div>
+            <span class="count-pill" id="resultCount">0 subjects</span>
+          </div>
+
+          <div class="toolbar">
+            <label class="search-field">
+              <span aria-hidden="true">⌕</span>
+              <input id="subjectSearch" type="search"
+                placeholder="Search name or course code..."
+                aria-label="Search subjects">
+            </label>
+
+            <select id="semesterFilter" aria-label="Filter by semester">
+              <option value="all">All semesters</option>
+              <option value="First Semester">First Semester</option>
+              <option value="Second Semester">Second Semester</option>
+              <option value="Third Semester">Third Semester</option>
+              <option value="Summer">Summer</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>SUBJECT</th>
+                  <th>SEMESTER</th>
+                  <th>CREDITS</th>
+                  <th>SCORE</th>
+                  <th>GRADE</th>
+                  <th>ACTIONS</th>
+                </tr>
+              </thead>
+              <tbody id="subjectsTableBody">
+                <tr>
+                  <td colspan="6" class="empty-cell">Loading subjects...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="empty-state" id="emptyState" hidden>
+            <div class="empty-icon">▤</div>
+            <h3 id="emptyTitle">No subjects yet</h3>
+            <p id="emptyDescription">
+              Add your first subject using the form above.
+            </p>
+            <button class="secondary-button" id="emptyAddButton" type="button">
+              Add your first subject
+            </button>
+          </div>
+        </section>
+
+        <p class="page-note">
+          GPA shown here is an estimate based on your credit-weighted average
+          score divided by 20. Your institution's official GPA rules may differ.
+        </p>
+      </div>
+    </main>
+  </div>
+
+  <script type="module" src="../js/subjects.js"></script>
+</body>
+</html>
