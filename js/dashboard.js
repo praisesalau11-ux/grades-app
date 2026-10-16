@@ -1,3 +1,4 @@
+
 /* ==========================================
    GradeFlow — Dashboard Controller
    File: js/dashboard.js
@@ -16,11 +17,10 @@ import {
     where,
     orderBy,
     limit,
-    getDocs,
+    onSnapshot,
     doc,
     getDoc
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
 // ------------------------------------------
 // DOM helpers
 // ------------------------------------------
@@ -141,24 +141,13 @@ async function loadProfile(user) {
 // Load the existing top-level history
 // ------------------------------------------
 
-async function loadHistory(user) {
+
+function loadHistory(user) {
     const historyContainer = $("#recentCalculations");
 
     if (historyContainer) {
         showMessage(historyContainer, "Loading your calculations…");
     }
-
-    /*
-     * Existing structure:
-     * history/{calculationId}
-     *
-     * Fields:
-     * gpa        string, e.g. "4.58"
-     * percentage number
-     * subjects   array of { name, score, grade }
-     * time       Firestore timestamp
-     * uid        owner UID
-     */
 
     const historyQuery = query(
         collection(db, "history"),
@@ -167,27 +156,48 @@ async function loadHistory(user) {
         limit(50)
     );
 
-    const snapshot = await getDocs(historyQuery);
+    return onSnapshot(
+        historyQuery,
+        snapshot => {
+            const calculations = snapshot.docs.map(document => ({
+                id: document.id,
+                ...document.data()
+            }));
 
-    const calculations = snapshot.docs.map(document => ({
-        id: document.id,
-        ...document.data()
-    }));
+            // Sort newest first, including timestamp values.
+            calculations.sort((a, b) => {
+                const dateA = getDate(a.time)?.getTime() || 0;
+                const dateB = getDate(b.time)?.getTime() || 0;
+                return dateB - dateA;
+            });
 
-    // Keep the newest records first.
-    calculations.sort((a, b) => {
-        const dateA = getDate(a.time)?.getTime() || 0;
-        const dateB = getDate(b.time)?.getTime() || 0;
+            renderDashboardMetrics(calculations);
+            renderRecentCalculations(calculations);
+            renderPerformanceChart(calculations);
+        },
+        error => {
+            console.error("GradeFlow history listener error:", error);
 
-        return dateB - dateA;
-    });
-
-    renderDashboardMetrics(calculations);
-    renderRecentCalculations(calculations);
-    renderPerformanceChart(calculations);
-
-    return calculations;
+            if (error.code === "permission-denied") {
+                showMessage(
+                    historyContainer,
+                    "Cannot read your calculations. Check your Firestore security rules."
+                );
+            } else if (error.code === "failed-precondition") {
+                showMessage(
+                    historyContainer,
+                    "A Firestore index is required. Check the browser console for the index link."
+                );
+            } else {
+                showMessage(
+                    historyContainer,
+                    "Could not load calculations. Check your connection and try again."
+                );
+            }
+        }
+    );
 }
+
 
 // ------------------------------------------
 // Dashboard metrics
@@ -322,6 +332,27 @@ function renderRecentCalculations(calculations) {
         result.textContent = `${gpaText} · ${percentageText}`;
 
         item.append(title, details, result);
+
+
+        if (Array.isArray(calculation.subjects)) {
+            const subjectList = document.createElement("ul");
+            subjectList.className = "activity-subjects";
+
+            calculation.subjects.forEach(subject => {
+                const row = document.createElement("li");
+
+                row.textContent =
+                    `${subject.name || "Subject"} — ` +
+                    `Score: ${subject.score ?? "—"} — ` +
+                    `Grade: ${subject.grade || "—"}`;
+
+                subjectList.appendChild(row);
+            });
+
+            item.appendChild(subjectList);
+        }
+
+
         container.appendChild(item);
     });
 }
@@ -493,9 +524,18 @@ function setupNavigation() {
 // Authentication and startup
 // ------------------------------------------
 
+
+let stopHistoryListener = null;
+
 setupNavigation();
 
 onAuthStateChanged(auth, async user => {
+    // Stop listening to the previous account, if any.
+    if (stopHistoryListener) {
+        stopHistoryListener();
+        stopHistoryListener = null;
+    }
+
     if (!user) {
         window.location.href = "login.html";
         return;
@@ -503,29 +543,15 @@ onAuthStateChanged(auth, async user => {
 
     try {
         await loadProfile(user);
-        await loadHistory(user);
+
+        // Live updates whenever this user's history changes.
+        stopHistoryListener = loadHistory(user);
     } catch (error) {
         console.error("GradeFlow dashboard error:", error);
 
-        const historyContainer = $("#recentCalculations");
-
-        if (error.code === "permission-denied") {
-            showMessage(
-                historyContainer,
-                "GradeFlow cannot read your history yet. Check the Firestore rules."
-            );
-        } else if (
-            error.code === "failed-precondition"
-        ) {
-            showMessage(
-                historyContainer,
-                "Firestore needs an index for this history query. Check the browser console for the index link."
-            );
-        } else {
-            showMessage(
-                historyContainer,
-                "Your dashboard could not load. Check your connection and try again."
-            );
-        }
+        showMessage(
+            $("#recentCalculations"),
+            "Your dashboard could not load. Check your connection and try again."
+        );
     }
 });
