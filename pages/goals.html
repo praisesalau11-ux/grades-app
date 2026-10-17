@@ -3,272 +3,353 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#171714">
-  <title>Goals | GradeFlow</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#11110f">
+  <meta name="description" content="Set academic goals and plan your future GPA with GradeFlow.">
+  <title>Goals & GPA Planner — GradeFlow</title>
   <link rel="stylesheet" href="../css/goals.css">
 </head>
 <body>
-  <div class="app-layout">
+  <div class="app-shell">
+
     <aside class="sidebar" id="sidebar">
-      <a href="../dashboard.html" class="brand">
+      <a class="brand" href="../dashboard.html">
         <span class="brand-mark">G</span>
-        <span>Grade<span class="gold">Flow</span></span>
+        <span>GradeFlow</span>
       </a>
 
-      <p class="nav-label">WORKSPACE</p>
-      <nav class="nav-links">
-        <a href="../dashboard.html"><span>⌂</span> Dashboard</a>
-        <a href="../calculator.html"><span>▤</span> Calculator</a>
-        <a href="subjects.html"><span>▦</span> Subjects</a>
-        <a href="history.html"><span>◷</span> History</a>
-        <a href="performance.html"><span>↗</span> Performance</a>
-        <a href="reports.html"><span>▥</span> Reports</a>
-        <a href="goals.html" class="active"><span>◎</span> Goals</a>
+      <p class="sidebar-label">WORKSPACE</p>
+      <nav class="nav-list">
+        <a class="nav-link" href="../dashboard.html"><span>▦</span> Dashboard</a>
+        <a class="nav-link" href="calculator.html"><span>∑</span> Calculator</a>
+        <a class="nav-link" href="subjects.html"><span>▤</span> Subjects &amp; Semesters</a>
+        <a class="nav-link" href="history.html"><span>◷</span> History</a>
+        <a class="nav-link" href="analytics.html"><span>⌁</span> Analytics</a>
+        <a class="nav-link active" href="goals.html" aria-current="page"><span>◎</span> Goals &amp; Planner</a>
+        <a class="nav-link" href="performance.html"><span>↗</span> Performance</a>
+        <a class="nav-link" href="reports.html"><span>▧</span> Reports</a>
       </nav>
 
-      <div class="sidebar-bottom">
-        <div class="sidebar-note">
-          <span class="note-icon">✦</span>
-          <p>Small steps. Consistent progress.</p>
+      <div class="sidebar-note">
+        <span class="note-icon">✦</span>
+        <strong>Small steps. Better results.</strong>
+        <p>Turn your academic targets into a plan you can follow.</p>
+      </div>
+
+      <div class="sidebar-account">
+        <div class="avatar" id="sidebarAvatar">G</div>
+        <div class="account-info">
+          <strong id="sidebarUserName">Your account</strong>
+          <span>Student workspace</span>
         </div>
-        <button id="signOutBtn" class="signout-btn" type="button">
-          <span>↪</span> Sign out
-        </button>
+        <button id="signOutButton" class="icon-button" type="button" title="Sign out" aria-label="Sign out">↗</button>
       </div>
     </aside>
 
+    <div class="sidebar-backdrop" id="sidebarBackdrop" hidden></div>
+
     <main class="main-content">
       <header class="topbar">
-        <button id="menuBtn" class="menu-btn" type="button"
-          aria-label="Toggle navigation">☰</button>
-        <div class="breadcrumb">Workspace <span>/</span> Goals</div>
-        <div class="topbar-right">
-          <span class="status-dot"></span>
-          <span id="userLabel">Your goals</span>
+        <div class="topbar-left">
+          <button class="icon-button menu-toggle" id="menuToggle" type="button"
+            aria-label="Open navigation" aria-expanded="false">☰</button>
+          <div class="breadcrumb"><span>Workspace</span><span>/</span><strong>Goals &amp; Planner</strong></div>
+        </div>
+        <div class="topbar-actions">
+          <span class="today-label">Plan your academic progress</span>
+          <div class="avatar avatar-small" id="headerAvatar">G</div>
         </div>
       </header>
 
-      <section class="page-content">
-        <div class="page-heading">
+      <div class="page-content">
+        <section class="page-heading">
           <div>
-            <p class="eyebrow">YOUR ACADEMIC FUTURE</p>
-            <h1>Set your <span class="gold">goals.</span></h1>
-            <p class="subtitle">
-              Turn your academic targets into measurable progress.
+            <p class="eyebrow">YOUR NEXT MILESTONE</p>
+            <h1>Goals &amp; <span>GPA Planner</span></h1>
+            <p class="page-description">
+              Set academic goals, estimate your next cumulative GPA, and calculate
+              the semester GPA you need to reach your target.
             </p>
           </div>
-          <button id="newGoalBtn" class="btn btn-primary" type="button">
+          <button class="primary-button" id="addGoalButton" type="button">
             <span>＋</span> Create a goal
           </button>
-        </div>
-
-        <div id="notice" class="notice" role="status" hidden></div>
-
-        <section class="hero-panel">
-          <div class="hero-copy">
-            <p class="eyebrow">STAY ON TRACK</p>
-            <h2>Your next achievement starts with a target.</h2>
-            <p>
-              Create a GPA or percentage goal. GradeFlow will compare it
-              with your saved calculation results.
-            </p>
-            <button id="heroCreateBtn" class="btn btn-light" type="button">
-              Set a target <span>→</span>
-            </button>
-          </div>
-          <div class="hero-art" aria-hidden="true">
-            <div class="orbit orbit-one"></div>
-            <div class="orbit orbit-two"></div>
-            <div class="target-circle">
-              <span>◎</span>
-            </div>
-            <div class="floating-star star-one">✦</div>
-            <div class="floating-star star-two">✧</div>
-          </div>
         </section>
 
-        <section class="stats-grid">
+        <section class="stats-grid" aria-label="Goal statistics">
           <article class="stat-card">
-            <div class="stat-top">
-              <span class="stat-label">Total goals</span>
-              <span class="stat-icon">◎</span>
-            </div>
+            <div class="stat-label">Total goals <span>◎</span></div>
             <div class="stat-value" id="totalGoals">0</div>
-            <p class="stat-foot">Goals you have created</p>
+            <p>All your saved goals</p>
           </article>
-
           <article class="stat-card">
-            <div class="stat-top">
-              <span class="stat-label">In progress</span>
-              <span class="stat-icon">↗</span>
-            </div>
+            <div class="stat-label">Active goals <span>↗</span></div>
             <div class="stat-value" id="activeGoals">0</div>
-            <p class="stat-foot">Targets still being pursued</p>
+            <p>Goals still in progress</p>
           </article>
-
           <article class="stat-card">
-            <div class="stat-top">
-              <span class="stat-label">Achieved</span>
-              <span class="stat-icon">✓</span>
-            </div>
+            <div class="stat-label">Completed <span>✓</span></div>
             <div class="stat-value" id="completedGoals">0</div>
-            <p class="stat-foot">Goals marked as complete</p>
+            <p>Goals you have achieved</p>
           </article>
-
-          <article class="stat-card">
-            <div class="stat-top">
-              <span class="stat-label">Current average GPA</span>
-              <span class="stat-icon">✦</span>
-            </div>
-            <div class="stat-value" id="currentGpa">—</div>
-            <p class="stat-foot">From saved GPA calculations</p>
+          <article class="stat-card stat-card-accent">
+            <div class="stat-label">Average GPA <span>◈</span></div>
+            <div class="stat-value" id="averageGpa">—</div>
+            <p id="averageGpaNote">Based on your saved results</p>
           </article>
         </section>
 
-        <section class="progress-overview panel">
-          <div class="panel-heading">
+        <!-- TARGET GPA PLANNER -->
+        <section class="panel planner-panel" id="targetGpaPlanner">
+          <div class="panel-header">
             <div>
-              <p class="eyebrow">OVERVIEW</p>
-              <h2>Your goal progress</h2>
+              <p class="eyebrow">PLAN BEFORE YOU REGISTER</p>
+              <h2>Target GPA Planner</h2>
+              <p class="panel-description">
+                Calculate the GPA you need next semester or estimate your future cumulative GPA.
+              </p>
             </div>
-            <span class="overview-badge" id="overallProgressLabel">0% achieved</span>
-          </div>
-
-          <div class="overall-track">
-            <div id="overallProgressBar" class="overall-fill"></div>
-          </div>
-          <p class="overview-foot" id="overallProgressText">
-            Create your first goal to start tracking progress.
-          </p>
-        </section>
-
-        <section class="goals-section">
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow">YOUR TARGETS</p>
-              <h2>Academic goals</h2>
-            </div>
-
-            <div class="filter-control">
-              <label for="goalFilter">Show</label>
-              <select id="goalFilter">
-                <option value="all">All goals</option>
-                <option value="active">In progress</option>
-                <option value="completed">Completed</option>
-                <option value="overdue">Overdue</option>
+            <div class="scale-control">
+              <label for="plannerScale">GPA scale</label>
+              <select id="plannerScale">
+                <option value="5">5-point scale</option>
+                <option value="4">4-point scale</option>
               </select>
             </div>
           </div>
 
-          <div id="goalsGrid" class="goals-grid">
-            <div class="loading-card">Loading your goals…</div>
+          <div class="planner-tabs" role="group" aria-label="Choose planning method">
+            <button class="planner-tab active" type="button"
+              data-planner-tab="semester" aria-pressed="true">
+              01 &nbsp; Required next-semester GPA
+            </button>
+            <button class="planner-tab" type="button"
+              data-planner-tab="cumulative" aria-pressed="false">
+              02 &nbsp; Future cumulative GPA
+            </button>
           </div>
 
-          <div id="goalsEmpty" class="empty-state" hidden>
-            <div class="empty-symbol">◎</div>
-            <h3 id="emptyTitle">No goals yet</h3>
-            <p id="emptyText">
-              Create your first academic goal and track your progress here.
-            </p>
-            <button id="emptyCreateBtn" class="btn btn-primary" type="button">
-              Create your first goal
+          <!-- METHOD ONE -->
+          <section class="planner-method" id="semesterPlanner">
+            <div class="method-heading">
+              <span class="method-number">01</span>
+              <div>
+                <h3>What GPA do I need next semester?</h3>
+                <p>Work out the semester GPA required to reach a target cumulative GPA.</p>
+              </div>
+            </div>
+
+            <div class="planner-fields">
+              <div class="field">
+                <label for="semesterCurrentGpa">Current cumulative GPA</label>
+                <input id="semesterCurrentGpa" type="number" min="0" max="5" step="0.01"
+                  inputmode="decimal" placeholder="e.g. 3.20" required>
+              </div>
+              <div class="field">
+                <label for="semesterCompletedCredits">Credits already completed</label>
+                <input id="semesterCompletedCredits" type="number" min="0" step="0.5"
+                  inputmode="decimal" placeholder="e.g. 36" required>
+              </div>
+              <div class="field">
+                <label for="semesterTargetGpa">Target cumulative GPA</label>
+                <input id="semesterTargetGpa" type="number" min="0" max="5" step="0.01"
+                  inputmode="decimal" placeholder="e.g. 4.00" required>
+              </div>
+              <div class="field">
+                <label for="semesterUpcomingCredits">Credits next semester</label>
+                <input id="semesterUpcomingCredits" type="number" min="0.01" step="0.5"
+                  inputmode="decimal" placeholder="e.g. 18" required>
+              </div>
+            </div>
+
+            <button class="primary-button calculate-button" id="calculateSemesterBtn" type="button">
+              Calculate required GPA <span>→</span>
             </button>
+            <div class="planner-result" id="semesterPlannerResult" role="status" aria-live="polite" hidden></div>
+          </section>
+
+          <!-- METHOD TWO -->
+          <section class="planner-method" id="cumulativePlanner" hidden>
+            <div class="method-heading">
+              <span class="method-number">02</span>
+              <div>
+                <h3>What will my cumulative GPA become?</h3>
+                <p>Estimate your cumulative GPA if you achieve a particular GPA next semester.</p>
+              </div>
+            </div>
+
+            <div class="planner-fields">
+              <div class="field">
+                <label for="cumulativeCurrentGpa">Current cumulative GPA</label>
+                <input id="cumulativeCurrentGpa" type="number" min="0" max="5" step="0.01"
+                  inputmode="decimal" placeholder="e.g. 3.20" required>
+              </div>
+              <div class="field">
+                <label for="cumulativeCompletedCredits">Credits already completed</label>
+                <input id="cumulativeCompletedCredits" type="number" min="0" step="0.5"
+                  inputmode="decimal" placeholder="e.g. 36" required>
+              </div>
+              <div class="field">
+                <label for="cumulativeSemesterGpa">Expected next-semester GPA</label>
+                <input id="cumulativeSemesterGpa" type="number" min="0" max="5" step="0.01"
+                  inputmode="decimal" placeholder="e.g. 4.50" required>
+              </div>
+              <div class="field">
+                <label for="cumulativeUpcomingCredits">Credits next semester</label>
+                <input id="cumulativeUpcomingCredits" type="number" min="0.01" step="0.5"
+                  inputmode="decimal" placeholder="e.g. 18" required>
+              </div>
+            </div>
+
+            <button class="primary-button calculate-button" id="calculateCumulativeBtn" type="button">
+              Estimate cumulative GPA <span>→</span>
+            </button>
+            <div class="planner-result" id="cumulativePlannerResult" role="status" aria-live="polite" hidden></div>
+          </section>
+
+          <p class="planner-disclaimer">
+            These estimates assume your current GPA represents all completed credits and that the
+            same GPA scale is used throughout. Your institution's rules for repeated courses,
+            withdrawals, and rounding may affect the official result.
+          </p>
+        </section>
+
+        <!-- GOAL PROGRESS SUMMARY -->
+        <section class="panel progress-overview">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">YOUR MOMENTUM</p>
+              <h2>Goal progress</h2>
+              <p class="panel-description">A quick view of how your goals are progressing.</p>
+            </div>
+          </div>
+          <div class="overall-progress">
+            <div class="overall-progress-top">
+              <span>Completed goals</span>
+              <strong id="overallProgressText">0%</strong>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill" id="overallProgressFill" style="width:0%"></div>
+            </div>
+            <p id="overallProgressNote">Create a goal to start tracking your progress.</p>
           </div>
         </section>
 
+        <!-- GOAL LIST -->
+        <section class="panel goals-panel">
+          <div class="panel-header goals-list-header">
+            <div>
+              <p class="eyebrow">YOUR TARGETS</p>
+              <h2>My goals</h2>
+            </div>
+            <div class="filter-controls">
+              <label class="sr-only" for="goalFilter">Filter goals</label>
+              <select id="goalFilter">
+                <option value="all">All goals</option>
+                <option value="active">Active</option>
+                <option value="completed">Completed</option>
+                <option value="overdue">Overdue</option>
+              </select>
+              <label class="sr-only" for="goalSort">Sort goals</label>
+              <select id="goalSort">
+                <option value="deadline">Deadline first</option>
+                <option value="newest">Newest first</option>
+                <option value="progress">Highest progress</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="goal-list" id="goalList">
+            <div class="empty-state">
+              <span class="empty-icon">◎</span>
+              <h3>Loading your goals</h3>
+              <p>Your saved goals will appear here.</p>
+            </div>
+          </div>
+          <p class="page-message" id="pageMessage" role="status" aria-live="polite"></p>
+        </section>
+
         <footer class="page-footer">
-          <span>GradeFlow Goals</span>
-          <span>Your progress is based on your saved calculations.</span>
+          <span>© <span id="currentYear"></span> GradeFlow</span>
+          <span>Academic progress, organized.</span>
         </footer>
-      </section>
+      </div>
     </main>
   </div>
 
-  <!-- Create / edit goal dialog -->
+  <!-- CREATE / EDIT GOAL MODAL -->
   <div class="modal-backdrop" id="goalModal" hidden>
-    <section class="goal-modal" role="dialog" aria-modal="true"
-      aria-labelledby="modalTitle">
-      <div class="modal-heading">
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="goalModalTitle">
+      <div class="modal-header">
         <div>
-          <p class="eyebrow">GOAL SETUP</p>
-          <h2 id="modalTitle">Create a goal</h2>
-          <p class="modal-subtitle">
-            Choose a target you want to work towards.
-          </p>
+          <p class="eyebrow">ACADEMIC TARGET</p>
+          <h2 id="goalModalTitle">Create a goal</h2>
+          <p>Choose a target and set a date to work toward.</p>
         </div>
-        <button id="closeModalBtn" class="close-btn" type="button"
-          aria-label="Close dialog">×</button>
+        <button class="icon-button modal-close" id="closeGoalModal" type="button" aria-label="Close">×</button>
       </div>
 
       <form id="goalForm">
-        <label class="field">
-          <span>Goal name</span>
-          <input id="goalTitle" name="title" type="text"
-            maxlength="70" placeholder="e.g. Reach my GPA target"
-            required>
-        </label>
+        <input id="goalId" type="hidden">
 
-        <label class="field">
-          <span>Goal type</span>
-          <select id="goalType" name="type" required>
-            <option value="gpa">GPA target</option>
-            <option value="percentage">Percentage target</option>
-          </select>
-        </label>
+        <div class="field">
+          <label for="goalTitle">Goal title</label>
+          <input id="goalTitle" type="text" maxlength="100"
+            placeholder="e.g. Improve my semester GPA" required>
+        </div>
 
-        <label class="field">
-          <span id="targetLabel">Target GPA</span>
-          <input id="goalTarget" name="target" type="number"
-            min="0.01" max="5" step="0.01" placeholder="e.g. 4.50"
-            required>
-          <small id="targetHelp">
-            Enter a target GPA that matches your grading scale.
-          </small>
-        </label>
+        <div class="form-grid">
+          <div class="field">
+            <label for="goalType">Goal type</label>
+            <select id="goalType" required>
+              <option value="gpa">Cumulative GPA</option>
+              <option value="percentage">Average percentage</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="goalTarget">Target value</label>
+            <input id="goalTarget" type="number" min="0.01" max="5" step="0.01"
+              placeholder="e.g. 4.00" required>
+            <small id="goalTargetHint">Maximum depends on your GPA scale.</small>
+          </div>
+        </div>
 
-        <label class="field">
-          <span>Deadline</span>
-          <input id="goalDeadline" name="deadline" type="date" required>
-        </label>
+        <div class="field">
+          <label for="goalDeadline">Deadline</label>
+          <input id="goalDeadline" type="date" required>
+        </div>
 
-        <label class="field">
-          <span>Description (optional)</span>
-          <textarea id="goalDescription" name="description"
-            rows="3" maxlength="250"
-            placeholder="What will help you achieve this goal?"></textarea>
-        </label>
+        <div class="field">
+          <label for="goalDescription">Description (optional)</label>
+          <textarea id="goalDescription" rows="3" maxlength="500"
+            placeholder="What steps will help you reach this target?"></textarea>
+        </div>
 
-        <p class="form-error" id="formError" hidden></p>
+        <p class="form-error" id="goalFormError" role="alert" hidden></p>
 
         <div class="modal-actions">
-          <button id="cancelModalBtn" class="btn btn-secondary"
-            type="button">Cancel</button>
-          <button id="saveGoalBtn" class="btn btn-primary"
-            type="submit">Save goal</button>
+          <button class="secondary-button" id="cancelGoalButton" type="button">Cancel</button>
+          <button class="primary-button" id="saveGoalButton" type="submit">Save goal</button>
         </div>
       </form>
     </section>
   </div>
 
-  <!-- Goal actions dialog -->
-  <div class="modal-backdrop" id="confirmModal" hidden>
-    <section class="confirm-modal" role="dialog" aria-modal="true"
-      aria-labelledby="confirmTitle">
-      <div class="modal-heading">
+  <!-- DELETE CONFIRMATION -->
+  <div class="modal-backdrop" id="deleteModal" hidden>
+    <section class="modal confirmation-modal" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle">
+      <div class="modal-header">
         <div>
-          <p class="eyebrow">GOAL MANAGEMENT</p>
-          <h2 id="confirmTitle">Confirm action</h2>
+          <p class="eyebrow">CONFIRM ACTION</p>
+          <h2 id="deleteModalTitle">Delete this goal?</h2>
+          <p>This action cannot be undone.</p>
         </div>
-        <button id="closeConfirmBtn" class="close-btn" type="button"
-          aria-label="Close dialog">×</button>
+        <button class="icon-button" id="closeDeleteModal" type="button" aria-label="Close">×</button>
       </div>
-      <p id="confirmMessage" class="confirm-message"></p>
+      <p id="deleteGoalName" class="delete-goal-name"></p>
       <div class="modal-actions">
-        <button id="cancelConfirmBtn" class="btn btn-secondary"
-          type="button">Cancel</button>
-        <button id="confirmActionBtn" class="btn btn-primary"
-          type="button">Confirm</button>
+        <button class="secondary-button" id="cancelDeleteButton" type="button">Keep goal</button>
+        <button class="danger-button" id="confirmDeleteButton" type="button">Delete goal</button>
       </div>
     </section>
   </div>

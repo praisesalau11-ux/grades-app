@@ -1,0 +1,134 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#11110f">
+  <meta name="description" content="Track your GPA, subject performance and academic progress with GradeFlow.">
+  <title>Performance Analytics | GradeFlow</title>
+  <link rel="stylesheet" href="../css/analytics.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="../dashboard.html">
+      <span class="brand-mark">G</span>
+      <span>GradeFlow</span>
+    </a>
+    <a class="back-link" href="../dashboard.html">← Dashboard</a>
+  </header>
+
+  <main class="container">
+    <section class="intro">
+      <p class="eyebrow">YOUR ACADEMIC DATA</p>
+      <h1>Performance <span>analytics.</span></h1>
+      <p>Understand your progress, identify strengths and make better study decisions.</p>
+    </section>
+
+    <p id="analyticsMessage" class="message" role="status" aria-live="polite">
+      Loading your academic data...
+    </p>
+
+    <section class="metrics">
+      <article class="panel metric">
+        <span class="metric-label">Latest GPA</span>
+        <strong id="latestGpa">—</strong>
+        <span class="muted" id="latestGpaNote">Your latest saved result</span>
+      </article>
+      <article class="panel metric">
+        <span class="metric-label">Overall average</span>
+        <strong id="overallAverage">—</strong>
+        <span class="muted">Average of saved calculation percentages</span>
+      </article>
+      <article class="panel metric">
+        <span class="metric-label">Credits in latest result</span>
+        <strong id="totalCredits">—</strong>
+        <span class="muted">Based on the latest saved calculation</span>
+      </article>
+      <article class="panel metric">
+        <span class="metric-label">Calculations saved</span>
+        <strong id="calculationCount">0</strong>
+        <span class="muted">Your available history records</span>
+      </article>
+    </section>
+
+    <section class="panel section">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">GPA TREND</p>
+          <h2>Your progress over time</h2>
+          <p class="muted">Each point represents a saved calculation.</p>
+        </div>
+        <label class="period-control">
+          <span>Show</span>
+          <select id="periodSelect">
+            <option value="5">Last 5</option>
+            <option value="10" selected>Last 10</option>
+            <option value="20">Last 20</option>
+            <option value="all">All records</option>
+          </select>
+        </label>
+      </div>
+      <div id="gpaChart" class="chart" aria-label="GPA history chart">
+        <p class="muted">Your chart will appear when saved results are available.</p>
+      </div>
+      <p id="trendSummary" class="insight"></p>
+    </section>
+
+    <section class="subject-grid">
+      <article class="panel section">
+        <p class="eyebrow">YOUR STRENGTHS</p>
+        <h2>Strongest subjects</h2>
+        <div id="strongSubjects" class="subject-list">
+          <p class="muted">Waiting for data...</p>
+        </div>
+      </article>
+
+      <article class="panel section">
+        <p class="eyebrow">ROOM TO IMPROVE</p>
+        <h2>Subjects to focus on</h2>
+        <div id="weakSubjects" class="subject-list">
+          <p class="muted">Waiting for data...</p>
+        </div>
+      </article>
+    </section>
+
+    <section class="panel section">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">SUBJECT BREAKDOWN</p>
+          <h2>Performance by subject</h2>
+          <p class="muted">Average saved score for each subject name.</p>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Subject</th>
+              <th>Average score</th>
+              <th>Records</th>
+              <th>Performance</th>
+            </tr>
+          </thead>
+          <tbody id="subjectTable">
+            <tr><td colspan="4">Waiting for saved results...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel section">
+      <p class="eyebrow">NEXT ACTION</p>
+      <h2>Keep improving</h2>
+      <p class="muted">Your analytics become more useful as you save more calculations over time.</p>
+      <a class="primary-button" href="calculator.html">＋ Calculate grades</a>
+      <a class="secondary-link" href="history.html">View calculation history →</a>
+    </section>
+
+    <footer>© <span id="currentYear"></span> GradeFlow · Academic progress, organized.</footer>
+  </main>
+
+  <script type="module" src="../js/analytics.js"></script>
+</body>
+</html>

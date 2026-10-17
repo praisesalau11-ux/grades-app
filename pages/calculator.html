@@ -30,6 +30,84 @@
                 </p>
             </section>
 
+
+<!-- CUSTOM GRADING SETTINGS -->
+<section class="grading-settings panel" aria-labelledby="gradingSettingsTitle">
+  <div class="panel-header">
+    <div>
+      <p class="eyebrow">PERSONALIZE YOUR RESULTS</p>
+      <h2 id="gradingSettingsTitle">Grading scale</h2>
+      <p class="panel-description">
+        Choose your GPA scale and customize the score boundaries and grade points.
+      </p>
+    </div>
+  </div>
+
+  <label for="gpaScale">GPA system</label>
+  <select id="gpaScale">
+    <option value="5">5-point GPA</option>
+    <option value="4">4-point GPA</option>
+  </select>
+
+  <div class="grading-table-wrap">
+    <table class="grading-table">
+      <thead>
+        <tr>
+          <th scope="col">Grade</th>
+          <th scope="col">Minimum score</th>
+          <th scope="col">GPA points</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">A</th>
+          <td><input id="boundaryA" type="number" min="0" max="100" step="1" value="70"></td>
+          <td><input id="pointsA" type="number" min="0" max="5" step="0.1" value="5"></td>
+        </tr>
+        <tr>
+          <th scope="row">B</th>
+          <td><input id="boundaryB" type="number" min="0" max="100" step="1" value="60"></td>
+          <td><input id="pointsB" type="number" min="0" max="5" step="0.1" value="4"></td>
+        </tr>
+        <tr>
+          <th scope="row">C</th>
+          <td><input id="boundaryC" type="number" min="0" max="100" step="1" value="50"></td>
+          <td><input id="pointsC" type="number" min="0" max="5" step="0.1" value="3"></td>
+        </tr>
+        <tr>
+          <th scope="row">D</th>
+          <td><input id="boundaryD" type="number" min="0" max="100" step="1" value="45"></td>
+          <td><input id="pointsD" type="number" min="0" max="5" step="0.1" value="2"></td>
+        </tr>
+        <tr>
+          <th scope="row">E</th>
+          <td><input id="boundaryE" type="number" min="0" max="100" step="1" value="40"></td>
+          <td><input id="pointsE" type="number" min="0" max="5" step="0.1" value="1"></td>
+        </tr>
+        <tr>
+          <th scope="row">F</th>
+          <td><span>Below E minimum</span></td>
+          <td><input id="pointsF" type="number" min="0" max="5" step="0.1" value="0"></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="grading-settings-actions">
+    <button id="saveGradingSettings" class="button button-primary" type="button">
+      Save grading settings
+    </button>
+    <button id="resetGradingSettings" class="button button-secondary" type="button">
+      Reset defaults
+    </button>
+  </div>
+
+  <p id="gradingSettingsMessage" class="save-message" role="status" aria-live="polite">
+    Sign in to save your grading settings to your account.
+  </p>
+</section>
+
+
             <section class="calculator-layout">
                 <div class="panel subjects-panel">
                     <div class="section-heading">
@@ -42,15 +120,51 @@
 
                     <form id="calculatorForm">
                         <div class="subject-table">
-                            <div class="subject-table-head">
-                                <span>Subject name</span>
-                                <span>Score / 100</span>
-                                <span>Grade</span>
-                                <span></span>
-                            </div>
+                            
+                       <div class="subject-table-head">
+                       <span>Subject name</span>
+                        <span>Score / 100</span>
+                        <span>Credits</span>
+                        <span>Grade</span>
+                       <span></span>
+                       </div>
+
 
                             <div id="subjectRows"></div>
                         </div>
+
+                    
+<div class="saved-subject-tools">
+    <div class="saved-subject-heading">
+        <h3>Saved subjects</h3>
+        <p>Reuse subjects you've saved to your account.</p>
+    </div>
+
+    <div class="saved-subject-controls">
+        <select id="savedSubjectSelect" aria-label="Choose a saved subject">
+            <option value="">Select a saved subject</option>
+        </select>
+
+        <button type="button" id="loadSavedSubject" class="button button-secondary">
+            Load subject
+        </button>
+    </div>
+
+    <div class="saved-subject-actions">
+        <button type="button" id="saveSubjectsButton" class="button button-secondary">
+            Save subject names
+        </button>
+
+        <button type="button" id="deleteSavedSubject" class="button button-quiet">
+            Delete selected
+        </button>
+    </div>
+
+    <p id="savedSubjectMessage" class="saved-subject-message" role="status">
+        Sign in to manage your saved subjects.
+    </p>
+</div>
+
 
                         <button type="button" id="addSubject" class="button button-secondary add-button">
                             <span>＋</span> Add subject
