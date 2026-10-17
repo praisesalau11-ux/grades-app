@@ -171,13 +171,15 @@ h1 {
     font-weight: 650;
 }
 
+
 .subject-table-head,
 .subject-row {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 104px 54px 30px;
+    grid-template-columns: minmax(0, 1fr) 92px 65px 48px 30px;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
 }
+
 
 .subject-table-head {
     padding: 0 0 10px;
@@ -532,11 +534,13 @@ h1 {
         gap: 8px;
     }
 
-    .subject-table-head,
-    .subject-row {
-        grid-template-columns: minmax(0, 1fr) 77px 35px 23px;
-        gap: 6px;
-    }
+    
+.subject-table-head,
+.subject-row {
+    grid-template-columns: minmax(0, 1fr) 68px 48px 32px 22px;
+    gap: 5px;
+}
+
 
     .subject-table-head {
         font-size: 9px;
@@ -568,4 +572,162 @@ h1 {
     .count-badge {
         font-size: 10px;
     }
+}
+
+
+/* Saved subjects */
+.saved-subject-tools {
+    margin-top: 22px;
+    padding: 17px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: #faf9f6;
+}
+
+.saved-subject-heading h3 {
+    margin-bottom: 5px;
+    font-size: 14px;
+}
+
+.saved-subject-heading p {
+    margin-bottom: 14px;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.saved-subject-controls {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+}
+
+.saved-subject-controls select {
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: white;
+    color: var(--text);
+    font: inherit;
+    font-size: 12px;
+}
+
+.saved-subject-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.saved-subject-actions .button {
+    flex: 1;
+}
+
+.saved-subject-message {
+    margin: 12px 0 0;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.saved-subject-message.success {
+    color: var(--success);
+}
+
+.saved-subject-message.error {
+    color: var(--danger);
+}
+
+@media (max-width: 420px) {
+    .saved-subject-controls {
+        grid-template-columns: 1fr;
+    }
+
+    .saved-subject-controls .button {
+        width: 100%;
+    }
+}
+
+
+/* Custom grading settings */
+.grading-settings {
+  margin: 24px 0;
+  padding: 22px;
+}
+
+.grading-settings > label {
+  display: block;
+  margin: 14px 0 8px;
+  font-weight: 600;
+}
+
+.grading-settings select,
+.grading-table input {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  color: inherit;
+  background: var(--input-bg, #151515);
+  border: 1px solid var(--border-color, #343434);
+  border-radius: 9px;
+  font: inherit;
+}
+
+.grading-settings select {
+  max-width: 260px;
+}
+
+.grading-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 18px;
+}
+
+.grading-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.grading-table th,
+.grading-table td {
+  padding: 9px 8px;
+  border-bottom: 1px solid var(--border-color, #303030);
+}
+
+.grading-table th {
+  font-weight: 600;
+}
+
+.grading-table input {
+  min-width: 78px;
+}
+
+.grading-settings-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.grading-settings-actions button {
+  cursor: pointer;
+}
+
+@media (max-width: 480px) {
+  .grading-settings {
+    padding: 14px;
+  }
+
+  .grading-table th,
+  .grading-table td {
+    padding: 8px 5px;
+  }
+
+  .grading-table input {
+    min-width: 68px;
+    padding: 8px;
+  }
 }
