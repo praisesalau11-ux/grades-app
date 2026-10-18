@@ -6,8 +6,17 @@
   <meta name="theme-color" content="#171714">
 
   <title>Performance | GradeFlow</title>
+  <script>
+  try {
+    document.documentElement.dataset.theme =
+      localStorage.getItem("gradeflow-theme") || "dark";
+  } catch (error) {
+    document.documentElement.dataset.theme = "dark";
+  }
+</script>
 
   <link rel="stylesheet" href="../css/performance.css">
+  <link rel="stylesheet" href="../css/theme.css">
   <script type="module" src="../js/performance.js"></script>
 </head>
 

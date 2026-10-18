@@ -7,7 +7,17 @@
   <meta name="theme-color" content="#11110f">
   <meta name="description" content="Track your GPA, subject performance and academic progress with GradeFlow.">
   <title>Performance Analytics | GradeFlow</title>
+<script>
+  try {
+    document.documentElement.dataset.theme =
+      localStorage.getItem("gradeflow-theme") || "dark";
+  } catch (error) {
+    document.documentElement.dataset.theme = "dark";
+  }
+</script>
+
   <link rel="stylesheet" href="../css/analytics.css">
+ <link rel="stylesheet" href="../css/theme.css">
 </head>
 <body>
   <header class="topbar">

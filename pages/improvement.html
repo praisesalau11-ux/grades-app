@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#10110f">
+  <title>Grade Improvement | GradeFlow</title>
+
+  <script>
+  try {
+    document.documentElement.dataset.theme =
+      localStorage.getItem("gradeflow-theme") || "dark";
+  } catch (error) {
+    document.documentElement.dataset.theme = "dark";
+  }
+</script>
+
+  <link rel="stylesheet" href="../css/improvement.css">
+  <link rel="stylesheet" href="../css/theme.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a href="../dashboard.html" class="brand">
+        <span class="brand-mark">G</span>
+        <span>GradeFlow<small>ACADEMIC WORKSPACE</small></span>
+      </a>
+
+      <div class="nav-label">WORKSPACE</div>
+      <nav class="nav-links">
+        <a href="../dashboard.html" class="nav-link">
+          <span>⌂</span> Dashboard
+        </a>
+        <a href="calculator.html" class="nav-link">
+          <span>＋</span> GPA Calculator
+        </a>
+        <a href="history.html" class="nav-link">
+          <span>◷</span> Calculation History
+        </a>
+        <a href="performance.html" class="nav-link">
+          <span>↗</span> Performance
+        </a>
+        <a href="analytics.html" class="nav-link">
+          <span>▥</span> Analytics
+        </a>
+        <a href="goals.html" class="nav-link">
+          <span>◎</span> Goals
+        </a>
+        <a href="improvement.html" class="nav-link active">
+          <span>⌁</span> Grade Improvement
+        </a>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="sidebar-note">
+          <span class="note-dot"></span>
+          <div>
+            <strong>Progress, not perfection</strong>
+            <p>Use your results to plan your next step.</p>
+          </div>
+        </div>
+        <button class="logout-button" id="logoutButton" type="button">
+          <span>↪</span> Sign out
+        </button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <button class="mobile-menu" id="mobileMenu" type="button"
+                aria-label="Toggle navigation">☰</button>
+        <div>
+          <div class="eyebrow">ACADEMIC WORKSPACE / TRACKING</div>
+          <h1>Grade Improvement</h1>
+        </div>
+        <a href="calculator.html" class="primary-button top-action">
+          + New calculation
+        </a>
+      </header>
+
+      <section class="welcome-row">
+        <div>
+          <h2>Measure your progress.</h2>
+          <p>
+            See how your GPA and subject scores change across your saved
+            GradeFlow calculations.
+          </p>
+        </div>
+        <div class="history-status">
+          <span class="status-dot"></span>
+          Using saved calculation history
+        </div>
+      </section>
+
+      <div class="message-banner" id="pageMessage" role="status" hidden></div>
+
+      <section class="stat-grid" aria-label="Improvement summary">
+        <article class="stat-card">
+          <div class="stat-top">
+            <span>Latest GPA</span>
+            <span class="stat-icon">G</span>
+          </div>
+          <div class="stat-value" id="latestGpa">—</div>
+          <div class="stat-foot" id="latestGpaNote">Waiting for history</div>
+        </article>
+
+        <article class="stat-card">
+          <div class="stat-top">
+            <span>GPA change</span>
+            <span class="stat-icon">↗</span>
+          </div>
+          <div class="stat-value" id="gpaChange">—</div>
+          <div class="stat-foot" id="gpaChangeNote">Compared with previous calculation</div>
+        </article>
+
+        <article class="stat-card">
+          <div class="stat-top">
+            <span>Subjects tracked</span>
+            <span class="stat-icon">▤</span>
+          </div>
+          <div class="stat-value" id="subjectsTracked">0</div>
+          <div class="stat-foot">Subjects found in saved calculations</div>
+        </article>
+
+        <article class="stat-card">
+          <div class="stat-top">
+            <span>Improving subjects</span>
+            <span class="stat-icon">↑</span>
+          </div>
+          <div class="stat-value" id="improvingSubjects">0</div>
+          <div class="stat-foot" id="improvingSubjectsNote">
+            Compared with each subject's previous recorded score
+          </div>
+        </article>
+      </section>
+
+      <section class="content-grid">
+        <article class="panel trend-panel">
+          <div class="panel-heading">
+            <div>
+              <div class="eyebrow">OVER TIME</div>
+              <h3>GPA trend</h3>
+              <p>Your saved GPA results, ordered by calculation date.</p>
+            </div>
+            <label class="select-wrap">
+              <span class="sr-only">Trend range</span>
+              <select id="trendRange">
+                <option value="all">All records</option>
+                <option value="5">Last 5</option>
+                <option value="10">Last 10</option>
+                <option value="20">Last 20</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="chart-summary">
+            <span>GPA recorded</span>
+            <strong id="trendRangeLabel">No records yet</strong>
+          </div>
+
+          <div class="chart-container" id="gpaChart">
+            <div class="empty-state compact-empty">
+              <span class="empty-symbol">⌁</span>
+              <strong>Your GPA trend will appear here</strong>
+              <p>Save at least two calculations to compare results.</p>
+            </div>
+          </div>
+
+          <div class="chart-legend">
+            <span class="legend-dot"></span> Saved GPA
+            <span class="legend-note">Values are taken from calculation history.</span>
+          </div>
+        </article>
+
+        <article class="panel overview-panel">
+          <div class="panel-heading">
+            <div>
+              <div class="eyebrow">SUBJECT BREAKDOWN</div>
+              <h3>Subject performance</h3>
+              <p>Compare each subject's latest score with its previous recorded score.</p>
+            </div>
+          </div>
+
+          <div class="subject-summary" id="subjectSummary">
+            <div class="empty-state compact-empty">
+              <span class="empty-symbol">▤</span>
+              <strong>No subject records yet</strong>
+              <p>Subjects will appear after you save calculations containing them.</p>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="panel subjects-panel">
+        <div class="panel-heading responsive-heading">
+          <div>
+            <div class="eyebrow">DETAILED COMPARISON</div>
+            <h3>Subject improvement tracker</h3>
+            <p>Search your subjects and review their score changes.</p>
+          </div>
+
+          <div class="table-controls">
+            <input id="subjectSearch" type="search"
+                   placeholder="Search subjects..." autocomplete="off">
+            <select id="subjectFilter" aria-label="Filter subjects">
+              <option value="all">All subjects</option>
+              <option value="improved">Improved</option>
+              <option value="declined">Declined</option>
+              <option value="unchanged">Unchanged</option>
+              <option value="single">One record</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Subject</th>
+                <th>Previous score</th>
+                <th>Latest score</th>
+                <th>Change</th>
+                <th>Records</th>
+                <th>Trend</th>
+              </tr>
+            </thead>
+            <tbody id="subjectTableBody">
+              <tr>
+                <td colspan="6" class="table-empty">
+                  Loading saved subject records...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-footer" id="subjectTableFooter"></div>
+      </section>
+
+      <section class="panel records-panel">
+        <div class="panel-heading responsive-heading">
+          <div>
+            <div class="eyebrow">YOUR SAVED RESULTS</div>
+            <h3>Calculation timeline</h3>
+            <p>Review the GPA and percentage from previous calculations.</p>
+          </div>
+          <label class="select-wrap">
+            <span class="sr-only">Number of history records</span>
+            <select id="historyLimit">
+              <option value="5">Latest 5</option>
+              <option value="10">Latest 10</option>
+              <option value="20">Latest 20</option>
+              <option value="all">All records</option>
+            </select>
+          </label>
+        </div>
+
+        <div id="historyTimeline" class="timeline">
+          <div class="empty-state compact-empty">
+            <strong>Loading calculation history...</strong>
+          </div>
+        </div>
+      </section>
+
+      <footer class="page-footer">
+        <span>GradeFlow</span>
+        <span>Improvement tracking is based on your saved calculations.</span>
+      </footer>
+    </main>
+  </div>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <script type="module" src="../js/improvement.js"></script>
+</body>
+</html>

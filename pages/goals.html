@@ -7,7 +7,17 @@
   <meta name="theme-color" content="#11110f">
   <meta name="description" content="Set academic goals and plan your future GPA with GradeFlow.">
   <title>Goals & GPA Planner — GradeFlow</title>
+<script>
+  try {
+    document.documentElement.dataset.theme =
+      localStorage.getItem("gradeflow-theme") || "dark";
+  } catch (error) {
+    document.documentElement.dataset.theme = "dark";
+  }
+</script>
+
   <link rel="stylesheet" href="../css/goals.css">
+  <link rel="stylesheet" href="../css/theme.css">
 </head>
 <body>
   <div class="app-shell">
@@ -354,6 +364,7 @@
     </section>
   </div>
 
+  <script type="module" src="../js/goal-deadline-notifications.js"></script>
   <script type="module" src="../js/goals.js"></script>
 </body>
 </html>

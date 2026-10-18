@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#11110f">
+  <meta name="description" content="Plan study sessions, organize subjects, and track academic progress with GradeFlow.">
+  <title>Study Planner | GradeFlow</title>
+<script>
+  try {
+    document.documentElement.dataset.theme =
+      localStorage.getItem("gradeflow-theme") || "dark";
+  } catch (error) {
+    document.documentElement.dataset.theme = "dark";
+  }
+</script>
+
+  <link rel="stylesheet" href="../css/study-planner.css">
+  <script type="module" src="../js/study-planner.js"></script>
+  <link rel="stylesheet" href="../css/theme.css">
+</head>
+
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="../dashboard.html">
+        <span class="brand-mark">G</span>
+        <span>GradeFlow</span>
+      </a>
+
+      <p class="sidebar-label">WORKSPACE</p>
+
+      <nav class="nav-list" aria-label="Main navigation">
+        <a class="nav-link" href="../dashboard.html">
+          <span>⌂</span> Dashboard
+        </a>
+        <a class="nav-link" href="./calculator.html">
+          <span>▦</span> GPA Calculator
+        </a>
+        <a class="nav-link" href="./subjects.html">
+          <span>▤</span> Saved Subjects
+        </a>
+        <a class="nav-link" href="./history.html">
+          <span>◷</span> GPA History
+        </a>
+        <a class="nav-link" href="./performance.html">
+          <span>↗</span> Performance
+        </a>
+        <a class="nav-link" href="./analytics.html">
+          <span>▥</span> Analytics
+        </a>
+        <a class="nav-link" href="./goals.html">
+          <span>◎</span> Academic Goals
+        </a>
+        <a class="nav-link active" href="./study-planner.html" aria-current="page">
+          <span>▣</span> Study Planner
+        </a>
+      </nav>
+
+      <div class="sidebar-note">
+        <span class="note-icon">✦</span>
+        <strong>Small steps, better grades.</strong>
+        <p>Consistent study sessions help you work towards your academic goals.</p>
+      </div>
+
+      <div class="sidebar-account">
+        <div class="avatar" id="sidebarAvatar">G</div>
+        <div class="account-info">
+          <strong id="sidebarUserName">Loading account...</strong>
+          <span>Student account</span>
+        </div>
+        <button class="icon-button" id="signOutButton" type="button"
+          aria-label="Sign out" title="Sign out">↪</button>
+      </div>
+    </aside>
+
+    <button class="sidebar-backdrop" id="sidebarBackdrop"
+      type="button" aria-label="Close navigation" hidden></button>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="icon-button menu-toggle" id="menuToggle"
+            type="button" aria-label="Open navigation"
+            aria-expanded="false">☰</button>
+
+          <div class="breadcrumb">
+            <span>Workspace</span>
+            <span>/</span>
+            <strong>Study Planner</strong>
+          </div>
+        </div>
+
+        <div class="topbar-actions">
+          <span class="today-label" id="headerDate"></span>
+          <div class="avatar avatar-small" id="headerAvatar">G</div>
+        </div>
+      </header>
+
+      <div class="page-content">
+        <section class="page-heading">
+          <div>
+            <p class="eyebrow">YOUR ACADEMIC ROUTINE</p>
+            <h1>Study <span>Planner.</span></h1>
+            <p class="page-description">
+              Turn your academic goals into manageable study sessions.
+              Organize your subjects, plan your time, and track your progress.
+            </p>
+          </div>
+
+          <button class="primary-button" id="addTaskButton" type="button">
+            <span>＋</span> Add study task
+          </button>
+        </section>
+
+        <section class="stats-grid" aria-label="Study statistics">
+          <article class="stat-card stat-card-accent">
+            <div class="stat-label">Total tasks <span>▣</span></div>
+            <div class="stat-value" id="totalTasks">0</div>
+            <p>All your saved study sessions</p>
+          </article>
+
+          <article class="stat-card">
+            <div class="stat-label">Pending <span>◷</span></div>
+            <div class="stat-value" id="pendingTasks">0</div>
+            <p>Tasks still to complete</p>
+          </article>
+
+          <article class="stat-card">
+            <div class="stat-label">Completed <span>✓</span></div>
+            <div class="stat-value" id="completedTasks">0</div>
+            <p>Sessions marked as finished</p>
+          </article>
+
+          <article class="stat-card">
+            <div class="stat-label">Planned time <span>◴</span></div>
+            <div class="stat-value" id="plannedHours">0h</div>
+            <p>Total time in saved tasks</p>
+          </article>
+        </section>
+
+        <section class="panel weekly-panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">STAY CONSISTENT</p>
+              <h2>Your study progress</h2>
+              <p class="panel-description">
+                See how many of your saved tasks you have completed.
+              </p>
+            </div>
+            <strong class="progress-percentage" id="completionPercentage">0%</strong>
+          </div>
+
+          <div class="progress-track" role="progressbar"
+            aria-label="Study task completion"
+            aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"
+            id="completionProgress">
+            <div class="progress-fill" id="completionProgressFill"></div>
+          </div>
+
+          <div class="progress-footer">
+            <span id="completionSummary">No study tasks yet.</span>
+            <span id="completedMinutes">0 minutes completed</span>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header task-list-header">
+            <div>
+              <p class="eyebrow">YOUR SCHEDULE</p>
+              <h2>Study tasks</h2>
+              <p class="panel-description">
+                Review, update, or complete your planned sessions.
+              </p>
+            </div>
+
+            <div class="filter-controls">
+              <label class="sr-only" for="taskFilter">Filter tasks</label>
+              <select id="taskFilter">
+                <option value="all">All tasks</option>
+                <option value="today">Today</option>
+                <option value="upcoming">Upcoming</option>
+                <option value="overdue">Overdue</option>
+                <option value="completed">Completed</option>
+                <option value="pending">Pending</option>
+              </select>
+
+              <label class="sr-only" for="taskSort">Sort tasks</label>
+              <select id="taskSort">
+                <option value="date">Date and time</option>
+                <option value="priority">Priority</option>
+                <option value="newest">Recently added</option>
+                <option value="duration">Study duration</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="task-list" id="taskList" aria-live="polite">
+            <div class="empty-state">
+              <span class="empty-icon">◷</span>
+              <h3>Loading your study plan</h3>
+              <p>Your saved study tasks will appear here.</p>
+            </div>
+          </div>
+
+          <p class="page-message" id="pageMessage" role="status"></p>
+        </section>
+
+        <footer class="page-footer">
+          <span>GradeFlow Study Planner</span>
+          <span>© <span id="currentYear"></span> GradeFlow</span>
+        </footer>
+      </div>
+    </main>
+  </div>
+
+  <!-- CREATE / EDIT STUDY TASK -->
+  <div class="modal-backdrop" id="taskModal" hidden>
+    <section class="modal" role="dialog" aria-modal="true"
+      aria-labelledby="taskModalTitle">
+
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">STUDY SESSION</p>
+          <h2 id="taskModalTitle">Add a study task</h2>
+          <p>Create a focused session for one of your subjects.</p>
+        </div>
+        <button class="icon-button modal-close" id="closeTaskModal"
+          type="button" aria-label="Close dialog">×</button>
+      </div>
+
+      <form id="taskForm">
+        <input id="taskId" type="hidden">
+
+        <div class="field">
+          <label for="taskTitle">Task title *</label>
+          <input id="taskTitle" type="text" maxlength="100"
+            placeholder="e.g. Revise quadratic equations" required>
+        </div>
+
+        <div class="form-grid">
+          <div class="field">
+            <label for="taskSubject">Subject *</label>
+            <input id="taskSubject" type="text" maxlength="70"
+              list="subjectSuggestions" placeholder="e.g. Mathematics" required>
+            <datalist id="subjectSuggestions">
+              <option value="Mathematics"></option>
+              <option value="English Language"></option>
+              <option value="Physics"></option>
+              <option value="Chemistry"></option>
+              <option value="Biology"></option>
+              <option value="Economics"></option>
+              <option value="Computer Studies"></option>
+            </datalist>
+          </div>
+
+          <div class="field">
+            <label for="taskTopic">Topic</label>
+            <input id="taskTopic" type="text" maxlength="100"
+              placeholder="e.g. Algebra">
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="field">
+            <label for="taskDate">Study date *</label>
+            <input id="taskDate" type="date" required>
+          </div>
+
+          <div class="field">
+            <label for="taskTime">Start time *</label>
+            <input id="taskTime" type="time" required>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="field">
+            <label for="taskDuration">Duration (minutes) *</label>
+            <input id="taskDuration" type="number" min="5" max="720"
+              step="5" value="45" required>
+            <small>Between 5 minutes and 12 hours.</small>
+          </div>
+
+          <div class="field">
+            <label for="taskPriority">Priority</label>
+            <select id="taskPriority">
+              <option value="low">Low</option>
+              <option value="medium" selected>Medium</option>
+              <option value="high">High</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="taskNotes">Notes (optional)</label>
+          <textarea id="taskNotes" maxlength="1000"
+            placeholder="What do you want to understand or finish?"></textarea>
+        </div>
+
+        <p class="form-error" id="taskFormError" role="alert" hidden></p>
+
+        <div class="modal-actions">
+          <button class="secondary-button" id="cancelTaskButton"
+            type="button">Cancel</button>
+          <button class="primary-button" id="saveTaskButton"
+            type="submit">Save study task</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <!-- DELETE CONFIRMATION -->
+  <div class="modal-backdrop" id="deleteModal" hidden>
+    <section class="modal confirmation-modal" role="dialog"
+      aria-modal="true" aria-labelledby="deleteModalTitle">
+
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">CONFIRM ACTION</p>
+          <h2 id="deleteModalTitle">Delete study task?</h2>
+          <p>This task will be permanently removed from your study plan.</p>
+        </div>
+        <button class="icon-button modal-close" id="closeDeleteModal"
+          type="button" aria-label="Close dialog">×</button>
+      </div>
+
+      <p class="delete-task-name" id="deleteTaskName"></p>
+
+      <div class="modal-actions">
+        <button class="secondary-button" id="cancelDeleteButton"
+          type="button">Keep task</button>
+        <button class="danger-button" id="confirmDeleteButton"
+          type="button">Delete task</button>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

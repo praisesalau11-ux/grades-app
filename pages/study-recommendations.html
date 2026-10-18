@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#10110f">
+  <title>Smart Study Recommendations | GradeFlow</title>
+  <script>
+  try {
+    document.documentElement.dataset.theme =
+      localStorage.getItem("gradeflow-theme") || "dark";
+  } catch (error) {
+    document.documentElement.dataset.theme = "dark";
+  }
+</script>
+
+  <link rel="stylesheet" href="../css/study-recommendations.css">
+  <script type="module" src="../js/study-recommendations.js"></script>
+  <link rel="stylesheet" href="../css/theme.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="../dashboard.html">
+        <span class="brand-mark">G</span>
+        <span>Grade<span class="gold">Flow</span></span>
+      </a>
+
+      <p class="nav-label">WORKSPACE</p>
+      <nav class="nav-list">
+        <a class="nav-link" href="../dashboard.html"><span>⌂</span> Dashboard</a>
+        <a class="nav-link" href="./calculator.html"><span>∑</span> GPA Calculator</a>
+        <a class="nav-link" href="./history.html"><span>◷</span> History</a>
+        <a class="nav-link" href="./performance.html"><span>↗</span> Performance</a>
+        <a class="nav-link" href="./analytics.html"><span>▥</span> Analytics</a>
+        <a class="nav-link" href="./goals.html"><span>◎</span> Goals</a>
+        <a class="nav-link" href="./study-planner.html"><span>▣</span> Study Planner</a>
+        <a class="nav-link active" href="./study-recommendations.html">
+          <span>✦</span> Study Recommendations
+        </a>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="account-avatar" id="userAvatar">G</div>
+        <div class="account-details">
+          <strong id="userName">Your account</strong>
+          <span>Student workspace</span>
+        </div>
+        <button id="signOutButton" class="sign-out" type="button" title="Sign out">
+          ↗
+        </button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">PERSONALIZED LEARNING</p>
+          <h1>Smart Study Recommendations</h1>
+          <p class="subtitle">
+            Use your saved results and study schedule to decide what to focus on next.
+          </p>
+        </div>
+        <a class="button button-secondary" href="./study-planner.html">
+          Open Study Planner ↗
+        </a>
+      </header>
+
+      <div id="pageMessage" class="message" role="status" hidden></div>
+
+      <section class="intro-card">
+        <div class="intro-symbol">✦</div>
+        <div>
+          <p class="eyebrow">YOUR NEXT BEST STEP</p>
+          <h2 id="topRecommendation">Preparing your recommendations…</h2>
+          <p id="topRecommendationText">
+            GradeFlow is checking your saved academic information.
+          </p>
+        </div>
+      </section>
+
+      <section class="stats-grid" aria-label="Study overview">
+        <article class="stat-card">
+          <span class="stat-label">Subjects analysed</span>
+          <strong id="subjectCount">—</strong>
+          <span class="stat-note">From saved calculations</span>
+        </article>
+        <article class="stat-card">
+          <span class="stat-label">Pending study tasks</span>
+          <strong id="pendingCount">—</strong>
+          <span class="stat-note">Tasks not completed</span>
+        </article>
+        <article class="stat-card">
+          <span class="stat-label">Overdue tasks</span>
+          <strong id="overdueCount">—</strong>
+          <span class="stat-note">Past their scheduled date</span>
+        </article>
+        <article class="stat-card">
+          <span class="stat-label">Planned study time</span>
+          <strong id="plannedHours">—</strong>
+          <span class="stat-note">Across pending tasks</span>
+        </article>
+      </section>
+
+      <section class="content-grid">
+        <article class="panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">ACADEMIC FOCUS</p>
+              <h2>Subjects to review</h2>
+            </div>
+            <a href="./history.html" class="text-link">View history →</a>
+          </div>
+          <p class="panel-description">
+            Subjects with lower average saved scores appear first. These averages
+            are based on the calculations available in your account.
+          </p>
+          <div id="subjectRecommendations" class="recommendation-list">
+            <div class="loading-state">Loading your subject results…</div>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">TIME MANAGEMENT</p>
+              <h2>What to study first</h2>
+            </div>
+            <span class="panel-icon">◷</span>
+          </div>
+          <p class="panel-description">
+            Tasks are prioritized using deadlines, completion status and priority.
+          </p>
+          <div id="taskRecommendations" class="recommendation-list">
+            <div class="loading-state">Loading your study tasks…</div>
+          </div>
+          <a class="button button-primary full-button" href="./study-planner.html">
+            Manage study tasks
+          </a>
+        </article>
+      </section>
+
+      <section class="panel plan-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">A PRACTICAL PLAN</p>
+            <h2>Your suggested study session</h2>
+          </div>
+          <span class="panel-icon">✧</span>
+        </div>
+
+        <div class="session-grid">
+          <div class="session-step">
+            <span class="step-number">01</span>
+            <div>
+              <strong id="sessionSubject">Choose a subject</strong>
+              <p id="sessionSubjectText">Your lowest-scoring subject will appear here when available.</p>
+            </div>
+          </div>
+          <div class="session-step">
+            <span class="step-number">02</span>
+            <div>
+              <strong id="sessionDuration">Start with 25 minutes</strong>
+              <p id="sessionDurationText">Study one topic without distractions, then take a short break.</p>
+            </div>
+          </div>
+          <div class="session-step">
+            <span class="step-number">03</span>
+            <div>
+              <strong>Test what you learned</strong>
+              <p>Close your notes and explain the topic or answer practice questions from memory.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="plan-actions">
+          <a class="button button-primary" href="./study-planner.html">Schedule a session</a>
+          <a class="button button-secondary" href="./calculator.html">Calculate grades</a>
+        </div>
+      </section>
+
+      <p class="footer-note">
+        Recommendations are generated from your saved GradeFlow data. They are
+        study suggestions, not guarantees of future grades.
+      </p>
+    </main>
+  </div>
+</body>
+</html>

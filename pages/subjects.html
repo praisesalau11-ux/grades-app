@@ -5,7 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#11110f">
   <title>Subjects | GradeFlow</title>
+  <script>
+  try {
+    document.documentElement.dataset.theme =
+      localStorage.getItem("gradeflow-theme") || "dark";
+  } catch (error) {
+    document.documentElement.dataset.theme = "dark";
+  }
+</script>
+  
   <link rel="stylesheet" href="../css/subjects.css">
+  <link rel="stylesheet" href="../css/theme.css">
 </head>
 <body>
   <div class="app-shell">

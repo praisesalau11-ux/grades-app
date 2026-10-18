@@ -5,7 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#171717">
     <title>GradeFlow — Grade Calculator</title>
+<script>
+  try {
+    document.documentElement.dataset.theme =
+      localStorage.getItem("gradeflow-theme") || "dark";
+  } catch (error) {
+    document.documentElement.dataset.theme = "dark";
+  }
+</script>
+
     <link rel="stylesheet" href="../css/calculator.css">
+    <link rel="stylesheet" href="../css/theme.css">
 </head>
 <body>
     <div class="app-shell">

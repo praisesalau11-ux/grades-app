@@ -8,12 +8,21 @@
   <meta name="description" content="View, search, and manage your saved GradeFlow calculations.">
 
   <title>Calculation History | GradeFlow</title>
+<script>
+  try {
+    document.documentElement.dataset.theme =
+      localStorage.getItem("gradeflow-theme") || "dark";
+  } catch (error) {
+    document.documentElement.dataset.theme = "dark";
+  }
+</script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="../css/history.css">
+ <link rel="stylesheet" href="../css/theme.css">
 </head>
 
 <body>

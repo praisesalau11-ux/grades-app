@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#11110f">
+  <meta name="description" content="Your GradeFlow notification centre.">
+  <title>Notifications | GradeFlow</title>
+
+  <script>
+    try {
+      document.documentElement.dataset.theme =
+        localStorage.getItem("gradeflow-theme") || "dark";
+    } catch {
+      document.documentElement.dataset.theme = "dark";
+    }
+  </script>
+
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/notifications.css">
+</head>
+<body>
+  <div class="notifications-shell">
+    <header class="notifications-topbar">
+      <a class="notifications-brand" href="../dashboard.html">
+        <span class="brand-mark">G</span>
+        <span>GradeFlow</span>
+      </a>
+      <a class="back-link" href="../dashboard.html">← Dashboard</a>
+    </header>
+
+    <main class="notifications-main">
+      <section class="notifications-intro">
+        <p class="eyebrow">YOUR PERSONAL INBOX</p>
+        <h1>Notifications<span>.</span></h1>
+        <p>Academic updates and important reminders, all in one place.</p>
+      </section>
+
+      <div id="notificationStatus" class="notification-status"
+           role="status" aria-live="polite" hidden></div>
+
+      <section class="notification-summary">
+        <div>
+          <span class="summary-label">Total notifications</span>
+          <strong id="totalCount">0</strong>
+        </div>
+        <div>
+          <span class="summary-label">Unread</span>
+          <strong id="unreadCount">0</strong>
+        </div>
+        <div>
+          <span class="summary-label">Read</span>
+          <strong id="readCount">0</strong>
+        </div>
+      </section>
+
+      <section class="notification-toolbar">
+        <div class="notification-filters" role="group" aria-label="Filter notifications">
+          <button type="button" class="filter-button active" data-filter="all" aria-pressed="true">All</button>
+          <button type="button" class="filter-button" data-filter="unread" aria-pressed="false">Unread</button>
+          <button type="button" class="filter-button" data-filter="read" aria-pressed="false">Read</button>
+        </div>
+
+        <div class="toolbar-actions">
+          <button type="button" class="text-action" id="markAllReadButton">Mark all read</button>
+          <button type="button" class="text-action danger-text" id="clearAllButton">Clear all</button>
+        </div>
+      </section>
+
+      <section class="notification-list-wrap">
+        <div id="notificationLoading" class="notification-state">
+          <span class="loading-spinner"></span>
+          <p>Loading your notifications…</p>
+        </div>
+
+        <div id="notificationList" class="notification-list" hidden></div>
+
+        <div id="notificationEmpty" class="notification-state" hidden>
+          <span class="empty-icon">♧</span>
+          <h2 id="emptyTitle">You're all caught up</h2>
+          <p id="emptyMessage">New notifications will appear here when GradeFlow creates them.</p>
+        </div>
+      </section>
+
+      <footer class="notifications-footer">
+        <span>GradeFlow</span>
+        <a href="settings.html">Manage preferences →</a>
+      </footer>
+    </main>
+  </div>
+
+  <script type="module" src="../js/notifications.js"></script>
+</body>
+</html>

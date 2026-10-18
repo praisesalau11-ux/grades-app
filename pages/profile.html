@@ -1,0 +1,150 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#171714">
+  <meta name="description" content="Manage your GradeFlow profile">
+  <title>My Profile | GradeFlow</title>
+<script>
+  try {
+    document.documentElement.dataset.theme =
+      localStorage.getItem("gradeflow-theme") || "dark";
+  } catch (error) {
+    document.documentElement.dataset.theme = "dark";
+  }
+</script>
+
+  <link rel="stylesheet" href="../css/profile.css">
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <main class="profile-page">
+    <header class="topbar">
+      <a class="brand" href="../dashboard.html">
+        <span class="brand-mark">G</span>
+        <span>Grade<span class="brand-accent">Flow</span></span>
+      </a>
+      <a class="back-link" href="../dashboard.html">← Dashboard</a>
+    </header>
+
+    <section class="page-heading">
+      <p class="eyebrow">YOUR ACCOUNT</p>
+      <h1>My profile</h1>
+      <p>Manage your personal details and academic information.</p>
+    </section>
+
+    <div id="pageMessage" class="message" role="status" hidden></div>
+
+    <section class="profile-card">
+      <div class="profile-hero">
+        <div class="avatar" id="profileAvatar">G</div>
+        <div>
+          <p class="eyebrow">STUDENT PROFILE</p>
+          <h2 id="profileDisplayName">Loading profile…</h2>
+          <p id="profileEmailDisplay" class="muted">Loading account details</p>
+          <span class="account-badge">● Account profile</span>
+        </div>
+      </div>
+
+      <div class="card-divider"></div>
+
+      <form id="profileForm">
+        <fieldset id="profileFields" disabled>
+          <div class="section-heading">
+            <h3>Personal information</h3>
+            <p>Keep your account details up to date.</p>
+          </div>
+
+          <div class="form-grid">
+            <label class="field full-width">
+              <span>Full name</span>
+              <input id="fullName" name="fullName" type="text" maxlength="100" autocomplete="name" required>
+            </label>
+
+            <label class="field">
+              <span>Username</span>
+              <input id="username" name="username" type="text" readonly>
+              <small>Username changes can be added separately.</small>
+            </label>
+
+            <label class="field">
+              <span>Email address</span>
+              <input id="email" name="email" type="email" readonly>
+              <small>Email changes require a separate account-security flow.</small>
+            </label>
+
+            <label class="field">
+              <span>Phone number</span>
+              <input id="phone" name="phone" type="tel" maxlength="25" autocomplete="tel" placeholder="Enter phone number">
+            </label>
+
+            <label class="field">
+              <span>Country</span>
+              <input id="country" name="country" type="text" maxlength="80" autocomplete="country-name" placeholder="Enter country">
+            </label>
+
+            <label class="field">
+              <span>Date of birth</span>
+              <input id="dob" name="dob" type="date">
+            </label>
+
+            <label class="field">
+              <span>Gender</span>
+              <select id="gender" name="gender">
+                <option value="">Prefer not to say</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="card-divider"></div>
+
+          <div class="section-heading">
+            <h3>Academic information</h3>
+            <p>Optional details to personalize your academic workspace.</p>
+          </div>
+
+          <div class="form-grid">
+            <label class="field">
+              <span>School or institution</span>
+              <input id="school" name="school" type="text" maxlength="150" placeholder="Enter school name">
+            </label>
+
+            <label class="field">
+              <span>Course or programme</span>
+              <input id="course" name="course" type="text" maxlength="150" placeholder="Enter course of study">
+            </label>
+
+            <label class="field full-width">
+              <span>Class or academic level</span>
+              <input id="classLevel" name="classLevel" type="text" maxlength="100" placeholder="e.g. SS2, Year 1, 200 Level">
+            </label>
+          </div>
+
+          <div class="form-actions">
+            <button id="resetButton" class="button secondary" type="button">Discard changes</button>
+            <button id="saveButton" class="button primary" type="submit">Save changes</button>
+          </div>
+        </fieldset>
+      </form>
+
+      <p class="privacy-note">
+        Your profile is linked to your signed-in account. Only update information you want stored in your account.
+      </p>
+    </section>
+
+    <footer class="page-footer">
+      GradeFlow · Your academic progress, clearly organized.
+    </footer>
+  </main>
+
+  <script type="module" src="../js/profile.js"></script>
+</body>
+</html>

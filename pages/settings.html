@@ -1,0 +1,195 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#11110f">
+  <meta name="description" content="Manage your GradeFlow preferences and account settings.">
+  <title>Settings | GradeFlow</title>
+
+  <script>
+    try {
+      document.documentElement.dataset.theme =
+        localStorage.getItem("gradeflow-theme") || "dark";
+    } catch (error) {
+      document.documentElement.dataset.theme = "dark";
+    }
+  </script>
+
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/settings.css">
+</head>
+<body>
+  <div class="settings-shell">
+    <header class="settings-topbar">
+      <a class="settings-brand" href="../dashboard.html">
+        <span class="settings-brand-mark">G</span>
+        <span>GradeFlow</span>
+      </a>
+
+      <a class="back-link" href="../dashboard.html">← Dashboard</a>
+    </header>
+
+    <main class="settings-main">
+      <section class="settings-intro">
+        <p class="settings-eyebrow">YOUR WORKSPACE</p>
+        <h1>Settings<span>.</span></h1>
+        <p>Control your appearance, academic preferences and account.</p>
+      </section>
+
+      <div id="settingsStatus" class="settings-status" role="status" aria-live="polite" hidden></div>
+
+      <section class="settings-section">
+        <div class="section-heading">
+          <span class="section-icon">◐</span>
+          <div>
+            <h2>Appearance</h2>
+            <p>Choose how GradeFlow looks on this device.</p>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="setting-row">
+            <div class="setting-copy">
+              <h3>Theme</h3>
+              <p>Switch between a dark workspace and a light workspace.</p>
+            </div>
+
+            <div class="theme-options" role="group" aria-label="Choose theme">
+              <button type="button" class="theme-option" data-theme-choice="dark" aria-pressed="true">
+                <span class="theme-preview theme-preview-dark"></span>
+                Dark
+              </button>
+              <button type="button" class="theme-option" data-theme-choice="light" aria-pressed="false">
+                <span class="theme-preview theme-preview-light"></span>
+                Light
+              </button>
+            </div>
+          </div>
+          <p class="setting-note">Your theme is saved on this device. Other pages need the shared theme stylesheet to display the full theme change.</p>
+        </div>
+      </section>
+
+      <section class="settings-section">
+        <div class="section-heading">
+          <span class="section-icon">⌗</span>
+          <div>
+            <h2>Academic preferences</h2>
+            <p>Set your preferred GPA scale for future use.</p>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="setting-row">
+            <div class="setting-copy">
+              <h3>Default GPA scale</h3>
+              <p>This saves your preference. It does not change grades already saved in your history.</p>
+            </div>
+            <label class="select-wrap" for="defaultGpaScale">
+              <span class="visually-hidden">Default GPA scale</span>
+              <select id="defaultGpaScale">
+                <option value="4.0">4.0 scale</option>
+                <option value="5.0">5.0 scale</option>
+              </select>
+            </label>
+          </div>
+          <div class="setting-actions">
+            <button type="button" class="primary-button" id="saveAcademicSettings">Save academic preferences</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="settings-section">
+        <div class="section-heading">
+          <span class="section-icon">♧</span>
+          <div>
+            <h2>Reminder preferences</h2>
+            <p>Choose the reminders you would like to receive in the future.</p>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="setting-row">
+            <div class="setting-copy">
+              <h3>Goal reminders</h3>
+              <p>Preference for reminders about academic goals and deadlines.</p>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="goalReminders">
+              <span class="switch-track"></span>
+              <span class="visually-hidden">Enable goal reminders</span>
+            </label>
+          </div>
+
+          <div class="setting-divider"></div>
+
+          <div class="setting-row">
+            <div class="setting-copy">
+              <h3>Progress reminders</h3>
+              <p>Preference for reminders to review your academic progress.</p>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="progressReminders">
+              <span class="switch-track"></span>
+              <span class="visually-hidden">Enable progress reminders</span>
+            </label>
+          </div>
+
+          <div class="setting-actions">
+            <button type="button" class="primary-button" id="saveReminderSettings">Save reminder preferences</button>
+          </div>
+          <p class="setting-note">These switches only store your choices. They do not send push notifications, emails or messages yet.</p>
+        </div>
+      </section>
+
+      <section class="settings-section">
+        <div class="section-heading">
+          <span class="section-icon">♙</span>
+          <div>
+            <h2>Account and data</h2>
+            <p>Manage your account access and keep a copy of your records.</p>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="setting-row">
+            <div class="setting-copy">
+              <h3>Password</h3>
+              <p>Request a password-reset email for your signed-in account.</p>
+            </div>
+            <button type="button" class="secondary-button" id="resetPasswordButton">Reset password</button>
+          </div>
+
+          <div class="setting-divider"></div>
+
+          <div class="setting-row">
+            <div class="setting-copy">
+              <h3>Export my history</h3>
+              <p>Download your saved GradeFlow calculations as a JSON file.</p>
+            </div>
+            <button type="button" class="secondary-button" id="exportHistoryButton">Export data</button>
+          </div>
+
+          <div class="setting-divider"></div>
+
+          <div class="setting-row">
+            <div class="setting-copy">
+              <h3>Sign out</h3>
+              <p>Sign out of your GradeFlow account on this device.</p>
+            </div>
+            <button type="button" class="danger-button" id="signOutButton">Sign out</button>
+          </div>
+        </div>
+      </section>
+
+      <footer class="settings-footer">
+        <span>GradeFlow</span>
+        <span>Your academic progress, organized.</span>
+      </footer>
+    </main>
+  </div>
+
+  <script type="module" src="../js/settings.js"></script>
+</body>
+</html>
