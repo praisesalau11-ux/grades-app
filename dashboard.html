@@ -6,8 +6,16 @@
   <meta name="theme-color" content="#171714">
   <meta name="description" content="Your GradeFlow academic dashboard">
   <title>Dashboard | GradeFlow</title>
-
+<script>
+  try {
+    document.documentElement.dataset.theme =
+      localStorage.getItem("gradeflow-theme") || "dark";
+  } catch (error) {
+    document.documentElement.dataset.theme = "dark";
+  }
+</script>
   <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/theme.css">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -62,6 +70,28 @@
           <span>Reports</span>
         </a>
       </nav>
+
+<a href="pages/study-planner.html" class="nav-link">
+  <span>▣</span>
+  <span>Study Planner</span>
+</a>
+
+<a class="nav-link" href="pages/study-recommendations.html">
+  <span class="nav-icon">✦</span>
+  <span>Study Recommendations</span>
+</a>
+
+<a class="nav-link" href="pages/improvement.html">
+  <span class="nav-icon">✦</span>
+  <span>Improvement Plans</span>
+</a>
+
+
+<a class="nav-link" href="pages/profile.html">
+  <span class="nav-icon">◉</span>
+  <span>My Profile</span>
+</a>
+
 
       <p class="sidebar-label">LEARNING COMMUNITY</p>
 
@@ -469,6 +499,8 @@
     <a href="pages/notifications.html">Notifications</a>
     <a href="pages/settings.html">Settings</a>
   </div>
+
+<script type="module" src="js/notification-badge.js"></script>
 
   <!-- Dashboard logic will be implemented in this separate file. -->
   <script type="module" src="js/dashboard.js"></script>
