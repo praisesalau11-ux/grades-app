@@ -24,6 +24,10 @@ import {
   setDoc
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+import {
+    createGradeFlowNotification
+} from "./notification-service.js";
+
 // ------------------------------------------
 // Elements and state
 // ------------------------------------------
@@ -834,6 +838,7 @@ function invalidateResults() {
 // Save to the existing history collection
 // ------------------------------------------
 
+
 async function saveCalculation() {
     if (!currentUser) {
         saveMessage.className = "save-message error";
@@ -860,44 +865,64 @@ async function saveCalculation() {
     saveButton.textContent = "Saving…";
 
     saveMessage.className = "save-message";
-    saveMessage.textContent = "Saving your calculation securely…";
+    saveMessage.textContent =
+        "Saving your calculation securely…";
 
     try {
         const results = latestResults;
 
         const documentData = {
             uid: currentUser.uid,
-
-            // Preserve the structure used by existing history.
             gpa: results.gpa.toFixed(2),
             percentage: results.percentage,
 
-            
-subjects: results.subjects.map(subject => ({
-    name: subject.name,
-    score: subject.score,
-    grade: subject.grade,
-    credits: subject.credits
-})),
+            subjects: results.subjects.map(subject => ({
+                name: subject.name,
+                score: subject.score,
+                grade: subject.grade,
+                credits: subject.credits
+            })),
 
-totalCredits: results.totalCredits,
-
-
+            totalCredits: results.totalCredits,
+            gpaScale: results.gpaScale,
             time: serverTimestamp()
         };
 
-        await addDoc(
+        // Save the calculation to your existing history.
+        const historyRef = await addDoc(
             collection(db, "history"),
             documentData
         );
 
         savedResultsKey = JSON.stringify(documentData.subjects);
 
+        // Create an in-app notification.
+        let notificationCreated = false;
+
+        try {
+            await createGradeFlowNotification(currentUser.uid, {
+                id: `calculation_saved_${historyRef.id}`,
+                title: "GPA calculation saved",
+                message: `Your GPA calculation was saved successfully. GPA: ${results.gpa.toFixed(2)} / ${results.gpaScale}. Average percentage: ${results.percentage.toFixed(2)}%.`,
+                type: "academic"
+            });
+
+            notificationCreated = true;
+        } catch (notificationError) {
+            console.error(
+                "GradeFlow: notification creation failed:",
+                notificationError
+            );
+        }
+
         saveMessage.className = "save-message success";
-        saveMessage.textContent =
-            "Calculation saved successfully to your history.";
+
+        saveMessage.textContent = notificationCreated
+            ? "Calculation saved successfully. A notification was added."
+            : "Calculation saved to history, but the notification could not be created.";
 
         saveButton.textContent = "Saved";
+
     } catch (error) {
         console.error("GradeFlow save error:", error);
 
@@ -905,7 +930,7 @@ totalCredits: results.totalCredits,
 
         if (error.code === "permission-denied") {
             saveMessage.textContent =
-                "Permission denied. Check that your Firestore history rules are published and that you are signed in.";
+                "Permission denied. Check your Firestore history rules and make sure you are signed in.";
         } else if (!navigator.onLine) {
             saveMessage.textContent =
                 "You appear to be offline. Reconnect and try saving again.";
