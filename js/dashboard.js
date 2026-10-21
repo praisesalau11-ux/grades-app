@@ -1,4 +1,3 @@
-
 /* ==========================================
    GradeFlow — Dashboard Controller
    File: js/dashboard.js
@@ -123,6 +122,7 @@ let goalRecords = [];
 
 let stopHistoryListener = null;
 let stopGoalsListener = null;
+let stopNotificationsListener = null;
 
 // ------------------------------------------
 // Profile
@@ -142,7 +142,6 @@ async function loadProfile(user) {
         console.error("Could not load GradeFlow profile:", error);
     }
 
-    // Do not update the dashboard for a different account.
     if (!currentUser || currentUser.uid !== user.uid) return;
 
     const displayName =
@@ -208,8 +207,6 @@ function loadHistory(user) {
             renderDashboardMetrics(historyRecords);
             renderRecentCalculations(historyRecords);
             renderPerformanceChart(historyRecords);
-
-            // Refresh goal progress when a new calculation is saved.
             renderCurrentGoals(goalRecords, historyRecords);
         },
         error => {
@@ -247,7 +244,6 @@ function renderDashboardMetrics(calculations) {
         `${calculations.length} saved calculation${calculations.length === 1 ? "" : "s"}`
     );
 
-    // Count distinct subject names in saved calculations.
     const uniqueSubjects = new Set();
 
     calculations.forEach(calculation => {
@@ -294,13 +290,8 @@ function renderDashboardMetrics(calculations) {
         setText("#overallAverageNote", "Calculate your grades to begin");
     }
 
-    // Goals are updated by their own live Firestore listener.
-    // Do not reset the goals count here.
-
-    setText("#notificationCount", "0");
-
-    const notificationDot = $("#notificationDot");
-    if (notificationDot) notificationDot.hidden = true;
+    // Goals and notification counts are handled by their own
+    // live Firestore listeners. Do not reset their counters here.
 }
 
 // ------------------------------------------
@@ -358,15 +349,10 @@ function renderRecentCalculations(calculations) {
             const subjectList = document.createElement("ul");
             subjectList.className = "activity-subjects";
 
-            subjects.forEach(subject => {
-                const row = document.createElement("li");
-
-                row.textContent =
-                    `${subject.name || "Subject"} — ` +
-                    `Score: ${subject.score ?? "—"} — ` +
-                    `Grade: ${subject.grade || "—"}`;
-
-                subjectList.appendChild(row);
+            subjects.slice(0, 4).forEach(subject => {
+                const listItem = document.createElement("li");
+                listItem.textContent = String(subject?.name || "Subject");
+                subjectList.appendChild(listItem);
             });
 
             item.appendChild(subjectList);
@@ -381,168 +367,172 @@ function renderRecentCalculations(calculations) {
 // ------------------------------------------
 
 function renderPerformanceChart(calculations) {
-    const container = $("#performanceChart");
-    if (!container) return;
+    const canvas = $("#performanceChart");
+    if (!canvas) return;
 
-    container.replaceChildren();
+    const context = canvas.getContext("2d");
+    if (!context) return;
 
-    const chartData = calculations
-        .filter(item => getRecordPercentage(item) !== null)
-        .slice(0, 10)
-        .reverse();
+    const rect = canvas.getBoundingClientRect();
+    const width = Math.max(rect.width, 280);
+    const height = Math.max(rect.height, 180);
+    const pixelRatio = window.devicePixelRatio || 1;
 
-    if (chartData.length < 2) {
-        showMessage(
-            container,
-            chartData.length === 1
-                ? "Your performance chart will appear after another calculation."
-                : "Your performance chart will appear after you save calculations."
+    canvas.width = width * pixelRatio;
+    canvas.height = height * pixelRatio;
+
+    context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+    context.clearRect(0, 0, width, height);
+
+    const points = calculations
+        .slice()
+        .reverse()
+        .map(record => ({
+            date: getDate(record.time),
+            percentage: getRecordPercentage(record)
+        }))
+        .filter(point =>
+            point.date instanceof Date &&
+            point.percentage !== null
+        )
+        .slice(-8);
+
+    if (!points.length) {
+        context.fillStyle = getComputedStyle(canvas).color || "#777";
+        context.font = "14px sans-serif";
+        context.textAlign = "center";
+        context.fillText(
+            "Save calculations to see your progress",
+            width / 2,
+            height / 2
         );
         return;
     }
 
-    const width = 640;
-    const height = 220;
-    const padding = 28;
+    const padding = {
+        top: 20,
+        right: 18,
+        bottom: 30,
+        left: 38
+    };
 
-    const values = chartData.map(item =>
-        Math.max(0, Math.min(100, getRecordPercentage(item)))
+    const chartWidth = width - padding.left - padding.right;
+    const chartHeight = height - padding.top - padding.bottom;
+
+    const maxValue = Math.max(
+        100,
+        ...points.map(point => point.percentage)
     );
 
-    const points = values.map((value, index) => ({
-        x: padding +
-            (index / (values.length - 1)) * (width - padding * 2),
-        y: height - padding -
-            (value / 100) * (height - padding * 2),
-        value
-    }));
-
-    const svgNS = "http://www.w3.org/2000/svg";
-    const svg = document.createElementNS(svgNS, "svg");
-
-    svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
-    svg.setAttribute("role", "img");
-    svg.setAttribute("aria-label", "Recent calculation percentages");
-
-    [0, 25, 50, 75, 100].forEach(value => {
-        const y = height - padding -
-            (value / 100) * (height - padding * 2);
-
-        const line = document.createElementNS(svgNS, "line");
-
-        line.setAttribute("x1", String(padding));
-        line.setAttribute("x2", String(width - padding));
-        line.setAttribute("y1", String(y));
-        line.setAttribute("y2", String(y));
-        line.setAttribute("stroke", "currentColor");
-        line.setAttribute("opacity", "0.14");
-
-        svg.appendChild(line);
-    });
-
-    const polyline = document.createElementNS(svgNS, "polyline");
-
-    polyline.setAttribute(
-        "points",
-        points.map(point => `${point.x},${point.y}`).join(" ")
+    const minValue = Math.min(
+        0,
+        ...points.map(point => point.percentage)
     );
 
-    polyline.setAttribute("fill", "none");
-    polyline.setAttribute("stroke", "#C6A76B");
-    polyline.setAttribute("stroke-width", "3");
-    polyline.setAttribute("stroke-linecap", "round");
-    polyline.setAttribute("stroke-linejoin", "round");
+    const range = Math.max(1, maxValue - minValue);
 
-    svg.appendChild(polyline);
+    context.font = "11px sans-serif";
+    context.textAlign = "right";
+    context.textBaseline = "middle";
 
-    points.forEach(point => {
-        const circle = document.createElementNS(svgNS, "circle");
+    for (let i = 0; i <= 4; i++) {
+        const value = maxValue - (range * i / 4);
+        const y = padding.top + chartHeight * i / 4;
 
-        circle.setAttribute("cx", String(point.x));
-        circle.setAttribute("cy", String(point.y));
-        circle.setAttribute("r", "4");
-        circle.setAttribute("fill", "#C6A76B");
+        context.strokeStyle = "rgba(128,128,128,0.2)";
+        context.beginPath();
+        context.moveTo(padding.left, y);
+        context.lineTo(width - padding.right, y);
+        context.stroke();
 
-        const title = document.createElementNS(svgNS, "title");
-        title.textContent = `${formatNumber(point.value, 1)}%`;
+        context.fillStyle = getComputedStyle(canvas).color || "#777";
+        context.fillText(`${Math.round(value)}%`, padding.left - 6, y);
+    }
 
-        circle.appendChild(title);
-        svg.appendChild(circle);
+    const getX = index => points.length === 1
+        ? padding.left + chartWidth / 2
+        : padding.left + index * chartWidth / (points.length - 1);
+
+    const getY = value =>
+        padding.top + ((maxValue - value) / range) * chartHeight;
+
+    context.strokeStyle = "#16a085";
+    context.lineWidth = 2.5;
+    context.lineJoin = "round";
+    context.lineCap = "round";
+    context.beginPath();
+
+    points.forEach((point, index) => {
+        const x = getX(index);
+        const y = getY(point.percentage);
+
+        if (index === 0) context.moveTo(x, y);
+        else context.lineTo(x, y);
     });
 
-    container.appendChild(svg);
+    context.stroke();
+
+    points.forEach((point, index) => {
+        const x = getX(index);
+        const y = getY(point.percentage);
+
+        context.beginPath();
+        context.arc(x, y, 4, 0, Math.PI * 2);
+        context.fillStyle = "#16a085";
+        context.fill();
+
+        context.fillStyle = getComputedStyle(canvas).color || "#777";
+        context.font = "10px sans-serif";
+        context.textAlign = "center";
+        context.textBaseline = "top";
+
+        context.fillText(
+            point.date.toLocaleDateString(undefined, {
+                day: "numeric",
+                month: "short"
+            }),
+            x,
+            height - padding.bottom + 8
+        );
+    });
 }
 
 // ------------------------------------------
-// CURRENT GOALS — DASHBOARD
+// Current goals
 // ------------------------------------------
 
-function renderCurrentGoals(goals = [], calculations = []) {
+function renderCurrentGoals(goals, calculations) {
     const container = $("#goalPreviewList");
+    if (!container) return;
 
-    const activeGoals = goals
-        .filter(goal => {
-            if (!goal || typeof goal !== "object") return false;
-
-            return !(
-                goal.completed === true ||
-                goal.isCompleted === true ||
-                goal.status === "completed"
-            );
-        })
-        .sort((a, b) => {
-            const dateA = getDate(a.deadline)?.getTime() ??
-                Number.MAX_SAFE_INTEGER;
-            const dateB = getDate(b.deadline)?.getTime() ??
-                Number.MAX_SAFE_INTEGER;
-
-            return dateA - dateB;
-        });
-
-    setText("#activeGoals", String(activeGoals.length));
-
-    setText(
-        "#activeGoalsNote",
-        activeGoals.length
-            ? "Goals you are currently working toward"
-            : "Create a goal to start tracking your progress"
+    const activeGoals = goals.filter(goal =>
+        goal.completed !== true &&
+        goal.status !== "completed"
     );
 
-    if (!container) return;
+    setText("#activeGoals", String(activeGoals.length));
+    setText(
+        "#activeGoalsNote",
+        activeGoals.length === 1 ? "Active academic goal" : "Active academic goals"
+    );
 
     container.replaceChildren();
 
     if (!activeGoals.length) {
-        const empty = document.createElement("div");
-        empty.className = "list-empty-state";
-
-        const heading = document.createElement("strong");
-        heading.textContent = "No current goals";
-
-        const message = document.createElement("p");
-        message.textContent =
-            "Create a GPA or percentage goal to track your academic progress.";
-
-        const link = document.createElement("a");
-        link.className = "secondary-button";
-        link.href = "pages/goals.html";
-        link.textContent = "Create a goal →";
-
-        empty.append(heading, message, link);
-        container.appendChild(empty);
+        showMessage(
+            container,
+            "No active goals yet. Create a goal to start tracking your progress."
+        );
         return;
     }
 
     const latest = calculations[0] || null;
 
     activeGoals.slice(0, 4).forEach(goal => {
+        const target = Number(goal.target);
         const type = goal.type === "percentage" ? "percentage" : "gpa";
-        const target = goal.target === "" || goal.target == null
-            ? null
-            : Number(goal.target);
 
-        const validTarget = target !== null &&
-            Number.isFinite(target) && target > 0;
+        const validTarget = Number.isFinite(target) && target > 0;
 
         const current = latest
             ? (
@@ -702,6 +692,58 @@ function loadGoals(user) {
 }
 
 // ------------------------------------------
+// Live notification badge
+// Path: users/{uid}/notifications/{notificationId}
+// ------------------------------------------
+
+function loadNotificationBadge(user) {
+    const badge = $("#notificationCount");
+    const dot = $("#notificationDot");
+
+    if (!badge && !dot) return () => {};
+
+    const notificationsRef = collection(
+        db,
+        "users",
+        user.uid,
+        "notifications"
+    );
+
+    const notificationsQuery = query(notificationsRef);
+
+    return onSnapshot(
+        notificationsQuery,
+        snapshot => {
+            if (!currentUser || currentUser.uid !== user.uid) return;
+
+            const unread = snapshot.docs.reduce((count, notificationDoc) => {
+                return count + (notificationDoc.data().read === true ? 0 : 1);
+            }, 0);
+
+            if (badge) {
+                badge.textContent = unread > 99 ? "99+" : String(unread);
+                badge.hidden = unread === 0;
+                badge.setAttribute(
+                    "aria-label",
+                    `${unread} unread notifications`
+                );
+            }
+
+            if (dot) {
+                dot.hidden = unread === 0;
+                dot.setAttribute(
+                    "aria-label",
+                    unread ? "Unread notifications" : "No unread notifications"
+                );
+            }
+        },
+        error => {
+            console.error("GradeFlow notification badge listener error:", error);
+        }
+    );
+}
+
+// ------------------------------------------
 // Sidebar and mobile navigation
 // ------------------------------------------
 
@@ -769,7 +811,6 @@ function setupNavigation() {
 setupNavigation();
 
 onAuthStateChanged(auth, async user => {
-    // Stop listeners belonging to the previous account.
     if (stopHistoryListener) {
         stopHistoryListener();
         stopHistoryListener = null;
@@ -778,6 +819,11 @@ onAuthStateChanged(auth, async user => {
     if (stopGoalsListener) {
         stopGoalsListener();
         stopGoalsListener = null;
+    }
+
+    if (stopNotificationsListener) {
+        stopNotificationsListener();
+        stopNotificationsListener = null;
     }
 
     currentUser = user;
@@ -795,11 +841,11 @@ onAuthStateChanged(auth, async user => {
     try {
         await loadProfile(user);
 
-        // The account may have changed while the profile loaded.
         if (!currentUser || currentUser.uid !== user.uid) return;
 
         stopHistoryListener = loadHistory(user);
         stopGoalsListener = loadGoals(user);
+        stopNotificationsListener = loadNotificationBadge(user);
     } catch (error) {
         console.error("GradeFlow dashboard error:", error);
 

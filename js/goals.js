@@ -1,3 +1,4 @@
+
 import { auth, db } from "./firebase.js";
 
 import {
@@ -9,6 +10,7 @@ import {
   updateDoc,
   deleteDoc,
   doc,
+  getDoc,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
@@ -16,6 +18,8 @@ import {
   onAuthStateChanged,
   signOut
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+import { createGradeFlowNotification } from "./notification-service.js";
 
 /* =====================================================
    GRADEFLOW GOALS AND TARGET GPA PLANNER
@@ -150,6 +154,78 @@ function getCreatedDate(goal) {
   }
 
   return 0;
+}
+
+/* =====================================================
+   GOAL NOTIFICATIONS
+   ===================================================== */
+
+async function notifyGoal(notification, checkExisting = false) {
+  if (!state.user) return false;
+
+  try {
+    // For deadline reminders, avoid recreating the same
+    // notification every time Firestore refreshes the goals.
+    if (checkExisting) {
+      const notificationRef = doc(
+        db,
+        "users",
+        state.user.uid,
+        "notifications",
+        notification.id
+      );
+
+      const existing = await getDoc(notificationRef);
+
+      if (existing.exists()) {
+        return false;
+      }
+    }
+
+    await createGradeFlowNotification(state.user.uid, notification);
+    return true;
+  } catch (error) {
+    // Notification failures must not undo a saved goal.
+    console.error("GradeFlow: goal notification failed:", error);
+    return false;
+  }
+}
+
+function checkGoalDeadlines(goals) {
+  const today = todayISO();
+
+  goals.forEach((goal) => {
+    if (goal.completed || !goal.deadline) return;
+
+    const todayDate = new Date(`${today}T00:00:00`);
+    const deadlineDate = new Date(`${goal.deadline}T00:00:00`);
+
+    if (
+      Number.isNaN(deadlineDate.getTime()) ||
+      goal.deadline < today
+    ) {
+      return;
+    }
+
+    const daysLeft = Math.round(
+      (deadlineDate.getTime() - todayDate.getTime()) /
+      (24 * 60 * 60 * 1000)
+    );
+
+    // Remind when the deadline is within three days.
+    if (daysLeft <= 3) {
+      const message = daysLeft === 0
+        ? `Your goal "${goal.title}" is due today.`
+        : `Your goal "${goal.title}" is due in ${daysLeft} day${daysLeft === 1 ? "" : "s"}.`;
+
+      void notifyGoal({
+        id: `goal-deadline-${goal.id}-${goal.deadline}`,
+        title: daysLeft === 0 ? "Goal deadline today" : "Upcoming goal deadline",
+        message,
+        type: "academic"
+      }, true);
+    }
+  });
 }
 
 /* =====================================================
@@ -341,6 +417,7 @@ function createGoalCard(goal) {
         </button>
 
         <button class="goal-action danger" type="button"
+
           data-goal-action="delete" data-goal-id="${safeId}">
           Delete
         </button>
@@ -556,6 +633,9 @@ async function saveGoal(event) {
   saveButton.textContent = "Saving…";
   showGoalFormError("");
 
+  const isEditing = Boolean(state.editingGoalId);
+  const editingGoalId = state.editingGoalId;
+
   const goalData = {
     uid: state.user.uid,
     title,
@@ -567,23 +647,38 @@ async function saveGoal(event) {
   };
 
   try {
-    if (state.editingGoalId) {
+    if (isEditing) {
       const existingGoal = state.goals.find(
-        (goal) => goal.id === state.editingGoalId
+        (goal) => goal.id === editingGoalId
       );
 
       if (!existingGoal || existingGoal.uid !== state.user.uid) {
         throw new Error("This goal could not be updated.");
       }
 
-      await updateDoc(doc(db, "goals", state.editingGoalId), goalData);
+      await updateDoc(doc(db, "goals", editingGoalId), goalData);
+
+      // The goal is saved first. A notification failure must not undo it.
+      await notifyGoal({
+        id: `goal-updated-${editingGoalId}-${Date.now()}`,
+        title: "Academic goal updated",
+        message: `Your goal "${title}" has been updated. Deadline: ${formatDate(deadline)}.`,
+        type: "academic"
+      });
 
       showMessage("Goal updated successfully.");
     } else {
-      await addDoc(collection(db, "goals"), {
+      const savedGoal = await addDoc(collection(db, "goals"), {
         ...goalData,
         completed: false,
         createdAt: serverTimestamp()
+      });
+
+      await notifyGoal({
+        id: `goal-created-${savedGoal.id}`,
+        title: "Academic goal created",
+        message: `Your goal "${title}" has been created. Deadline: ${formatDate(deadline)}.`,
+        type: "academic"
       });
 
       showMessage("Goal created successfully.");
@@ -600,9 +695,7 @@ async function saveGoal(event) {
     );
   } finally {
     saveButton.disabled = false;
-    saveButton.textContent = state.editingGoalId
-      ? "Save changes"
-      : "Save goal";
+    saveButton.textContent = isEditing ? "Save changes" : "Save goal";
   }
 }
 
@@ -618,10 +711,21 @@ async function toggleGoalCompletion(goalId) {
   if (!goal || goal.uid !== state.user.uid) return;
 
   try {
+    const willComplete = !goal.completed;
+
     await updateDoc(doc(db, "goals", goalId), {
-      completed: !goal.completed,
+      completed: willComplete,
       updatedAt: serverTimestamp()
     });
+
+    if (willComplete) {
+      await notifyGoal({
+        id: `goal-completed-${goalId}-${Date.now()}`,
+        title: "Academic goal completed",
+        message: `You marked "${goal.title || "Untitled goal"}" as completed.`,
+        type: "academic"
+      });
+    }
 
     showMessage(
       goal.completed
@@ -826,6 +930,7 @@ function listenForGoals(user) {
 
       renderStatistics();
       renderGoals();
+      checkGoalDeadlines(state.goals);
     },
     (error) => {
       console.error("GradeFlow: loading goals failed:", error);
