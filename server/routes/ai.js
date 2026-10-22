@@ -21,6 +21,8 @@ function normalizeOrigin(value) {
 const ALLOWED_ORIGINS = new Set(
   [
     "https://praisesalau11-ux.github.io",
+    "http://127.0.0.1:5500",
+    "http://localhost:5500",
     normalizeOrigin(process.env.FRONTEND_ORIGIN)
   ].filter(Boolean)
 );
