@@ -1,158 +1,225 @@
-/* ==========================================
-   GRADEFLOW
-   File: server/routes/ai.js
 
-   AI Routes
-========================================== */
-
-import express from "express";
+import { Router } from "express";
+import { jwtVerify, createRemoteJWKSet } from "jose";
 import { askGemini } from "../services/gemini.js";
 
-const router = express.Router();
+const router = Router();
 
+const PROJECT_ID = process.env.FIREBASE_PROJECT_ID || "grades-calculator-72499";
+const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN ||
+  "https://praisesalau11-ux.github.io";
 
-/* ==========================================
-   AI CHAT
-========================================== */
+const firebaseKeys = createRemoteJWKSet(
+  new URL(
+    "https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com"
+  )
+);
+
+const rateLimits = new Map();
+const WINDOW_MS = 60_000;
+const MAX_REQUESTS = 15;
+
+function allowRequest(uid) {
+  const now = Date.now();
+  const item = rateLimits.get(uid);
+
+  if (!item || now - item.start >= WINDOW_MS) {
+    rateLimits.set(uid, { start: now, count: 1 });
+    return true;
+  }
+
+  if (item.count >= MAX_REQUESTS) return false;
+
+  item.count += 1;
+  return true;
+}
+
+function cleanText(value, max = 4000) {
+  return typeof value === "string" ? value.trim().slice(0, max) : "";
+}
+
+function cleanHistory(value) {
+  if (!Array.isArray(value)) return [];
+
+  return value.slice(-12).filter((item) =>
+    item &&
+    (item.role === "user" || item.role === "assistant") &&
+    typeof item.text === "string"
+  ).map((item) => ({
+    role: item.role,
+    text: cleanText(item.text, 2500)
+  })).filter((item) => item.text.length);
+}
+
+function cleanAcademicContext(value) {
+  if (!value || typeof value !== "object") {
+    return { history: [], goals: [] };
+  }
+
+  // Bound payload size and fields before passing to Gemini.
+  const history = Array.isArray(value.history)
+    ? value.history.slice(0, 8).map((item) => ({
+        gpa: item?.gpa ?? null,
+        gpaScale: item?.gpaScale ?? null,
+        percentage: item?.percentage ?? null,
+        subjects: Array.isArray(item?.subjects)
+          ? item.subjects.slice(0, 20)
+          : [],
+        time: item?.time ?? null,
+        date: item?.date ?? null
+      }))
+    : [];
+
+  const goals = Array.isArray(value.goals)
+    ? value.goals.slice(0, 8).map((item) => ({
+        title: cleanText(item?.title, 150),
+        description: cleanText(item?.description, 500),
+        target: item?.target ?? null,
+        progress: item?.progress ?? null,
+        status: cleanText(item?.status, 60)
+      }))
+    : [];
+
+  return { history, goals };
+}
+
+router.use((req, res, next) => {
+  const origin = req.headers.origin;
+
+  if (origin && origin !== FRONTEND_ORIGIN) {
+    return res.status(403).json({
+      error: "This website is not allowed to use GradeFlow AI."
+    });
+  }
+
+  if (origin === FRONTEND_ORIGIN) {
+    res.setHeader("Access-Control-Allow-Origin", FRONTEND_ORIGIN);
+    res.setHeader("Vary", "Origin");
+  }
+
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization"
+  );
+
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(204);
+  }
+
+  next();
+});
 
 router.post("/chat", async (req, res) => {
-    try {
+  try {
+    const authHeader = req.headers.authorization || "";
+    const match = authHeader.match(/^Bearer\s+(.+)$/i);
 
-        const {
-            message,
-            context = ""
-        } = req.body || {};
-
-        if (
-            !message ||
-            typeof message !== "string"
-        ) {
-            return res.status(400).json({
-                success: false,
-                message: "A message is required."
-            });
-        }
-
-        if (message.length > 10000) {
-            return res.status(400).json({
-                success: false,
-                message: "Message is too long."
-            });
-        }
-
-        const systemInstruction = `
-You are GradeFlow AI, an academic assistant.
-
-Your job is to help students understand academic
-subjects, grades, calculations, revision and study
-planning.
-
-Rules:
-
-1. Explain things clearly.
-2. Show mathematical steps when appropriate.
-3. Do not invent grades or academic records.
-4. If GradeFlow data is provided, distinguish actual
-   user data from your interpretation.
-5. If you are uncertain, say so.
-6. Do not claim to be a teacher, school or official.
-7. Encourage learning rather than simply giving answers
-   when the user is studying.
-`;
-
-        const prompt = `
-Student request:
-
-${message}
-
-GradeFlow context, if available:
-
-${context}
-`;
-
-        const result = await askGemini({
-            prompt,
-            systemInstruction
-        });
-
-        return res.json({
-            success: true,
-            response: result.text
-        });
-
-    } catch (error) {
-
-        console.error(
-            "GradeFlow AI error:",
-            error
-        );
-
-        return res.status(500).json({
-            success: false,
-            message:
-                "GradeFlow AI could not process your request."
-        });
+    if (!match) {
+      return res.status(401).json({
+        error: "Please sign in to use GradeFlow AI."
+      });
     }
-});
 
+    let claims;
 
-/* ==========================================
-   EXPLAIN GRADE
-========================================== */
-
-router.post("/explain-grade", async (req, res) => {
     try {
+      const result = await jwtVerify(match[1], firebaseKeys, {
+        issuer: `https://securetoken.google.com/${PROJECT_ID}`,
+        audience: PROJECT_ID,
+        algorithms: ["RS256"]
+      });
 
-        const {
-            subject,
-            score,
-            percentage,
-            grade
-        } = req.body || {};
-
-        const prompt = `
-Explain this student's grade in a simple educational way.
-
-Subject: ${subject || "Unknown"}
-Score: ${score ?? "Unknown"}
-Percentage: ${percentage ?? "Unknown"}
-Grade: ${grade || "Unknown"}
-
-Explain:
-- what the result means
-- what was done well
-- what the student could improve
-- one practical study suggestion
-
-Do not invent information that was not provided.
-`;
-
-        const result = await askGemini({
-            prompt,
-            systemInstruction:
-                "You are GradeFlow's grade-analysis assistant.",
-            temperature: 0.5
-        });
-
-        return res.json({
-            success: true,
-            response: result.text
-        });
-
-    } catch (error) {
-
-        console.error(
-            "Grade explanation error:",
-            error
-        );
-
-        return res.status(500).json({
-            success: false,
-            message:
-                "Grade explanation could not be generated."
-        });
+      claims = result.payload;
+    } catch {
+      return res.status(401).json({
+        error: "Your sign-in token is invalid or expired. Sign in again."
+      });
     }
-});
 
+    if (
+      typeof claims.sub !== "string" ||
+      claims.sub.length === 0 ||
+      claims.sub.length > 128
+    ) {
+      return res.status(401).json({
+        error: "The sign-in token does not contain a valid user."
+      });
+    }
+
+    if (!allowRequest(claims.sub)) {
+      return res.status(429).json({
+        error: "Too many requests. Please wait a minute and try again."
+      });
+    }
+
+    const message = cleanText(req.body?.message);
+
+    if (!message) {
+      return res.status(400).json({
+        error: "Enter a message first."
+      });
+    }
+
+    if (
+      typeof req.body?.message === "string" &&
+      req.body.message.length > 4000
+    ) {
+      return res.status(413).json({
+        error: "Messages must be 4,000 characters or fewer."
+      });
+    }
+
+    const history = cleanHistory(req.body?.history);
+    const academicContext = cleanAcademicContext(
+      req.body?.academicContext
+    );
+
+    const transcript = history.map((item) =>
+      `${item.role === "assistant" ? "Assistant" : "Student"}: ${item.text}`
+    ).join("\n\n");
+
+    const prompt = [
+      "Recent conversation:",
+      transcript || "(No earlier messages.)",
+      "",
+      "Student's current message:",
+      message,
+      "",
+      "Academic context supplied by the GradeFlow client:",
+      JSON.stringify(academicContext),
+      "",
+      "Answer the current question. Do not invent missing grades or claim that you changed database records."
+    ].join("\n");
+
+    const result = await askGemini({
+      prompt,
+      systemInstruction: [
+        "You are GradeFlow AI, a clear and patient educational assistant.",
+        "Help students learn school subjects, prepare for exams, practise with quizzes, plan revision, and understand academic progress.",
+        "Explain difficult ideas step by step and use examples.",
+        "Treat academic context as information supplied by the client, not independently verified database truth.",
+        "Never invent GPA values, grades, goals, or actions.",
+        "Do not claim to update or delete records.",
+        "Give practical, age-appropriate educational advice."
+      ].join(" "),
+      temperature: 0.7
+    });
+
+    return res.json({ reply: result.text });
+  } catch (error) {
+    console.error("GradeFlow AI error:", error.message);
+
+    if (error.message?.includes("GEMINI_API_KEY")) {
+      return res.status(503).json({
+        error: "Gemini is not configured on the backend."
+      });
+    }
+
+    return res.status(500).json({
+      error: "GradeFlow AI could not answer right now. Please try again."
+    });
+  }
+});
 
 export default router;
