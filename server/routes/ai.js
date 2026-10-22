@@ -243,7 +243,7 @@ router.post("/chat", async (req, res) => {
 
     return res.json({ reply: result.text });
   } catch (error) {
-    console.error("GradeFlow AI error:", error.message);
+    console.error("GradeFlow AI error:", error);
 
     if (error.message?.includes("GEMINI_API_KEY")) {
       return res.status(503).json({
