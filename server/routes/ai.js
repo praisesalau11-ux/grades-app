@@ -1,13 +1,29 @@
-
 import { Router } from "express";
 import { jwtVerify, createRemoteJWKSet } from "jose";
 import { askGemini } from "../services/gemini.js";
 
 const router = Router();
 
-const PROJECT_ID = process.env.FIREBASE_PROJECT_ID || "grades-calculator-72499";
-const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN ||
-  "https://praisesalau11-ux.github.io";
+const PROJECT_ID =
+  process.env.FIREBASE_PROJECT_ID || "grades-calculator-72499";
+
+function normalizeOrigin(value) {
+  if (!value) return null;
+
+  try {
+    return new URL(value).origin;
+  } catch {
+    return null;
+  }
+}
+
+// Only allow your actual frontend origins.
+const ALLOWED_ORIGINS = new Set(
+  [
+    "https://praisesalau11-ux.github.io",
+    normalizeOrigin(process.env.FRONTEND_ORIGIN)
+  ].filter(Boolean)
+);
 
 const firebaseKeys = createRemoteJWKSet(
   new URL(
@@ -15,6 +31,7 @@ const firebaseKeys = createRemoteJWKSet(
   )
 );
 
+// Basic per-user rate limit: 15 requests per minute.
 const rateLimits = new Map();
 const WINDOW_MS = 60_000;
 const MAX_REQUESTS = 15;
@@ -35,20 +52,27 @@ function allowRequest(uid) {
 }
 
 function cleanText(value, max = 4000) {
-  return typeof value === "string" ? value.trim().slice(0, max) : "";
+  return typeof value === "string"
+    ? value.trim().slice(0, max)
+    : "";
 }
 
 function cleanHistory(value) {
   if (!Array.isArray(value)) return [];
 
-  return value.slice(-12).filter((item) =>
-    item &&
-    (item.role === "user" || item.role === "assistant") &&
-    typeof item.text === "string"
-  ).map((item) => ({
-    role: item.role,
-    text: cleanText(item.text, 2500)
-  })).filter((item) => item.text.length);
+  return value
+    .slice(-12)
+    .filter(
+      (item) =>
+        item &&
+        (item.role === "user" || item.role === "assistant") &&
+        typeof item.text === "string"
+    )
+    .map((item) => ({
+      role: item.role,
+      text: cleanText(item.text, 2500)
+    }))
+    .filter((item) => item.text.length > 0);
 }
 
 function cleanAcademicContext(value) {
@@ -56,7 +80,6 @@ function cleanAcademicContext(value) {
     return { history: [], goals: [] };
   }
 
-  // Bound payload size and fields before passing to Gemini.
   const history = Array.isArray(value.history)
     ? value.history.slice(0, 8).map((item) => ({
         gpa: item?.gpa ?? null,
@@ -83,17 +106,20 @@ function cleanAcademicContext(value) {
   return { history, goals };
 }
 
+// CORS and origin validation.
 router.use((req, res, next) => {
   const origin = req.headers.origin;
 
-  if (origin && origin !== FRONTEND_ORIGIN) {
+  if (origin && !ALLOWED_ORIGINS.has(origin)) {
+    console.warn("GradeFlow AI blocked origin:", origin);
+
     return res.status(403).json({
       error: "This website is not allowed to use GradeFlow AI."
     });
   }
 
-  if (origin === FRONTEND_ORIGIN) {
-    res.setHeader("Access-Control-Allow-Origin", FRONTEND_ORIGIN);
+  if (origin) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
     res.setHeader("Vary", "Origin");
   }
 
@@ -112,6 +138,7 @@ router.use((req, res, next) => {
 
 router.post("/chat", async (req, res) => {
   try {
+    // Require a Firebase ID token.
     const authHeader = req.headers.authorization || "";
     const match = authHeader.match(/^Bearer\s+(.+)$/i);
 
@@ -131,7 +158,9 @@ router.post("/chat", async (req, res) => {
       });
 
       claims = result.payload;
-    } catch {
+    } catch (error) {
+      console.warn("Firebase token verification failed:", error.message);
+
       return res.status(401).json({
         error: "Your sign-in token is invalid or expired. Sign in again."
       });
@@ -147,6 +176,7 @@ router.post("/chat", async (req, res) => {
       });
     }
 
+    // Limit requests per authenticated user.
     if (!allowRequest(claims.sub)) {
       return res.status(429).json({
         error: "Too many requests. Please wait a minute and try again."
@@ -175,9 +205,12 @@ router.post("/chat", async (req, res) => {
       req.body?.academicContext
     );
 
-    const transcript = history.map((item) =>
-      `${item.role === "assistant" ? "Assistant" : "Student"}: ${item.text}`
-    ).join("\n\n");
+    const transcript = history
+      .map(
+        (item) =>
+          `${item.role === "assistant" ? "Assistant" : "Student"}: ${item.text}`
+      )
+      .join("\n\n");
 
     const prompt = [
       "Recent conversation:",
