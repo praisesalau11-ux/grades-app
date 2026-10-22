@@ -1,0 +1,113 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b0b0d">
+  <title>GradeFlow AI Assistant</title>
+
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/ai-assistant.css">
+
+  <script type="module" src="../js/ai-assistant.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="../dashboard.html">
+        <span class="brand-mark">G</span>
+        <span>GradeFlow<span class="gold">.</span></span>
+      </a>
+
+      <a class="back-link" href="../dashboard.html">← Dashboard</a>
+
+      <button class="new-chat" id="newChatBtn" type="button">
+        ＋ New conversation
+      </button>
+
+      <p class="sidebar-label">YOUR STUDY PARTNER</p>
+
+      <div class="assistant-card">
+        <span class="assistant-icon">✦</span>
+        <div>
+          <strong>GradeFlow AI</strong>
+          <small>Powered by Gemini</small>
+        </div>
+      </div>
+
+      <div class="sidebar-bottom">
+        <p class="connection"><span class="status-dot"></span>
+          <span id="connectionStatus">Connecting…</span>
+        </p>
+        <div class="profile">
+          <div class="avatar" id="userAvatar">G</div>
+          <div class="profile-text">
+            <strong id="userName">GradeFlow student</strong>
+            <small id="userEmail">Checking account…</small>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="menu-button" id="menuBtn" type="button"
+                aria-label="Toggle menu">☰</button>
+        <div>
+          <p class="eyebrow">YOUR PERSONAL LEARNING SPACE</p>
+          <h1>AI Assistant <span class="gold">✦</span></h1>
+        </div>
+        <span class="model-pill"><i></i> Gemini AI</span>
+      </header>
+
+      <section class="chat-layout">
+        <div class="welcome" id="welcome">
+          <div class="hero-logo">G<span>✦</span></div>
+          <p class="welcome-label">MEET YOUR STUDY PARTNER</p>
+          <h2>Learn smarter.<br><span>Go further.</span></h2>
+          <p class="welcome-copy">
+            Understand difficult topics, prepare for exams, create study plans,
+            and review academic information available in your GradeFlow account.
+          </p>
+
+          <div class="suggestions">
+            <button type="button" data-prompt="Help me build a realistic weekly study plan. Ask me what subjects I study and when I am available.">
+              <b>▦</b><span><strong>Build a study plan</strong><small>Organise my week</small></span><em>↗</em>
+            </button>
+            <button type="button" data-prompt="Teach me a school topic step by step with simple explanations and examples. Ask me which topic first.">
+              <b>◇</b><span><strong>Learn a topic</strong><small>Understand it clearly</small></span><em>↗</em>
+            </button>
+            <button type="button" data-prompt="Review the academic information available in my GradeFlow account and suggest practical ways to improve. Do not guess missing grades.">
+              <b>↗</b><span><strong>Review my progress</strong><small>Find areas to improve</small></span><em>↗</em>
+            </button>
+            <button type="button" data-prompt="Quiz me on a school subject. Ask which subject and difficulty I want, then ask one question at a time.">
+              <b>✎</b><span><strong>Practise with a quiz</strong><small>Test my knowledge</small></span><em>↗</em>
+            </button>
+          </div>
+        </div>
+
+        <div class="messages" id="messages" aria-live="polite" hidden></div>
+        <div class="error-banner" id="errorBanner" role="alert" hidden></div>
+
+        <form class="composer" id="chatForm">
+          <label class="sr-only" for="promptInput">Your message</label>
+          <textarea id="promptInput" maxlength="4000" rows="1"
+                    placeholder="Ask anything about learning, grades, or studying…"
+                    required></textarea>
+          <div class="composer-bottom">
+            <small>✦ Gemini AI · Verify important answers</small>
+            <button class="send-button" id="sendBtn" type="submit">
+              <span id="sendLabel">Send</span> ↑
+            </button>
+          </div>
+        </form>
+
+        <p class="disclaimer">
+          AI can make mistakes. Your saved grades are not changed by this assistant.
+        </p>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
