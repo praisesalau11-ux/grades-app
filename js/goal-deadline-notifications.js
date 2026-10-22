@@ -17,6 +17,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 let stopWatchingGoals = null;
+const remindersBeingCreated = new Set();
 
 async function createDeadlineReminder(user, goalDocument) {
     const goal = goalDocument.data();
@@ -52,17 +53,24 @@ async function createDeadlineReminder(user, goalDocument) {
     const notificationId =
         `goal_deadline_${goalDocument.id}_${deadlineDate}`;
 
-    const notificationRef = doc(
-        db,
-        "users",
-        user.uid,
-        "notifications",
-        notificationId
-    );
+    // Prevent duplicate requests if Firestore emits another snapshot while
+    // the first reminder for this goal is still being checked/created.
+    const inFlightKey = `${user.uid}:${notificationId}`;
+    if (remindersBeingCreated.has(inFlightKey)) return;
+    remindersBeingCreated.add(inFlightKey);
 
-    // Do not recreate the same reminder on every page update.
-    const existing = await getDoc(notificationRef);
-    if (existing.exists()) return;
+    try {
+        const notificationRef = doc(
+            db,
+            "users",
+            user.uid,
+            "notifications",
+            notificationId
+        );
+
+        // Do not recreate the same reminder on every page update.
+        const existing = await getDoc(notificationRef);
+        if (existing.exists()) return;
 
     let message;
 
@@ -74,15 +82,18 @@ async function createDeadlineReminder(user, goalDocument) {
         message = `"${goal.title || "Your academic goal"}" is due in ${daysRemaining} day${daysRemaining === 1 ? "" : "s"}.`;
     }
 
-    await setDoc(notificationRef, {
-        title: daysRemaining < 0
-            ? "Academic goal overdue"
-            : "Academic goal deadline approaching",
-        message,
-        type: "goal",
-        read: false,
-        createdAt: serverTimestamp()
-    });
+        await setDoc(notificationRef, {
+            title: daysRemaining < 0
+                ? "Academic goal overdue"
+                : "Academic goal deadline approaching",
+            message,
+            type: "goal",
+            read: false,
+            createdAt: serverTimestamp()
+        });
+    } finally {
+        remindersBeingCreated.delete(inFlightKey);
+    }
 }
 
 onAuthStateChanged(auth, (user) => {

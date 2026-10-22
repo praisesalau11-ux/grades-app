@@ -1,3 +1,4 @@
+
 /* ==========================================
    GradeFlow — Dashboard Controller
    File: js/dashboard.js
@@ -98,8 +99,12 @@ function getTimestamp(value) {
 
 function getRecordGpa(record) {
     const value = Number(record?.gpa);
-    return record?.gpa !== "" && record?.gpa != null &&
-        Number.isFinite(value) ? value : null;
+
+    return record?.gpa !== "" &&
+        record?.gpa != null &&
+        Number.isFinite(value)
+        ? value
+        : null;
 }
 
 function getRecordPercentage(record) {
@@ -252,46 +257,115 @@ function renderDashboardMetrics(calculations) {
         calculation.subjects.forEach(subject => {
             const name = String(subject?.name || "").trim();
 
-            if (name) uniqueSubjects.add(name.toLowerCase());
+            if (name) {
+                uniqueSubjects.add(name.toLowerCase());
+            }
         });
     });
 
     setText("#subjectsTracked", String(uniqueSubjects.size));
 
-    if (latest) {
-        const gpa = getRecordGpa(latest);
-        const percentage = getRecordPercentage(latest);
-
-        setText(
-            "#currentGpa",
-            gpa === null ? "—" : formatNumber(gpa)
-        );
-
-        setText(
-            "#currentGpaNote",
-            `Latest calculation · ${formatDate(latest.time)}`
-        );
-
-        setText(
-            "#overallAverage",
-            percentage === null
-                ? "—"
-                : `${formatNumber(percentage, 1)}%`
-        );
-
-        setText(
-            "#overallAverageNote",
-            "From your latest calculation"
-        );
-    } else {
+    if (!latest) {
         setText("#currentGpa", "—");
         setText("#currentGpaNote", "No calculations saved yet");
+
         setText("#overallAverage", "—");
         setText("#overallAverageNote", "Calculate your grades to begin");
+
+        setText(
+            "#performanceTrendSummary",
+            "Save more calculations to compare your results over time."
+        );
+
+        return;
     }
 
-    // Goals and notification counts are handled by their own
-    // live Firestore listeners. Do not reset their counters here.
+    const latestGpa = getRecordGpa(latest);
+
+    const percentages = calculations
+        .map(getRecordPercentage)
+        .filter(value =>
+            value !== null &&
+            value >= 0 &&
+            value <= 100
+        );
+
+    const overallAverage = percentages.length
+        ? percentages.reduce((sum, value) => sum + value, 0) /
+            percentages.length
+        : null;
+
+    setText(
+        "#currentGpa",
+        latestGpa === null ? "—" : formatNumber(latestGpa)
+    );
+
+    let gpaNote = `Latest calculation · ${formatDate(latest.time)}`;
+
+    const previousWithGpa = calculations
+        .slice(1)
+        .find(record => getRecordGpa(record) !== null);
+
+    if (latestGpa !== null && previousWithGpa) {
+        const difference = latestGpa - getRecordGpa(previousWithGpa);
+        const roundedDifference = Math.abs(difference).toFixed(2);
+
+        if (difference > 0.004) {
+            gpaNote += ` · Up ${roundedDifference} from previous result`;
+        } else if (difference < -0.004) {
+            gpaNote += ` · Down ${roundedDifference} from previous result`;
+        } else {
+            gpaNote += " · Unchanged from previous result";
+        }
+    }
+
+    setText("#currentGpaNote", gpaNote);
+
+    setText(
+        "#overallAverage",
+        overallAverage === null
+            ? "—"
+            : `${formatNumber(overallAverage, 1)}%`
+    );
+
+    setText(
+        "#overallAverageNote",
+        overallAverage === null
+            ? "No percentage results available yet"
+            : `Average across ${percentages.length} saved result${percentages.length === 1 ? "" : "s"}`
+    );
+
+    const latestPercentage = getRecordPercentage(latest);
+
+    const previousWithPercentage = calculations
+        .slice(1)
+        .find(record => getRecordPercentage(record) !== null);
+
+    let trendText =
+        `${percentages.length} percentage result${percentages.length === 1 ? "" : "s"} included in your overall average.`;
+
+    if (latestPercentage !== null && previousWithPercentage) {
+        const previousPercentage =
+            getRecordPercentage(previousWithPercentage);
+
+        const difference = latestPercentage - previousPercentage;
+
+        if (difference > 0.049) {
+            trendText =
+                `Your latest percentage is up ${difference.toFixed(1)} points from the previous result.`;
+        } else if (difference < -0.049) {
+            trendText =
+                `Your latest percentage is down ${Math.abs(difference).toFixed(1)} points from the previous result.`;
+        } else {
+            trendText =
+                "Your latest percentage is nearly unchanged from the previous result.";
+        }
+    } else if (latestPercentage !== null) {
+        trendText =
+            "Save another calculation to compare your percentage trend.";
+    }
+
+    setText("#performanceTrendSummary", trendText);
 }
 
 // ------------------------------------------
@@ -300,6 +374,7 @@ function renderDashboardMetrics(calculations) {
 
 function renderRecentCalculations(calculations) {
     const container = $("#recentCalculations");
+
     if (!container) return;
 
     container.replaceChildren();
@@ -309,6 +384,7 @@ function renderRecentCalculations(calculations) {
             container,
             "No saved calculations yet. Use the calculator to create your first result."
         );
+
         return;
     }
 
@@ -325,17 +401,20 @@ function renderRecentCalculations(calculations) {
             .filter(Boolean);
 
         const title = document.createElement("h3");
+
         title.textContent = subjectNames.length
             ? subjectNames.slice(0, 3).join(", ") +
                 (subjectNames.length > 3 ? "…" : "")
             : "Grade calculation";
 
         const details = document.createElement("p");
+
         details.textContent =
             `${subjectNames.length} subject${subjectNames.length === 1 ? "" : "s"} · ` +
             formatDate(calculation.time);
 
         const result = document.createElement("p");
+
         const gpa = getRecordGpa(calculation);
         const percentage = getRecordPercentage(calculation);
 
@@ -351,7 +430,11 @@ function renderRecentCalculations(calculations) {
 
             subjects.slice(0, 4).forEach(subject => {
                 const listItem = document.createElement("li");
-                listItem.textContent = String(subject?.name || "Subject");
+
+                listItem.textContent = String(
+                    subject?.name || "Subject"
+                );
+
                 subjectList.appendChild(listItem);
             });
 
@@ -368,9 +451,11 @@ function renderRecentCalculations(calculations) {
 
 function renderPerformanceChart(calculations) {
     const canvas = $("#performanceChart");
+
     if (!canvas) return;
 
     const context = canvas.getContext("2d");
+
     if (!context) return;
 
     const rect = canvas.getBoundingClientRect();
@@ -401,11 +486,13 @@ function renderPerformanceChart(calculations) {
         context.fillStyle = getComputedStyle(canvas).color || "#777";
         context.font = "14px sans-serif";
         context.textAlign = "center";
+
         context.fillText(
             "Save calculations to see your progress",
             width / 2,
             height / 2
         );
+
         return;
     }
 
@@ -446,15 +533,22 @@ function renderPerformanceChart(calculations) {
         context.stroke();
 
         context.fillStyle = getComputedStyle(canvas).color || "#777";
-        context.fillText(`${Math.round(value)}%`, padding.left - 6, y);
+
+        context.fillText(
+            `${Math.round(value)}%`,
+            padding.left - 6,
+            y
+        );
     }
 
     const getX = index => points.length === 1
         ? padding.left + chartWidth / 2
-        : padding.left + index * chartWidth / (points.length - 1);
+        : padding.left +
+            index * chartWidth / (points.length - 1);
 
     const getY = value =>
-        padding.top + ((maxValue - value) / range) * chartHeight;
+        padding.top +
+        ((maxValue - value) / range) * chartHeight;
 
     context.strokeStyle = "#16a085";
     context.lineWidth = 2.5;
@@ -466,8 +560,11 @@ function renderPerformanceChart(calculations) {
         const x = getX(index);
         const y = getY(point.percentage);
 
-        if (index === 0) context.moveTo(x, y);
-        else context.lineTo(x, y);
+        if (index === 0) {
+            context.moveTo(x, y);
+        } else {
+            context.lineTo(x, y);
+        }
     });
 
     context.stroke();
@@ -503,6 +600,7 @@ function renderPerformanceChart(calculations) {
 
 function renderCurrentGoals(goals, calculations) {
     const container = $("#goalPreviewList");
+
     if (!container) return;
 
     const activeGoals = goals.filter(goal =>
@@ -511,9 +609,12 @@ function renderCurrentGoals(goals, calculations) {
     );
 
     setText("#activeGoals", String(activeGoals.length));
+
     setText(
         "#activeGoalsNote",
-        activeGoals.length === 1 ? "Active academic goal" : "Active academic goals"
+        activeGoals.length === 1
+            ? "Active academic goal"
+            : "Active academic goals"
     );
 
     container.replaceChildren();
@@ -523,6 +624,7 @@ function renderCurrentGoals(goals, calculations) {
             container,
             "No active goals yet. Create a goal to start tracking your progress."
         );
+
         return;
     }
 
@@ -530,9 +632,13 @@ function renderCurrentGoals(goals, calculations) {
 
     activeGoals.slice(0, 4).forEach(goal => {
         const target = Number(goal.target);
-        const type = goal.type === "percentage" ? "percentage" : "gpa";
 
-        const validTarget = Number.isFinite(target) && target > 0;
+        const type = goal.type === "percentage"
+            ? "percentage"
+            : "gpa";
+
+        const validTarget =
+            Number.isFinite(target) && target > 0;
 
         const current = latest
             ? (
@@ -543,7 +649,10 @@ function renderCurrentGoals(goals, calculations) {
             : null;
 
         const progress = validTarget && current !== null
-            ? Math.max(0, Math.min(100, current / target * 100))
+            ? Math.max(
+                0,
+                Math.min(100, current / target * 100)
+            )
             : null;
 
         const card = document.createElement("article");
@@ -553,10 +662,14 @@ function renderCurrentGoals(goals, calculations) {
         top.className = "goal-preview-top";
 
         const heading = document.createElement("h3");
-        heading.textContent = String(goal.title || goal.name || "Academic goal");
+
+        heading.textContent = String(
+            goal.title || goal.name || "Academic goal"
+        );
 
         const targetLabel = document.createElement("span");
         targetLabel.className = "goal-target";
+
         targetLabel.textContent = validTarget
             ? `Target: ${formatNumber(target)}${type === "percentage" ? "%" : " GPA"}`
             : "Target not set";
@@ -565,6 +678,7 @@ function renderCurrentGoals(goals, calculations) {
 
         const currentLabel = document.createElement("p");
         currentLabel.className = "goal-preview-current";
+
         currentLabel.textContent = current === null
             ? "No result saved yet"
             : `Current: ${formatNumber(current)}${type === "percentage" ? "%" : " GPA"}`;
@@ -574,11 +688,18 @@ function renderCurrentGoals(goals, calculations) {
         if (progress !== null) {
             const track = document.createElement("div");
             track.className = "goal-preview-progress";
+
             track.setAttribute("role", "progressbar");
             track.setAttribute("aria-valuemin", "0");
             track.setAttribute("aria-valuemax", "100");
-            track.setAttribute("aria-valuenow", String(Math.round(progress)));
-            track.setAttribute("aria-label", `${heading.textContent} progress`);
+            track.setAttribute(
+                "aria-valuenow",
+                String(Math.round(progress))
+            );
+            track.setAttribute(
+                "aria-label",
+                `${heading.textContent} progress`
+            );
 
             const fill = document.createElement("span");
             fill.className = "goal-preview-progress-fill";
@@ -590,6 +711,7 @@ function renderCurrentGoals(goals, calculations) {
             meta.className = "goal-preview-meta";
 
             const progressLabel = document.createElement("span");
+
             progressLabel.textContent =
                 `${formatNumber(progress, 0)}% of target`;
 
@@ -611,7 +733,9 @@ function renderCurrentGoals(goals, calculations) {
             meta.className = "goal-preview-meta";
 
             const hint = document.createElement("span");
-            hint.textContent = "Save a calculation to see progress.";
+
+            hint.textContent =
+                "Save a calculation to see progress.";
 
             const deadline = getDate(goal.deadline);
             const due = document.createElement("span");
@@ -640,6 +764,7 @@ function renderCurrentGoals(goals, calculations) {
     if (activeGoals.length > 4) {
         const more = document.createElement("p");
         more.className = "goal-preview-more";
+
         more.textContent =
             `Showing 4 of ${activeGoals.length} active goals.`;
 
@@ -655,6 +780,7 @@ function loadGoals(user) {
     const container = $("#goalPreviewList");
 
     showMessage(container, "Loading your goals…");
+
     setText("#activeGoals", "…");
     setText("#activeGoalsNote", "Loading your saved goals");
 
@@ -716,13 +842,20 @@ function loadNotificationBadge(user) {
         snapshot => {
             if (!currentUser || currentUser.uid !== user.uid) return;
 
-            const unread = snapshot.docs.reduce((count, notificationDoc) => {
-                return count + (notificationDoc.data().read === true ? 0 : 1);
-            }, 0);
+            const unread = snapshot.docs.reduce(
+                (count, notificationDoc) => {
+                    return count +
+                        (notificationDoc.data().read === true ? 0 : 1);
+                },
+                0
+            );
 
             if (badge) {
-                badge.textContent = unread > 99 ? "99+" : String(unread);
+                badge.textContent =
+                    unread > 99 ? "99+" : String(unread);
+
                 badge.hidden = unread === 0;
+
                 badge.setAttribute(
                     "aria-label",
                     `${unread} unread notifications`
@@ -731,14 +864,20 @@ function loadNotificationBadge(user) {
 
             if (dot) {
                 dot.hidden = unread === 0;
+
                 dot.setAttribute(
                     "aria-label",
-                    unread ? "Unread notifications" : "No unread notifications"
+                    unread
+                        ? "Unread notifications"
+                        : "No unread notifications"
                 );
             }
         },
         error => {
-            console.error("GradeFlow notification badge listener error:", error);
+            console.error(
+                "GradeFlow notification badge listener error:",
+                error
+            );
         }
     );
 }
@@ -771,13 +910,18 @@ function setupNavigation() {
     backdrop?.addEventListener("click", closeSidebar);
 
     moreButton?.addEventListener("click", () => {
-        if (moreMenu) moreMenu.hidden = !moreMenu.hidden;
+        if (moreMenu) {
+            moreMenu.hidden = !moreMenu.hidden;
+        }
     });
 
     document.addEventListener("keydown", event => {
         if (event.key === "Escape") {
             closeSidebar();
-            if (moreMenu) moreMenu.hidden = true;
+
+            if (moreMenu) {
+                moreMenu.hidden = true;
+            }
         }
     });
 

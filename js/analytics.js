@@ -1,4 +1,5 @@
 
+
 import { auth, db } from "./firebase.js";
 
 import {
@@ -18,6 +19,9 @@ const elements = {
   message: $("#analyticsMessage"),
   latestGpa: $("#latestGpa"),
   latestGpaNote: $("#latestGpaNote"),
+  gpaChange: $("#gpaChange"),
+  gpaChangeNote: $("#gpaChangeNote"),
+  insights: $("#academicInsights"),
   overallAverage: $("#overallAverage"),
   totalCredits: $("#totalCredits"),
   calculationCount: $("#calculationCount"),
@@ -30,6 +34,7 @@ const elements = {
 };
 
 let allHistory = [];
+let userGoals = [];
 
 $("#currentYear").textContent = new Date().getFullYear();
 
@@ -60,6 +65,10 @@ function dateValue(record) {
 }
 
 function validNumber(value) {
+  if (value === null || value === undefined || value === "") {
+    return null;
+  }
+
   const number = Number(value);
   return Number.isFinite(number) ? number : null;
 }
@@ -116,6 +125,17 @@ function safeText(value) {
 function renderEmpty() {
   elements.latestGpa.textContent = "—";
   elements.latestGpaNote.textContent = "Save a calculation to begin.";
+
+  elements.gpaChange.textContent = "—";
+  elements.gpaChange.classList.remove("metric-positive", "metric-negative");
+  elements.gpaChangeNote.textContent = "Needs two saved GPA results";
+
+  elements.insights.replaceChildren();
+  addInsight(
+    "Start with one saved result",
+    "Save a grade calculation to begin tracking your academic performance."
+  );
+
   elements.overallAverage.textContent = "—";
   elements.totalCredits.textContent = "—";
   elements.calculationCount.textContent = "0";
@@ -124,8 +144,13 @@ function renderEmpty() {
     '<div class="chart-empty">No saved calculations yet. Calculate grades and save your result to see your progress.</div>';
 
   elements.trend.textContent = "";
-  elements.strong.innerHTML = '<p class="muted">No subject data available.</p>';
-  elements.weak.innerHTML = '<p class="muted">No subject data available.</p>';
+
+  elements.strong.innerHTML =
+    '<p class="muted">No subject data available.</p>';
+
+  elements.weak.innerHTML =
+    '<p class="muted">No subject data available.</p>';
+
   elements.table.innerHTML =
     '<tr><td colspan="4">No saved subject records yet.</td></tr>';
 }
@@ -159,6 +184,39 @@ function renderMetrics() {
   const gpa = getGpa(newest.data);
   const scale = getScale(newest.data);
   const credits = validNumber(newest.data.totalCredits);
+
+  const previous = [...allHistory]
+    .filter(item => item.timestamp < newest.timestamp || item.id !== newest.id)
+    .filter(item => getGpa(item.data) !== null)
+    .sort((a, b) => b.timestamp - a.timestamp)[0];
+
+  if (gpa !== null && previous) {
+    const previousNormalized =
+      getGpa(previous.data) / getScale(previous.data);
+
+    const currentNormalized = gpa / scale;
+    const difference = (currentNormalized - previousNormalized) * 100;
+
+    elements.gpaChange.textContent =
+      `${difference > 0 ? "+" : ""}${difference.toFixed(1)} pts`;
+
+    elements.gpaChange.classList.toggle(
+      "metric-positive",
+      difference > 0.05
+    );
+
+    elements.gpaChange.classList.toggle(
+      "metric-negative",
+      difference < -0.05
+    );
+
+    elements.gpaChangeNote.textContent =
+      `Compared with ${getGpa(previous.data).toFixed(2)} / ${getScale(previous.data)} · normalized for scale`;
+  } else {
+    elements.gpaChange.textContent = "—";
+    elements.gpaChange.classList.remove("metric-positive", "metric-negative");
+    elements.gpaChangeNote.textContent = "Save another GPA result to compare";
+  }
 
   elements.latestGpa.textContent =
     gpa === null ? "—" : `${gpa.toFixed(2)} / ${scale}`;
@@ -198,7 +256,9 @@ function getSubjectCredits(subjects) {
 function renderChart() {
   const records = getVisibleHistory();
 
-  const validRecords = records.filter(item => getGpa(item.data) !== null);
+  const validRecords = records.filter(
+    item => getGpa(item.data) !== null
+  );
 
   if (!validRecords.length) {
     elements.chart.innerHTML =
@@ -216,7 +276,10 @@ function renderChart() {
 
     // Normalize each GPA to a percentage so 4-point and
     // 5-point systems can be compared on the same chart.
-    const normalized = Math.max(0, Math.min(100, (gpa / scale) * 100));
+    const normalized = Math.max(
+      0,
+      Math.min(100, (gpa / scale) * 100)
+    );
 
     const column = document.createElement("div");
     column.className = "chart-item";
@@ -337,10 +400,15 @@ function renderSubjectAnalytics() {
   elements.table.replaceChildren();
 
   if (!subjects.length) {
-    elements.strong.innerHTML = '<p class="muted">No subject data available yet.</p>';
-    elements.weak.innerHTML = '<p class="muted">No subject data available yet.</p>';
+    elements.strong.innerHTML =
+      '<p class="muted">No subject data available yet.</p>';
+
+    elements.weak.innerHTML =
+      '<p class="muted">No subject data available yet.</p>';
+
     elements.table.innerHTML =
       '<tr><td colspan="4">Save a calculation containing subjects to see this breakdown.</td></tr>';
+
     return;
   }
 
@@ -373,7 +441,8 @@ function renderSubjectAnalytics() {
 
     const fill = document.createElement("div");
     fill.className = "progress-fill";
-    fill.style.width = `${Math.max(0, Math.min(100, subject.average))}%`;
+    fill.style.width =
+      `${Math.max(0, Math.min(100, subject.average))}%`;
 
     track.appendChild(fill);
     progressCell.appendChild(track);
@@ -383,10 +452,150 @@ function renderSubjectAnalytics() {
   });
 }
 
+function addInsight(title, description, kind = "") {
+  const card = document.createElement("article");
+  card.className = `insight-card ${kind}`.trim();
+
+  const heading = document.createElement("strong");
+  heading.textContent = title;
+
+  const paragraph = document.createElement("p");
+  paragraph.textContent = description;
+
+  card.append(heading, paragraph);
+  elements.insights.appendChild(card);
+}
+
+function renderAcademicInsights() {
+  elements.insights.replaceChildren();
+
+  const records = [...allHistory]
+    .sort((a, b) => a.timestamp - b.timestamp);
+
+  const latest = [...records]
+    .reverse()
+    .find(item => getGpa(item.data) !== null);
+
+  const previous = latest
+    ? [...records].reverse().find(
+        item => item.id !== latest.id && getGpa(item.data) !== null
+      )
+    : null;
+
+  const subjects = collectSubjectStats();
+
+  if (!latest) {
+    addInsight(
+      "No GPA data yet",
+      "Save a calculation with a GPA to unlock comparisons and tailored suggestions."
+    );
+  } else {
+    const currentGpa = getGpa(latest.data);
+    const scale = getScale(latest.data);
+
+    addInsight(
+      "Latest result",
+      `Your latest saved GPA is ${currentGpa.toFixed(2)} out of ${scale}.`,
+      "insight-neutral"
+    );
+
+    if (previous) {
+      const change = (
+        currentGpa / scale -
+        getGpa(previous.data) / getScale(previous.data)
+      ) * 100;
+
+      if (change > 0.05) {
+        addInsight(
+          "Progress is up",
+          `Your normalized GPA is up ${change.toFixed(1)} percentage points from the previous saved result. Keep using the study habits that are working.`,
+          "insight-positive"
+        );
+      } else if (change < -0.05) {
+        addInsight(
+          "Review what changed",
+          `Your normalized GPA is down ${Math.abs(change).toFixed(1)} percentage points. Check which subjects or study conditions changed before setting a new target.`,
+          "insight-attention"
+        );
+      } else {
+        addInsight(
+          "Performance is steady",
+          "Your normalized GPA is approximately unchanged from the previous saved result. Choose one topic to strengthen next.",
+          "insight-neutral"
+        );
+      }
+    } else {
+      addInsight(
+        "Build a trend",
+        "One result is a starting point. Save another calculation later to see whether your GPA is improving."
+      );
+    }
+  }
+
+  if (subjects.length) {
+    const strongest = subjects[0];
+    const weakest = subjects[subjects.length - 1];
+
+    addInsight(
+      "Strongest subject",
+      `${strongest.name} averages ${strongest.average.toFixed(1)}% across ${strongest.count} saved record${strongest.count === 1 ? "" : "s"}.`,
+      "insight-positive"
+    );
+
+    if (subjects.length > 1) {
+      addInsight(
+        "Suggested focus",
+        `${weakest.name} has the lowest saved average at ${weakest.average.toFixed(1)}%. Review specific mistakes and practise the topics you find hardest.`,
+        "insight-attention"
+      );
+    }
+  } else {
+    addInsight(
+      "Subject-level insights",
+      "Saved results need subject names and scores to identify strengths and focus areas."
+    );
+  }
+
+  const activeGpaGoal = userGoals
+    .filter(goal =>
+      goal.type === "gpa" &&
+      !goal.completed &&
+      validNumber(goal.target) !== null
+    )
+    .sort((a, b) =>
+      String(a.deadline || "9999").localeCompare(
+        String(b.deadline || "9999")
+      )
+    )[0];
+
+  if (activeGpaGoal && latest) {
+    const target = Number(activeGpaGoal.target);
+    const current = getGpa(latest.data);
+    const scale = getScale(latest.data);
+
+    if (target <= scale) {
+      if (current >= target) {
+        addInsight(
+          "GPA goal reached",
+          `Your latest GPA (${current.toFixed(2)}) meets your goal “${activeGpaGoal.title}” (${target.toFixed(2)}). Check the Goals page to update its status.`,
+          "insight-positive"
+        );
+      } else {
+        addInsight(
+          "GPA goal in progress",
+          `Your latest GPA is ${(target - current).toFixed(2)} points below “${activeGpaGoal.title}” (${target.toFixed(2)} / ${scale}).`,
+          "insight-attention"
+        );
+      }
+    }
+  }
+}
+
 function renderAnalytics() {
   renderMetrics();
   renderChart();
   renderSubjectAnalytics();
+  renderAcademicInsights();
 }
 
 async function loadAnalytics(user) {
@@ -412,6 +621,27 @@ async function loadAnalytics(user) {
 
     allHistory.sort((a, b) => a.timestamp - b.timestamp);
 
+    try {
+      const goalsQuery = query(
+        collection(db, "goals"),
+        where("uid", "==", user.uid)
+      );
+
+      const goalsSnapshot = await getDocs(goalsQuery);
+
+      userGoals = goalsSnapshot.docs.map(document => ({
+        id: document.id,
+        ...document.data()
+      }));
+    } catch (goalError) {
+      console.warn(
+        "GradeFlow analytics: goals could not be loaded:",
+        goalError
+      );
+
+      userGoals = [];
+    }
+
     renderAnalytics();
 
     showMessage(
@@ -421,6 +651,7 @@ async function loadAnalytics(user) {
     );
   } catch (error) {
     console.error("GradeFlow analytics failed to load:", error);
+
     showMessage(
       "Could not load analytics. Check your internet connection and Firebase permissions, then reload.",
       true
@@ -433,8 +664,14 @@ elements.period.addEventListener("change", renderChart);
 onAuthStateChanged(auth, user => {
   if (!user) {
     allHistory = [];
+    userGoals = [];
     renderEmpty();
-    showMessage("Sign in to view your personal performance analytics.", true);
+
+    showMessage(
+      "Sign in to view your personal performance analytics.",
+      true
+    );
+
     return;
   }
 

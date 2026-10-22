@@ -191,42 +191,6 @@ async function notifyGoal(notification, checkExisting = false) {
   }
 }
 
-function checkGoalDeadlines(goals) {
-  const today = todayISO();
-
-  goals.forEach((goal) => {
-    if (goal.completed || !goal.deadline) return;
-
-    const todayDate = new Date(`${today}T00:00:00`);
-    const deadlineDate = new Date(`${goal.deadline}T00:00:00`);
-
-    if (
-      Number.isNaN(deadlineDate.getTime()) ||
-      goal.deadline < today
-    ) {
-      return;
-    }
-
-    const daysLeft = Math.round(
-      (deadlineDate.getTime() - todayDate.getTime()) /
-      (24 * 60 * 60 * 1000)
-    );
-
-    // Remind when the deadline is within three days.
-    if (daysLeft <= 3) {
-      const message = daysLeft === 0
-        ? `Your goal "${goal.title}" is due today.`
-        : `Your goal "${goal.title}" is due in ${daysLeft} day${daysLeft === 1 ? "" : "s"}.`;
-
-      void notifyGoal({
-        id: `goal-deadline-${goal.id}-${goal.deadline}`,
-        title: daysLeft === 0 ? "Goal deadline today" : "Upcoming goal deadline",
-        message,
-        type: "academic"
-      }, true);
-    }
-  });
-}
 
 /* =====================================================
    CURRENT ACADEMIC PERFORMANCE
@@ -930,7 +894,6 @@ function listenForGoals(user) {
 
       renderStatistics();
       renderGoals();
-      checkGoalDeadlines(state.goals);
     },
     (error) => {
       console.error("GradeFlow: loading goals failed:", error);
