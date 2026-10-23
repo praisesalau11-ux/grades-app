@@ -7,6 +7,31 @@ const router = Router();
 const PROJECT_ID =
   process.env.FIREBASE_PROJECT_ID || "grades-calculator-72499";
 
+const MAX_MESSAGE_LENGTH = 4000;
+const MAX_FILES = 3;
+const MAX_FILE_BYTES = 5 * 1024 * 1024;
+const MAX_TOTAL_FILE_BYTES = 15 * 1024 * 1024;
+
+const ALLOWED_MIME_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "application/pdf",
+  "text/plain",
+  "text/csv",
+  "audio/mpeg",
+  "audio/wav",
+  "audio/ogg",
+  "audio/mp4",
+  "audio/webm",
+  "audio/aac",
+  "audio/flac",
+  "video/mp4",
+  "video/webm",
+  "video/quicktime",
+  "video/mpeg"
+]);
+
 function normalizeOrigin(value) {
   if (!value) return null;
 
@@ -17,7 +42,6 @@ function normalizeOrigin(value) {
   }
 }
 
-// Only allow your actual frontend origins.
 const ALLOWED_ORIGINS = new Set(
   [
     "https://praisesalau11-ux.github.io",
@@ -33,7 +57,6 @@ const firebaseKeys = createRemoteJWKSet(
   )
 );
 
-// Basic per-user rate limit: 15 requests per minute.
 const rateLimits = new Map();
 const WINDOW_MS = 60_000;
 const MAX_REQUESTS = 15;
@@ -108,6 +131,72 @@ function cleanAcademicContext(value) {
   return { history, goals };
 }
 
+function cleanAttachments(value) {
+  if (value === undefined) return [];
+
+  if (!Array.isArray(value)) {
+    throw new Error("Attachments must be supplied as a list.");
+  }
+
+  if (value.length > MAX_FILES) {
+    throw new Error(`You can attach up to ${MAX_FILES} files per message.`);
+  }
+
+  let totalBytes = 0;
+
+  return value.map((item) => {
+    if (!item || typeof item !== "object") {
+      throw new Error("An attachment is invalid.");
+    }
+
+    const name =
+      typeof item.name === "string"
+        ? item.name.replace(/[\\/\u0000-\u001f]/g, "_").slice(0, 180)
+        : "attachment";
+
+    const mimeType =
+      typeof item.mimeType === "string"
+        ? item.mimeType.toLowerCase().trim()
+        : "";
+
+    const data = typeof item.data === "string" ? item.data : "";
+
+    if (!ALLOWED_MIME_TYPES.has(mimeType)) {
+      throw new Error(`Unsupported file type for "${name}".`);
+    }
+
+    if (!data || data.length > Math.ceil(MAX_FILE_BYTES * 4 / 3) + 8) {
+      throw new Error(`"${name}" is empty or exceeds the 5 MB file limit.`);
+    }
+
+    // Reject malformed Base64 instead of silently accepting bad data.
+    if (
+      data.length % 4 !== 0 ||
+      !/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(data)
+    ) {
+      throw new Error(`The uploaded data for "${name}" is invalid.`);
+    }
+
+    const bytes = Buffer.from(data, "base64");
+
+    if (bytes.length === 0 || bytes.length > MAX_FILE_BYTES) {
+      throw new Error(`"${name}" must be no larger than 5 MB.`);
+    }
+
+    totalBytes += bytes.length;
+
+    if (totalBytes > MAX_TOTAL_FILE_BYTES) {
+      throw new Error("All attachments combined must be 15 MB or less.");
+    }
+
+    return {
+      name,
+      mimeType,
+      data
+    };
+  });
+}
+
 // CORS and origin validation.
 router.use((req, res, next) => {
   const origin = req.headers.origin;
@@ -140,7 +229,7 @@ router.use((req, res, next) => {
 
 router.post("/chat", async (req, res) => {
   try {
-    // Require a Firebase ID token.
+    // Require a valid Firebase ID token.
     const authHeader = req.headers.authorization || "";
     const match = authHeader.match(/^Bearer\s+(.+)$/i);
 
@@ -178,27 +267,37 @@ router.post("/chat", async (req, res) => {
       });
     }
 
-    // Limit requests per authenticated user.
     if (!allowRequest(claims.sub)) {
       return res.status(429).json({
         error: "Too many requests. Please wait a minute and try again."
       });
     }
 
-    const message = cleanText(req.body?.message);
-
-    if (!message) {
-      return res.status(400).json({
-        error: "Enter a message first."
-      });
-    }
+    const rawMessage = req.body?.message;
 
     if (
-      typeof req.body?.message === "string" &&
-      req.body.message.length > 4000
+      typeof rawMessage === "string" &&
+      rawMessage.length > MAX_MESSAGE_LENGTH
     ) {
       return res.status(413).json({
         error: "Messages must be 4,000 characters or fewer."
+      });
+    }
+
+    const message = cleanText(rawMessage);
+    let attachments;
+
+    try {
+      attachments = cleanAttachments(req.body?.attachments);
+    } catch (error) {
+      return res.status(400).json({
+        error: error.message || "One or more attachments are invalid."
+      });
+    }
+
+    if (!message && attachments.length === 0) {
+      return res.status(400).json({
+        error: "Enter a message or attach a file first."
       });
     }
 
@@ -219,20 +318,27 @@ router.post("/chat", async (req, res) => {
       transcript || "(No earlier messages.)",
       "",
       "Student's current message:",
-      message,
+      message || "Please inspect the attached file or files and explain their relevant contents.",
       "",
       "Academic context supplied by the GradeFlow client:",
       JSON.stringify(academicContext),
       "",
-      "Answer the current question. Do not invent missing grades or claim that you changed database records."
+      "Answer the current question using the attachments when relevant.",
+      "If a file cannot be interpreted, explain the limitation instead of guessing.",
+      "Do not invent missing grades or claim to have changed database records."
     ].join("\n");
 
     const result = await askGemini({
       prompt,
+      attachments: attachments.map(({ mimeType, data }) => ({
+        mimeType,
+        data
+      })),
       systemInstruction: [
         "You are GradeFlow AI, a clear and patient educational assistant.",
         "Help students learn school subjects, prepare for exams, practise with quizzes, plan revision, and understand academic progress.",
         "Explain difficult ideas step by step and use examples.",
+        "When files are attached, inspect their contents when supported and relevant to the student's request.",
         "Treat academic context as information supplied by the client, not independently verified database truth.",
         "Never invent GPA values, grades, goals, or actions.",
         "Do not claim to update or delete records.",
