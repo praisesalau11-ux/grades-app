@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b0b0d">
+  <meta name="description" content="Create and configure a GradeFlow Games quiz match.">
+  <title>Create Match | GradeFlow Games</title>
+
+  <link rel="stylesheet" href="../../css/games/create-match.css">
+
+  <script src="../../js/games/currencies.js" defer></script>
+  <script type="module" src="../../js/games/create-match.js"></script>
+</head>
+
+<body>
+  <div class="page-shell">
+    <header class="topbar">
+      <a class="brand" href="../games.html" aria-label="Back to GradeFlow Games">
+        <span class="brand-mark">G</span>
+        <span class="brand-copy">
+          <strong>GradeFlow</strong>
+          <small>GAMES</small>
+        </span>
+      </a>
+
+      <div class="topbar-actions">
+        <span class="draft-status" id="draftStatus">Ready to create</span>
+        <a class="back-link" href="../games.html">← Games dashboard</a>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <section class="page-intro">
+        <div>
+          <span class="eyebrow">MATCH STUDIO</span>
+          <h1>Create a match</h1>
+          <p>
+            Configure your quiz, competitors, audience, schedule and optional
+            sponsorship features.
+          </p>
+        </div>
+
+        <div class="intro-badge">
+          <span class="status-dot"></span>
+          Match setup
+        </div>
+      </section>
+
+      <div class="notice" role="note">
+        <strong>Before you continue</strong>
+        <p>
+          Match settings can now be saved to your GradeFlow Firebase account.
+          AI question generation, live scheduling, private-viewer enforcement
+          and payment processing still require separate integrations.
+        </p>
+      </div>
+
+      <form id="createMatchForm" novalidate>
+        <section class="form-section">
+          <div class="section-heading">
+            <span class="section-number">01</span>
+            <div>
+              <h2>Match details</h2>
+              <p>Give your match a clear identity.</p>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="field field-full">
+              <label for="matchTitle">Match title <span class="required">*</span></label>
+              <input
+                id="matchTitle"
+                name="matchTitle"
+                type="text"
+                maxlength="100"
+                placeholder="e.g. GradeFlow National Science Challenge"
+                required
+              >
+              <small class="field-hint">Maximum 100 characters.</small>
+            </div>
+
+            <div class="field field-full">
+              <label for="matchDescription">Description</label>
+              <textarea
+                id="matchDescription"
+                name="matchDescription"
+                rows="4"
+                maxlength="1000"
+                placeholder="Explain the match, its rules and what competitors should expect."
+              ></textarea>
+              <small class="field-hint">Maximum 1,000 characters.</small>
+            </div>
+
+            <div class="field">
+              <label for="matchCategory">Match category <span class="required">*</span></label>
+              <select id="matchCategory" name="matchCategory" required>
+                <option value="">Choose a category</option>
+                <option value="Academic">Academic</option>
+                <option value="General Knowledge">General Knowledge</option>
+                <option value="Technology">Technology</option>
+                <option value="Business">Business</option>
+                <option value="Language">Language</option>
+                <option value="Entertainment">Entertainment</option>
+                <option value="Mixed">Mixed</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="difficulty">Difficulty <span class="required">*</span></label>
+              <select id="difficulty" name="difficulty" required>
+                <option value="Beginner">Beginner</option>
+                <option value="Intermediate" selected>Intermediate</option>
+                <option value="Advanced">Advanced</option>
+                <option value="Expert">Expert</option>
+                <option value="Mixed">Mixed difficulty</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="matchLanguage">Question language</label>
+              <select id="matchLanguage" name="matchLanguage">
+                <option value="English" selected>English</option>
+                <option value="French">French</option>
+                <option value="Spanish">Spanish</option>
+                <option value="Portuguese">Portuguese</option>
+                <option value="Arabic">Arabic</option>
+                <option value="Chinese">Chinese</option>
+                <option value="Japanese">Japanese</option>
+                <option value="Hindi">Hindi</option>
+                <option value="Swahili">Swahili</option>
+                <option value="Yoruba">Yoruba</option>
+                <option value="Igbo">Igbo</option>
+                <option value="Hausa">Hausa</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="matchFormat">Match format</label>
+              <select id="matchFormat" name="matchFormat">
+                <option value="Live quiz" selected>Live quiz</option>
+                <option value="Timed challenge">Timed challenge</option>
+                <option value="Tournament">Tournament</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <div class="section-heading">
+            <span class="section-number">02</span>
+            <div>
+              <h2>Subjects and questions</h2>
+              <p>Choose the subjects and set the AI question requirements.</p>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Subject selection <span class="required">*</span></label>
+            <p class="field-hint">
+              Select one subject or several subjects for a mixed-subject match.
+            </p>
+
+            <div class="subject-grid" id="subjectGrid">
+              <label class="subject-option">
+                <input type="checkbox" name="subjects" value="Mathematics">
+                <span>Mathematics</span>
+              </label>
+
+              <label class="subject-option">
+                <input type="checkbox" name="subjects" value="English">
+                <span>English</span>
+              </label>
+
+              <label class="subject-option">
+                <input type="checkbox" name="subjects" value="Biology">
+                <span>Biology</span>
+              </label>
+
+              <label class="subject-option">
+                <input type="checkbox" name="subjects" value="Chemistry">
+                <span>Chemistry</span>
+              </label>
+
+              <label class="subject-option">
+                <input type="checkbox" name="subjects" value="Physics">
+                <span>Physics</span>
+              </label>
+
+              <label class="subject-option">
+                <input type="checkbox" name="subjects" value="Computer Science">
+                <span>Computer Science</span>
+              </label>
+
+              <label class="subject-option">
+                <input type="checkbox" name="subjects" value="History">
+                <span>History</span>
+              </label>
+
+              <label class="subject-option">
+                <input type="checkbox" name="subjects" value="Geography">
+                <span>Geography</span>
+              </label>
+
+              <label class="subject-option">
+                <input type="checkbox" name="subjects" value="Economics">
+                <span>Economics</span>
+              </label>
+
+              <label class="subject-option">
+                <input type="checkbox" name="subjects" value="Business Studies">
+                <span>Business Studies</span>
+              </label>
+
+              <label class="subject-option">
+                <input type="checkbox" name="subjects" value="General Knowledge">
+                <span>General Knowledge</span>
+              </label>
+
+              <label class="subject-option">
+                <input type="checkbox" name="subjects" value="Literature">
+                <span>Literature</span>
+              </label>
+            </div>
+
+            <p class="inline-error" id="subjectsError" aria-live="polite"></p>
+          </div>
+
+          <div class="form-grid top-gap">
+            <div class="field">
+              <label for="questionCount">Number of questions <span class="required">*</span></label>
+              <input
+                id="questionCount"
+                name="questionCount"
+                type="number"
+                min="30"
+                max="100"
+                step="1"
+                value="30"
+                required
+              >
+              <p>
+  GradeFlow AI generates questions from your selected subjects and settings.
+  Review the questions before saving your match.
+</p>
+
+            <div class="field">
+              <label for="questionType">Question type</label>
+              <select id="questionType" name="questionType">
+                <option value="Multiple choice" selected>Multiple choice</option>
+                <option value="True or false">True or false</option>
+                <option value="Mixed">Mixed question types</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="secondsPerQuestion">Seconds per question</label>
+              <select id="secondsPerQuestion" name="secondsPerQuestion">
+                <option value="10">10 seconds</option>
+                <option value="15">15 seconds</option>
+                <option value="20" selected>20 seconds</option>
+                <option value="30">30 seconds</option>
+                <option value="45">45 seconds</option>
+                <option value="60">60 seconds</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="pointsPerQuestion">Points per correct answer</label>
+              <select id="pointsPerQuestion" name="pointsPerQuestion">
+                <option value="1">1 point</option>
+                <option value="5">5 points</option>
+                <option value="10" selected>10 points</option>
+                <option value="20">20 points</option>
+                <option value="50">50 points</option>
+                <option value="100">100 points</option>
+              </select>
+            </div>
+          </div>
+        </section>
+                <section class="form-section">
+          <div class="section-heading">
+            <span class="section-number">03</span>
+            <div>
+              <h2>Access and competitors</h2>
+              <p>Control who can enter and who can watch.</p>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="field">
+              <label for="visibility">Match visibility <span class="required">*</span></label>
+              <select id="visibility" name="visibility" required>
+                <option value="public" selected>Public</option>
+                <option value="private">Private</option>
+              </select>
+              <small class="field-hint">
+                Public matches can be discovered. Private access requires server-side enforcement.
+              </small>
+            </div>
+
+            <div class="field">
+              <label for="competitorMode">Competitor entry</label>
+              <select id="competitorMode" name="competitorMode">
+                <option value="applications" selected>Apply and await approval</option>
+                <option value="open">Open registration</option>
+                <option value="invite">Invite-only competitors</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="competitorSlots">Competitor slots <span class="required">*</span></label>
+              <input
+                id="competitorSlots"
+                name="competitorSlots"
+                type="number"
+                min="2"
+                max="10000"
+                step="1"
+                value="20"
+                required
+              >
+              <small class="field-hint">Minimum 2 competitors.</small>
+            </div>
+
+            <div class="field">
+              <label for="watchingAccess">Who can watch?</label>
+              <select id="watchingAccess" name="watchingAccess">
+                <option value="everyone" selected>Everyone</option>
+                <option value="registered">Registered users</option>
+                <option value="approved">Approved viewers only</option>
+                <option value="authorized">Authorized users only</option>
+              </select>
+            </div>
+
+            <div class="field field-full hidden" id="authorizedViewersField">
+              <label for="authorizedViewers">Authorized viewer emails or usernames</label>
+              <textarea
+                id="authorizedViewers"
+                name="authorizedViewers"
+                rows="3"
+                placeholder="Enter one email or username per line."
+              ></textarea>
+              <small class="field-hint">
+                One entry per line. The backend must verify access before allowing private viewing.
+              </small>
+            </div>
+
+            <div class="field field-full hidden" id="inviteCompetitorsField">
+              <label for="invitedCompetitors">Invited competitor emails or usernames</label>
+              <textarea
+                id="invitedCompetitors"
+                name="invitedCompetitors"
+                rows="3"
+                placeholder="Enter one email or username per line."
+              ></textarea>
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <div class="section-heading">
+            <span class="section-number">04</span>
+            <div>
+              <h2>Schedule</h2>
+              <p>Set when applications open and when the match is planned to begin.</p>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="field">
+              <label for="startDateTime">Scheduled start <span class="required">*</span></label>
+              <input
+                id="startDateTime"
+                name="startDateTime"
+                type="datetime-local"
+                required
+              >
+            </div>
+
+            <div class="field">
+              <label for="applicationDeadline">Application deadline</label>
+              <input
+                id="applicationDeadline"
+                name="applicationDeadline"
+                type="datetime-local"
+              >
+            </div>
+
+            <div class="field">
+              <label for="estimatedDuration">Estimated duration</label>
+              <select id="estimatedDuration" name="estimatedDuration">
+                <option value="15">15 minutes</option>
+                <option value="30" selected>30 minutes</option>
+                <option value="45">45 minutes</option>
+                <option value="60">1 hour</option>
+                <option value="90">1 hour 30 minutes</option>
+                <option value="120">2 hours</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="matchTimezone">Time zone</label>
+              <select id="matchTimezone" name="matchTimezone">
+                <option value="Africa/Lagos" selected>Africa/Lagos (WAT)</option>
+                <option value="Europe/London">Europe/London</option>
+                <option value="Europe/Paris">Europe/Paris</option>
+                <option value="Asia/Tokyo">Asia/Tokyo</option>
+                <option value="America/New_York">America/New_York</option>
+                <option value="America/Los_Angeles">America/Los_Angeles</option>
+                <option value="Asia/Dubai">Asia/Dubai</option>
+                <option value="Asia/Kolkata">Asia/Kolkata</option>
+                <option value="Australia/Sydney">Australia/Sydney</option>
+                <option value="UTC">UTC</option>
+              </select>
+              <small class="field-hint">
+                Store a proper time-zone identifier on the backend when saving the match.
+              </small>
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <div class="section-heading">
+            <span class="section-number">05</span>
+            <div>
+              <h2>Viewing fee and currency</h2>
+              <p>Configure optional paid viewing. A currency selector does not process payments.</p>
+            </div>
+          </div>
+
+          <div class="toggle-row">
+            <div>
+              <strong>Enable paid viewing</strong>
+              <p>Leave disabled to let viewers watch for free.</p>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="paidViewing" name="paidViewing">
+              <span class="switch-track"></span>
+              <span class="sr-only">Enable paid viewing</span>
+            </label>
+          </div>
+
+          <div class="form-grid top-gap hidden" id="paidViewingFields">
+            <div class="field">
+              <label for="viewingFee">Viewing fee amount</label>
+              <input
+                id="viewingFee"
+                name="viewingFee"
+                type="number"
+                min="0.01"
+                max="100000000"
+                step="0.01"
+                placeholder="Enter amount"
+              >
+            </div>
+
+            <div class="field">
+              <label for="viewingCurrency">Viewing fee currency</label>
+              <select id="viewingCurrency" name="viewingCurrency">
+                <option value="NGN">NGN — Nigerian naira (₦)</option>
+              </select>
+            </div>
+
+            <div class="field field-full">
+              <div class="fee-preview">
+                <span>Example fee display</span>
+                <strong id="viewingFeePreview">₦0.00</strong>
+              </div>
+              <small class="field-hint">
+                Actual charges, refunds, fees and payouts require a supported payment provider
+                and trusted server-side verification.
+              </small>
+            </div>
+          </div>
+
+          <div class="notice notice-subtle top-gap">
+            <strong>Payment safety</strong>
+            <p>
+              Do not collect card details in this form or treat a client-side fee
+              as proof of payment. Real-money betting is not included.
+            </p>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <div class="section-heading">
+            <span class="section-number">06</span>
+            <div>
+              <h2>Community features</h2>
+              <p>Choose which interaction features should be available.</p>
+            </div>
+          </div>
+
+          <div class="settings-list">
+            <div class="toggle-row">
+              <div>
+                <strong>Comments</strong>
+                <p>Allow viewers to comment during the match.</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="enableComments" name="enableComments" checked>
+                <span class="switch-track"></span>
+                <span class="sr-only">Enable comments</span>
+              </label>
+            </div>
+
+            <div class="toggle-row">
+              <div>
+                <strong>Audience reactions</strong>
+                <p>Allow quick reactions from viewers.</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="enableReactions" name="enableReactions" checked>
+                <span class="switch-track"></span>
+                <span class="sr-only">Enable audience reactions</span>
+              </label>
+            </div>
+
+            <div class="toggle-row">
+              <div>
+                <strong>Non-cash predictions</strong>
+                <p>Allow predictions for fun without cash stakes or payouts.</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="enablePredictions" name="enablePredictions">
+                <span class="switch-track"></span>
+                <span class="sr-only">Enable non-cash predictions</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <div class="section-heading">
+            <span class="section-number">07</span>
+            <div>
+              <h2>Sponsorships</h2>
+              <p>Choose whether sponsors can make offers for this match.</p>
+            </div>
+          </div>
+
+          <div class="toggle-row">
+            <div>
+              <strong>Accept sponsorship offers</strong>
+              <p>Allow the match to receive sponsorship proposals.</p>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="enableSponsorships" name="enableSponsorships">
+              <span class="switch-track"></span>
+              <span class="sr-only">Enable sponsorship offers</span>
+            </label>
+          </div>
+
+          <div class="form-grid top-gap hidden" id="sponsorshipFields">
+            <div class="field">
+              <label for="sponsorshipType">Preferred sponsorship model</label>
+              <select id="sponsorshipType" name="sponsorshipType">
+                <option value="Any" selected>Any offer</option>
+                <option value="Fixed">Fixed amount</option>
+                <option value="Revenue share">Revenue share</option>
+                <option value="Long-term contract">Long-term contract</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="sponsorshipCurrency">Preferred offer currency</label>
+              <select id="sponsorshipCurrency" name="sponsorshipCurrency">
+                <option value="NGN">NGN — Nigerian naira (₦)</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="sponsorshipNotes">Sponsorship notes</label>
+              <textarea
+                id="sponsorshipNotes"
+                name="sponsorshipNotes"
+                rows="3"
+                maxlength="1000"
+                placeholder="Optional sponsor requirements or conditions."
+              ></textarea>
+            </div>
+
+            <div class="field">
+              <label for="sponsorshipAmount">Preferred fixed amount (optional)</label>
+              <input
+                id="sponsorshipAmount"
+                name="sponsorshipAmount"
+                type="number"
+                min="0"
+                max="1000000000"
+                step="0.01"
+                placeholder="Leave blank if negotiable"
+              >
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <div class="section-heading">
+            <span class="section-number">08</span>
+            <div>
+              <h2>Halftime advertising</h2>
+              <p>Configure a possible sponsor break between match rounds.</p>
+            </div>
+          </div>
+
+          <div class="toggle-row">
+            <div>
+              <strong>Enable halftime sponsor break</strong>
+              <p>Mark a planned point for a sponsor video or advertisement.</p>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="enableHalftimeAd" name="enableHalftimeAd">
+              <span class="switch-track"></span>
+              <span class="sr-only">Enable halftime advertising</span>
+            </label>
+          </div>
+
+          <div class="form-grid top-gap hidden" id="halftimeFields">
+            <div class="field">
+              <label for="halftimeAfterQuestion">Show break after question</label>
+              <input
+                id="halftimeAfterQuestion"
+                name="halftimeAfterQuestion"
+                type="number"
+                min="1"
+                max="499"
+                step="1"
+                value="15"
+              >
+            </div>
+
+            <div class="field">
+              <label for="halftimeDuration">Break duration</label>
+              <select id="halftimeDuration" name="halftimeDuration">
+                <option value="15">15 seconds</option>
+                <option value="30" selected>30 seconds</option>
+                <option value="45">45 seconds</option>
+                <option value="60">60 seconds</option>
+                <option value="90">90 seconds</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <div class="section-heading">
+            <span class="section-number">09</span>
+            <div>
+              <h2>Final settings</h2>
+              <p>Choose the initial status and confirm your configuration.</p>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="field">
+              <label for="initialStatus">Initial status</label>
+              <select id="initialStatus" name="initialStatus">
+                <option value="draft" selected>Save as draft</option>
+                <option value="scheduled">Prepare as scheduled</option>
+              </select>
+              <small class="field-hint">
+                Scheduled status must be enforced by the server when this is connected.
+              </small>
+            </div>
+
+            <div class="field">
+              <label for="hostDisplayName">Host display name</label>
+              <input
+                id="hostDisplayName"
+                name="hostDisplayName"
+                type="text"
+                maxlength="60"
+                placeholder="Your display name"
+              >
+            </div>
+          </div>
+
+          <label class="confirmation-check">
+            <input type="checkbox" id="confirmRules" name="confirmRules" required>
+            <span>
+              I have reviewed the match settings and understand that private access,
+              question generation, scheduling, payments and notifications need
+              connected backend services.
+            </span>
+          </label>
+          <p class="inline-error" id="confirmationError" aria-live="polite"></p>
+        </section>
+
+        <div class="form-actions">
+          <a class="button button-secondary" href="../games.html">Cancel</a>
+          <button class="button button-secondary" type="button" id="saveDraftButton">
+            Save local draft
+          </button>
+          <button class="button button-primary" type="submit" id="reviewMatchButton">
+            Review match →
+          </button>
+        </div>
+      </form>
+
+      <section class="local-draft-panel hidden" id="localDraftPanel">
+        <div>
+          <strong>Local draft saved</strong>
+          <p>This draft is saved in this browser only, not in your GradeFlow account.</p>
+        </div>
+        <button type="button" class="text-button" id="clearDraftButton">
+          Clear local draft
+        </button>
+      </section>
+    </main>
+
+    <footer class="page-footer">
+      <span>GradeFlow Games</span>
+      <span>Match Studio</span>
+    </footer>
+  </div>
+
+  <dialog class="review-dialog" id="reviewDialog" aria-labelledby="reviewTitle">
+    <div class="dialog-header">
+      <div>
+        <span class="eyebrow">FINAL CHECK</span>
+        <h2 id="reviewTitle">Review your match</h2>
+      </div>
+      <button type="button" class="dialog-close" id="closeReviewButton" aria-label="Close dialog">
+        ×
+      </button>
+    </div>
+
+    <div id="reviewContent" class="review-content"></div>
+<details class="generated-questions-details" id="generatedQuestionsDetails">
+  <summary>Review generated questions</summary>
+  <div id="generatedQuestionsList"></div>
+</details>
+
+    <div class="dialog-notice">
+  Generate and review the questions before saving. The match will remain
+  a draft and will not be published automatically.
+</div>
+
+    <div class="dialog-actions">
+      <button type="button" class="button button-secondary" id="editMatchButton">
+        Go back and edit
+      </button>
+      <button
+  type="button"
+  class="button button-secondary"
+  id="generateQuestionsButton"
+>
+  Generate questions
+</button>
+      <button type="button" class="button button-primary" id="confirmReviewButton">
+        Confirm review
+      </button>
+    </div>
+  </dialog>
+
+  <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+</body>
+</html>

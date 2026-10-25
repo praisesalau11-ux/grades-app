@@ -1,0 +1,127 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101010">
+  <title>Edit Draft | GradeFlow Games</title>
+  <link rel="stylesheet" href="../../css/games/match-details.css">
+  <link rel="stylesheet" href="../../css/games/edit-draft.css">
+</head>
+<body>
+  <div class="page-shell">
+    <header class="topbar">
+      <a class="brand" href="../games.html">
+        <span class="brand-mark">G</span>
+        <span class="brand-copy"><strong>GradeFlow</strong><small>GAMES</small></span>
+      </a>
+      <a class="back-link" href="my-matches.html">← My Matches</a>
+    </header>
+
+    <main class="main-content">
+      <div id="pageMessage" class="message" role="status">Loading draft…</div>
+
+      <div id="editorContent" hidden>
+        <section class="hero">
+          <div>
+            <span class="eyebrow">MATCH STUDIO</span>
+            <h1>Edit draft</h1>
+            <p class="description">Changes are saved to this existing draft. This does not publish it.</p>
+          </div>
+          <span class="status-badge">Draft only</span>
+        </section>
+
+        <form id="editDraftForm">
+          <section class="panel">
+            <div class="section-heading">
+              <h2>Match settings</h2>
+              <p>Update the main information for your match.</p>
+            </div>
+
+            <div class="edit-grid">
+              <label class="edit-field full">
+                Match title
+                <input id="matchTitle" maxlength="100" required>
+              </label>
+
+              <label class="edit-field full">
+                Description
+                <textarea id="matchDescription" rows="4" maxlength="1000"></textarea>
+              </label>
+
+              <label class="edit-field">
+                Category
+                <select id="matchCategory" required>
+                  <option value="Academic">Academic</option>
+                  <option value="General Knowledge">General Knowledge</option>
+                  <option value="Technology">Technology</option>
+                  <option value="Business">Business</option>
+                  <option value="Language">Language</option>
+                  <option value="Entertainment">Entertainment</option>
+                  <option value="Mixed">Mixed</option>
+                  <option value="Other">Other</option>
+                </select>
+              </label>
+
+              <label class="edit-field">
+                Difficulty
+                <select id="difficulty">
+                  <option value="Beginner">Beginner</option>
+                  <option value="Intermediate">Intermediate</option>
+                  <option value="Advanced">Advanced</option>
+                </select>
+              </label>
+
+              <label class="edit-field">
+                Language
+                <input id="matchLanguage" maxlength="60" required>
+              </label>
+
+              <label class="edit-field">
+                Match format
+                <input id="matchFormat" maxlength="60" required>
+              </label>
+
+              <label class="edit-field full">
+                Subjects (one per line)
+                <textarea id="subjects" rows="3" required></textarea>
+              </label>
+
+              <label class="edit-field">
+                Question type
+                <input id="questionType" maxlength="60" required>
+              </label>
+
+              <label class="edit-field">
+                Seconds per question
+                <input id="secondsPerQuestion" type="number" min="1" max="600" required>
+              </label>
+
+              <label class="edit-field">
+                Points per correct answer
+                <input id="pointsPerQuestion" type="number" min="1" max="100000" required>
+              </label>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="section-heading">
+              <h2>Saved questions</h2>
+              <p>Edit the question text, answer options, correct answer and explanation. Keep the number of options appropriate for your quiz.</p>
+            </div>
+            <div id="questionsEditor" class="questions-editor"></div>
+          </section>
+
+          <div class="bottom-actions">
+            <a id="cancelButton" class="btn btn-secondary" href="my-matches.html">Cancel</a>
+            <button id="saveButton" class="btn btn-primary" type="submit">Save changes</button>
+          </div>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <script type="module" src="../../js/games/edit-draft.js"></script>
+</body>
+</html>

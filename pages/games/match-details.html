@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101010">
+  <meta name="description" content="View your GradeFlow Games match and questions.">
+  <title>Match Details | GradeFlow Games</title>
+  <link rel="stylesheet" href="../../css/games/match-details.css">
+</head>
+<body>
+  <div class="page-shell">
+    <header class="topbar">
+      <a class="brand" href="../games.html">
+        <span class="brand-mark">G</span>
+        <span class="brand-copy">
+          <strong>GradeFlow</strong>
+          <small>GAMES</small>
+        </span>
+      </a>
+
+      <a class="back-link" href="my-matches.html">← My Matches</a>
+    </header>
+
+    <main class="main-content">
+      <div id="pageMessage" class="message" role="status">
+        Loading your match…
+      </div>
+
+      <div id="matchContent" hidden>
+        <section class="hero">
+          <div>
+            <span class="eyebrow">MATCH STUDIO</span>
+            <h1 id="matchTitle">Match details</h1>
+            <p id="matchDescription" class="description"></p>
+          </div>
+          <span id="matchStatus" class="status-badge">Draft</span>
+        </section>
+
+        <section class="stats-grid">
+          <article class="stat-card">
+            <span>Questions saved</span>
+            <strong id="questionCount">—</strong>
+          </article>
+          <article class="stat-card">
+            <span>Category</span>
+            <strong id="matchCategory">—</strong>
+          </article>
+          <article class="stat-card">
+            <span>Difficulty</span>
+            <strong id="matchDifficulty">—</strong>
+          </article>
+          <article class="stat-card">
+            <span>Format</span>
+            <strong id="matchFormat">—</strong>
+          </article>
+        </section>
+
+        <section class="panel">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">CONFIGURATION</span>
+              <h2>Match settings</h2>
+            </div>
+          </div>
+
+          <div class="details-grid">
+            <div class="detail-item">
+              <span>Subjects</span>
+              <strong id="matchSubjects">—</strong>
+            </div>
+            <div class="detail-item">
+              <span>Language</span>
+              <strong id="matchLanguage">—</strong>
+            </div>
+            <div class="detail-item">
+              <span>Question type</span>
+              <strong id="questionType">—</strong>
+            </div>
+            <div class="detail-item">
+              <span>Seconds per question</span>
+              <strong id="secondsPerQuestion">—</strong>
+            </div>
+            <div class="detail-item">
+              <span>Points per correct answer</span>
+              <strong id="pointsPerQuestion">—</strong>
+            </div>
+            <div class="detail-item">
+              <span>Competitor capacity</span>
+              <strong id="competitorSlots">—</strong>
+            </div>
+            <div class="detail-item">
+              <span>Visibility</span>
+              <strong id="matchVisibility">—</strong>
+            </div>
+            <div class="detail-item">
+              <span>Scheduled start</span>
+              <strong id="startDateTime">—</strong>
+            </div>
+            <div class="detail-item">
+              <span>Created</span>
+              <strong id="createdAt">—</strong>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="section-heading questions-heading">
+            <div>
+              <span class="eyebrow">QUESTION BANK</span>
+              <h2>Saved questions</h2>
+              <p>Review the questions generated for this match.</p>
+            </div>
+            <span id="questionBadge" class="question-badge">0 questions</span>
+          </div>
+
+          <div id="questionsList" class="questions-list"></div>
+        </section>
+
+        <section class="bottom-actions">
+          <a class="btn btn-secondary" href="my-matches.html">
+            ← Back to My Matches
+          </a>
+          <button id="copyMatchIdButton" class="btn btn-primary" type="button">
+            Copy match ID
+          </button>
+          <a id="editDraftButton" class="btn btn-primary" href="#" hidden>
+            Edit draft
+          </a>
+          <button
+  id="publishMatchButton"
+  class="btn btn-primary"
+  type="button"
+  hidden
+>
+  Publish Match
+</button>
+        </section>
+
+        <p class="match-id-line">
+          Match ID: <code id="matchIdText"></code>
+        </p>
+      </div>
+    </main>
+  </div>
+
+  <script type="module" src="../../js/games/match-details.js"></script>
+</body>
+</html>

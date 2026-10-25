@@ -1,0 +1,238 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b0c0e">
+  <meta name="description" content="View and manage your GradeFlow Games matches.">
+  <title>My Matches | GradeFlow Games</title>
+
+  <link rel="stylesheet" href="../../css/games.css">
+  <link rel="stylesheet" href="../../css/games/my-matches.css">
+
+  <script type="module" src="../../js/games/my-matches.js"></script>
+</head>
+
+<body>
+  <div class="games-layout">
+
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="../../dashboard.html">
+        <span class="brand-mark">G</span>
+        <span>GradeFlow <small>GAMES</small></span>
+      </a>
+
+      <div class="sidebar-label">PLAY</div>
+
+      <nav class="side-nav" aria-label="Games navigation">
+        <a class="nav-link" href="../games.html">
+          <span class="nav-icon">⌂</span> Overview
+        </a>
+
+        <a class="nav-link" href="create-match.html">
+          <span class="nav-icon">＋</span> Create Match
+        </a>
+
+        <a class="nav-link" href="match-lobby.html">
+          <span class="nav-icon">◈</span> Match Lobby
+        </a>
+
+        <a class="nav-link" href="watch-match.html">
+          <span class="nav-icon">▷</span> Watch Matches
+        </a>
+
+        <a class="nav-link active" href="my-matches.html" aria-current="page">
+          <span class="nav-icon">▤</span> My Matches
+        </a>
+
+        <div class="sidebar-label nav-section-label">COMMUNITY</div>
+
+        <a class="nav-link" href="games-search.html">
+          <span class="nav-icon">⌕</span> Search
+        </a>
+
+        <a class="nav-link" href="games-profile.html">
+          <span class="nav-icon">◎</span> My Profile
+        </a>
+
+        <a class="nav-link" href="leaderboard.html">
+          <span class="nav-icon">↗</span> Leaderboard
+        </a>
+
+        <a class="nav-link" href="hall-of-fame.html">
+          <span class="nav-icon">♛</span> Hall of Fame
+        </a>
+
+        <div class="sidebar-label nav-section-label">BUSINESS</div>
+
+        <a class="nav-link" href="sponsorships.html">
+          <span class="nav-icon">◇</span> Sponsorships
+        </a>
+
+        <a class="nav-link" href="games-wallet.html">
+          <span class="nav-icon">₦</span> Games Wallet
+        </a>
+
+        <a class="nav-link" href="games-notifications.html">
+          <span class="nav-icon">♧</span> Notifications
+        </a>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="sidebar-note">
+          <span class="status-dot"></span>
+          <span>Games workspace</span>
+        </div>
+
+        <a class="back-dashboard" href="../../dashboard.html">
+          ← Back to GradeFlow
+        </a>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <button
+          class="menu-toggle"
+          id="menuToggle"
+          type="button"
+          aria-label="Toggle navigation"
+          aria-expanded="false"
+        >☰</button>
+
+        <div class="breadcrumb">
+          <a href="../games.html">GradeFlow</a>
+          <span class="breadcrumb-separator">/</span>
+          <strong>My Matches</strong>
+        </div>
+
+        <div class="topbar-right">
+          <span class="live-indicator"></span>
+          <span class="topbar-label">My workspace</span>
+        </div>
+      </header>
+
+      <section class="page-content my-matches-page">
+
+        <div class="matches-hero">
+          <div class="matches-hero-copy">
+            <div class="eyebrow">
+              <span></span>
+              YOUR COMPETITION WORKSPACE
+            </div>
+
+            <h1>My <span>matches.</span></h1>
+
+            <p class="intro">
+              Find the matches you have created and check their saved
+              settings, subjects, questions and current status.
+            </p>
+
+            <div class="hero-actions">
+              <a class="button button-primary" href="create-match.html">
+                <span>＋</span> Create a match
+              </a>
+
+              <button class="button button-secondary" id="refreshMatches" type="button">
+                ↻ Refresh list
+              </button>
+            </div>
+          </div>
+
+          <div class="matches-hero-art" aria-hidden="true">
+            <div class="matches-orbit orbit-a"></div>
+            <div class="matches-orbit orbit-b"></div>
+            <div class="matches-hero-symbol">G</div>
+            <span class="matches-art-label">MY MATCHES</span>
+          </div>
+        </div>
+
+        <div class="matches-stats">
+          <article class="matches-stat-card">
+            <span class="matches-stat-label">Total created</span>
+            <strong id="totalMatchesCount">—</strong>
+            <span class="matches-stat-note">Matches hosted by you</span>
+          </article>
+
+          <article class="matches-stat-card">
+            <span class="matches-stat-label">Saved as drafts</span>
+            <strong id="draftMatchesCount">—</strong>
+            <span class="matches-stat-note">Awaiting further setup</span>
+          </article>
+
+          <article class="matches-stat-card">
+            <span class="matches-stat-label">Questions saved</span>
+            <strong id="totalQuestionsCount">—</strong>
+            <span class="matches-stat-note">Across your saved matches</span>
+          </article>
+        </div>
+
+        <section class="matches-section">
+          <div class="matches-section-heading">
+            <div>
+              <div class="eyebrow">YOUR MATCH LIBRARY</div>
+              <h2>Created matches</h2>
+              <p>Changes appear automatically when Firebase updates.</p>
+            </div>
+
+            <span class="connection-status" id="connectionStatus">
+              Connecting…
+            </span>
+          </div>
+
+          <div class="matches-toolbar">
+            <label class="matches-search">
+              <span aria-hidden="true">⌕</span>
+              <input
+                id="matchSearch"
+                type="search"
+                placeholder="Search by title or subject…"
+                autocomplete="off"
+                aria-label="Search your matches"
+              >
+            </label>
+
+            <label class="matches-filter-label" for="matchStatusFilter">
+              Status
+            </label>
+
+            <select id="matchStatusFilter" aria-label="Filter matches by status">
+              <option value="all">All statuses</option>
+              <option value="draft">Drafts</option>
+              <option value="other">Other statuses</option>
+            </select>
+          </div>
+
+          <div
+            class="matches-list"
+            id="matchesList"
+            aria-live="polite"
+            aria-busy="true"
+          >
+            <div class="matches-message">
+              <span class="matches-spinner"></span>
+              <h3>Loading your matches</h3>
+              <p>Connecting to your GradeFlow account…</p>
+            </div>
+          </div>
+
+          <div class="matches-footer">
+            <span id="matchesResultCount">Loading matches…</span>
+            <a href="create-match.html">Create another match ↗</a>
+          </div>
+        </section>
+
+        <footer class="page-footer">
+          <span>GradeFlow Games</span>
+          <span>Learn. Compete. Improve.</span>
+        </footer>
+      </section>
+    </main>
+  </div>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <div class="matches-toast" id="matchesToast" role="status" aria-live="polite"></div>
+</body>
+</html>
