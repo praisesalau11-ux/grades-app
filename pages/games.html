@@ -1,0 +1,407 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b0c0e">
+  <meta name="description" content="GradeFlow Games — create matches, compete, watch, and climb the leaderboards.">
+  <title>GradeFlow Games</title>
+  <link rel="stylesheet" href="../css/games.css">
+  <script src="../js/games.js" defer></script>
+  <script src="../js/games/currencies.js" defer></script>
+  <script type="module" src="../js/games-home-matches.js"></script>
+</head>
+
+<body>
+  <div class="games-layout">
+
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="../dashboard.html">
+        <span class="brand-mark">G</span>
+        <span>GradeFlow <small>GAMES</small></span>
+      </a>
+
+      <div class="sidebar-label">PLAY</div>
+
+      <nav class="side-nav" aria-label="Games navigation">
+        <a class="nav-link active" href="games.html">
+          <span class="nav-icon">⌂</span> Overview
+        </a>
+
+        <a class="nav-link" href="games/create-match.html">
+          <span class="nav-icon">＋</span> Create Match
+        </a>
+
+        <a class="nav-link" href="games/match-lobby.html"
+           data-game-route="match-lobby">
+          <span class="nav-icon">◈</span> Match Lobby
+        </a>
+
+        <a class="nav-link" href="games/watch-match.html"
+           data-game-route="watch-match">
+          <span class="nav-icon">▷</span> Watch Matches
+        </a>
+
+        <a class="nav-link" href="games/my-matches.html"
+           data-game-route="my-matches">
+          <span class="nav-icon">▤</span> My Matches
+        </a>
+
+        <div class="sidebar-label nav-section-label">COMMUNITY</div>
+
+        <a class="nav-link" href="games/games-search.html"
+           data-game-route="games-search">
+          <span class="nav-icon">⌕</span> Search
+        </a>
+
+        <a class="nav-link" href="games/games-profile.html"
+           data-game-route="games-profile">
+          <span class="nav-icon">◎</span> My Profile
+        </a>
+
+        <a class="nav-link" href="games/leaderboard.html"
+           data-game-route="leaderboard">
+          <span class="nav-icon">↗</span> Leaderboard
+        </a>
+
+        <a class="nav-link" href="games/hall-of-fame.html"
+           data-game-route="hall-of-fame">
+          <span class="nav-icon">♛</span> Hall of Fame
+        </a>
+
+        <div class="sidebar-label nav-section-label">BUSINESS</div>
+
+        <a class="nav-link" href="games/sponsorships.html"
+           data-game-route="sponsorships">
+          <span class="nav-icon">◇</span> Sponsorships
+        </a>
+
+        <a class="nav-link" href="games/games-wallet.html"
+           data-game-route="games-wallet">
+          <span class="nav-icon">₦</span> Games Wallet
+        </a>
+
+        <a class="nav-link" href="games/games-notifications.html"
+           data-game-route="games-notifications">
+          <span class="nav-icon">♧</span> Notifications
+        </a>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="sidebar-note">
+          <span class="status-dot"></span>
+          <span>Games workspace</span>
+        </div>
+        <a class="back-dashboard" href="../dashboard.html">
+          ← Back to GradeFlow
+        </a>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <button class="menu-toggle" id="menuToggle"
+                type="button" aria-label="Toggle navigation"
+                aria-expanded="false">☰</button>
+
+        <div class="breadcrumb">
+          <span>GradeFlow</span>
+          <span class="breadcrumb-separator">/</span>
+          <strong>Games</strong>
+        </div>
+
+        <div class="topbar-right">
+          <span class="live-indicator"></span>
+          <span class="topbar-label">Games Hub</span>
+          <a class="profile-shortcut" href="games/games-profile.html"
+             data-game-route="games-profile" aria-label="My profile">◎</a>
+        </div>
+      </header>
+
+      <section class="page-content">
+        <div class="welcome-row">
+          <div>
+            <div class="eyebrow"><span></span> THE GRADEFLOW COMPETITION HUB</div>
+            <h1>Think sharp.<br><span>Play to win.</span></h1>
+            <p class="intro">
+              Create academic competitions, challenge other players,
+              watch matches, and build your ranking.
+            </p>
+            <div class="hero-actions">
+              <a class="button button-primary"
+                 href="games/create-match.html">
+                <span>＋</span> Create a match
+              </a>
+              <a class="button button-secondary"
+                 href="games/match-lobby.html"
+                 data-game-route="match-lobby">
+                Explore matches <span>↗</span>
+              </a>
+            </div>
+          </div>
+
+          <div class="hero-art" aria-hidden="true">
+            <div class="orbit orbit-one"></div>
+            <div class="orbit orbit-two"></div>
+            <div class="hero-core">
+              <span class="core-symbol">G</span>
+              <span class="core-caption">GAME ON</span>
+            </div>
+            <div class="floating-chip chip-top">+ KNOWLEDGE</div>
+            <div class="floating-chip chip-bottom">01 / COMPETE</div>
+            <div class="floating-dot dot-one"></div>
+            <div class="floating-dot dot-two"></div>
+          </div>
+        </div>
+
+        <div class="section-heading">
+          <div>
+            <div class="eyebrow">YOUR WORKSPACE</div>
+            <h2>Games at a glance</h2>
+          </div>
+          <span class="section-caption">Your competition tools</span>
+        </div>
+
+        <div class="stats-grid">
+          <article class="stat-card">
+            <div class="stat-top"><span>My matches</span><span>▤</span></div>
+            <div class="stat-value" id="myMatchesCount">—</div>
+            <p>Matches you participate in</p>
+          </article>
+
+          
+<!-- PUBLISHED GAMES -->
+<section class="match-section" aria-labelledby="publishedGamesHeading">
+  <div class="section-heading">
+    <div>
+      <div class="eyebrow">DISCOVER</div>
+      <h2 id="publishedGamesHeading">Published Games</h2>
+    </div>
+
+    <button class="match-refresh" id="refreshPublishedGames" type="button">
+      ↻ Refresh
+    </button>
+  </div>
+
+  <p class="match-section-description">
+    Explore competitions that hosts have published.
+  </p>
+
+  <div id="publishedGamesMessage" class="match-message" role="status">
+    Loading published games…
+  </div>
+
+  <div id="publishedGamesList" class="home-match-grid"></div>
+</section>
+
+<!-- GAMES YOU HOST -->
+<section class="match-section" aria-labelledby="hostedGamesHeading">
+  <div class="section-heading">
+    <div>
+      <div class="eyebrow">YOUR COMPETITIONS</div>
+      <h2 id="hostedGamesHeading">Games You Host</h2>
+    </div>
+
+    <a class="match-text-link" href="games/my-matches.html"
+       data-game-route="my-matches">
+      My Matches ↗
+    </a>
+  </div>
+
+  <p class="match-section-description">
+    Manage your drafts and see the matches you have published.
+  </p>
+
+  <div id="hostedGamesMessage" class="match-message" role="status">
+    Loading your hosted games…
+  </div>
+
+  <div id="hostedGamesList" class="home-match-grid"></div>
+</section>
+
+
+          <article class="stat-card">
+            <div class="stat-top"><span>Hosted</span><span>＋</span></div>
+            <div class="stat-value" id="hostedMatchesCount">—</div>
+            <p>Competitions you host</p>
+          </article>
+
+          <article class="stat-card">
+            <div class="stat-top"><span>Ranking</span><span>↗</span></div>
+            <div class="stat-value" id="playerRank">—</div>
+            <p>Your competition position</p>
+          </article>
+
+          <article class="stat-card">
+            <div class="stat-top"><span>Games wallet</span><span>₦</span></div>
+            <div class="stat-value" id="gamesWalletBalance">—</div>
+            <p>Balance will appear when connected</p>
+          </article>
+        </div>
+
+        <div class="section-heading modules-heading">
+          <div>
+            <div class="eyebrow">ALL FEATURES</div>
+            <h2>Games modules</h2>
+          </div>
+          <span class="section-caption" id="moduleCount">12 modules</span>
+        </div>
+
+        <div class="module-grid" id="moduleGrid">
+          <a class="module-card featured-module"
+             href="games/create-match.html">
+            <div class="module-icon">＋</div>
+            <div class="module-card-body">
+              <h3>Create Match</h3>
+              <p>Set subjects, schedule a competition, and configure its rules.</p>
+              <span class="module-link">Open module <b>↗</b></span>
+            </div>
+            <span class="module-status status-ready">Available</span>
+          </a>
+
+          <a class="module-card" href="games/match-lobby.html"
+             data-game-route="match-lobby">
+            <div class="module-icon">◈</div>
+            <div class="module-card-body">
+              <h3>Match Lobby</h3>
+              <p>Discover matches and apply to compete.</p>
+              <span class="module-link">Open module <b>↗</b></span>
+            </div>
+            <span class="module-status status-planned">Registered</span>
+          </a>
+
+          <a class="module-card" href="games/live-match.html"
+             data-game-route="live-match">
+            <div class="module-icon">◉</div>
+            <div class="module-card-body">
+              <h3>Live Match</h3>
+              <p>Answer timed questions and follow live scores.</p>
+              <span class="module-link">Open module <b>↗</b></span>
+            </div>
+            <span class="module-status status-planned">Registered</span>
+          </a>
+
+          <a class="module-card" href="games/watch-match.html"
+             data-game-route="watch-match">
+            <div class="module-icon">▷</div>
+            <div class="module-card-body">
+              <h3>Watch Matches</h3>
+              <p>Watch competitions and participate in match discussions.</p>
+              <span class="module-link">Open module <b>↗</b></span>
+            </div>
+            <span class="module-status status-planned">Registered</span>
+          </a>
+
+          <a class="module-card" href="games/my-matches.html"
+             data-game-route="my-matches">
+            <div class="module-icon">▤</div>
+            <div class="module-card-body">
+              <h3>My Matches</h3>
+              <p>Review applications, upcoming matches, and past results.</p>
+              <span class="module-link">Open module <b>↗</b></span>
+            </div>
+            <span class="module-status status-planned">Registered</span>
+          </a>
+
+          <a class="module-card" href="games/games-profile.html"
+             data-game-route="games-profile">
+            <div class="module-icon">◎</div>
+            <div class="module-card-body">
+              <h3>Games Profile</h3>
+              <p>Manage your player identity and competition activity.</p>
+              <span class="module-link">Open module <b>↗</b></span>
+            </div>
+            <span class="module-status status-planned">Registered</span>
+          </a>
+
+          <a class="module-card" href="games/leaderboard.html"
+             data-game-route="leaderboard">
+            <div class="module-icon">↗</div>
+            <div class="module-card-body">
+              <h3>Leaderboard</h3>
+              <p>Compare scores, speed, accuracy, and subject rankings.</p>
+              <span class="module-link">Open module <b>↗</b></span>
+            </div>
+            <span class="module-status status-planned">Registered</span>
+          </a>
+
+          <a class="module-card" href="games/hall-of-fame.html"
+             data-game-route="hall-of-fame">
+            <div class="module-icon">♛</div>
+            <div class="module-card-body">
+              <h3>Hall of Fame</h3>
+              <p>Explore records, top players, and historic competitions.</p>
+              <span class="module-link">Open module <b>↗</b></span>
+            </div>
+            <span class="module-status status-planned">Registered</span>
+          </a>
+
+          <a class="module-card" href="games/sponsorships.html"
+             data-game-route="sponsorships">
+            <div class="module-icon">◇</div>
+            <div class="module-card-body">
+              <h3>Sponsorships</h3>
+              <p>Review sponsor offers and manage sponsorship opportunities.</p>
+              <span class="module-link">Open module <b>↗</b></span>
+            </div>
+            <span class="module-status status-planned">Registered</span>
+          </a>
+
+          <a class="module-card" href="games/games-wallet.html"
+             data-game-route="games-wallet">
+            <div class="module-icon">₦</div>
+            <div class="module-card-body">
+              <h3>Games Wallet</h3>
+              <p>View earnings, fees, transactions, and withdrawals.</p>
+              <span class="module-link">Open module <b>↗</b></span>
+            </div>
+            <span class="module-status status-planned">Registered</span>
+          </a>
+
+          <a class="module-card" href="games/games-search.html"
+             data-game-route="games-search">
+            <div class="module-icon">⌕</div>
+            <div class="module-card-body">
+              <h3>Search</h3>
+              <p>Find matches, players, hosts, and competition videos.</p>
+              <span class="module-link">Open module <b>↗</b></span>
+            </div>
+            <span class="module-status status-planned">Registered</span>
+          </a>
+
+          <a class="module-card" href="games/games-notifications.html"
+             data-game-route="games-notifications">
+            <div class="module-icon">♧</div>
+            <div class="module-card-body">
+              <h3>Notifications</h3>
+              <p>Track applications, match updates, offers, and activity.</p>
+              <span class="module-link">Open module <b>↗</b></span>
+            </div>
+            <span class="module-status status-planned">Registered</span>
+          </a>
+        </div>
+
+        <section class="bottom-banner">
+          <div>
+            <span class="banner-label">START HERE</span>
+            <h2>Your next competition starts with an idea.</h2>
+            <p>Create a match and configure its subjects, timing, and entry rules.</p>
+          </div>
+          <a class="button button-primary" href="games/create-match.html">
+            Create Match <span>↗</span>
+          </a>
+        </section>
+
+        <footer class="page-footer">
+          <span>GradeFlow Games</span>
+          <span>Learn. Compete. Improve.</span>
+        </footer>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="gamesToast" role="status" aria-live="polite"></div>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+</body>
+</html>

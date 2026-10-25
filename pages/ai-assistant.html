@@ -22,6 +22,7 @@
       <div class="sidebar-section-title">YOUR WORKSPACE</div>
       <a class="sidebar-link" href="../dashboard.html"><span>⌂</span> Dashboard</a>
       <a class="sidebar-link active" href="ai-assistant.html"><span>✧</span> AI Assistant</a>
+      <a class="sidebar-link" href="quiz-mode.html"><span>✓</span> Quiz Mode</a>
 
       <section class="saved-chats" aria-label="Saved conversations">
         <div class="saved-chats-heading">SAVED CONVERSATIONS</div>
@@ -95,13 +96,31 @@
         <form id="chatForm" class="composer">
           <label class="sr-only" for="promptInput">Message GradeFlow AI</label>
           <textarea id="promptInput" rows="1" maxlength="4000" placeholder="Ask GradeFlow AI anything about your studies…" autocomplete="off"></textarea>
-          <div class="composer-footer">
-            <span class="composer-hint">Enter to send · Shift + Enter for a new line</span>
-            <button id="sendBtn" class="send-btn" type="submit">
-              <span id="sendLabel">Send</span>
-              <span aria-hidden="true">↑</span>
-            </button>
-          </div>
+          
+<div class="composer-footer">
+  <span class="composer-hint" id="voiceStatus">
+    Enter to send · Shift + Enter for a new line
+  </span>
+
+  <div class="composer-actions">
+    <button
+      id="voiceBtn"
+      class="voice-btn"
+      type="button"
+      aria-label="Speak to GradeFlow AI"
+      title="Speak to GradeFlow AI"
+    >
+      <span aria-hidden="true">🎙</span>
+      <span id="voiceLabel">Voice</span>
+    </button>
+
+    <button id="sendBtn" class="send-btn" type="submit">
+      <span id="sendLabel">Send</span>
+      <span aria-hidden="true">↑</span>
+    </button>
+  </div>
+</div>
+
         </form>
 
         <p class="disclaimer">AI can make mistakes. Check important academic information with your teacher or course materials.</p>
