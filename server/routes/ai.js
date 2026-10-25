@@ -485,22 +485,51 @@ router.post("/chat", async (req, res) => {
 
 function parseGeneratedQuestions(text) {
     if (typeof text !== "string" || !text.trim()) {
-        throw new Error("The AI returned an empty response. Please regenerate.");
+        throw new Error(
+            "The AI returned an empty response. Please regenerate."
+        );
     }
 
-    const cleaned = text
-        .trim()
-        .replace(/^```(?:json)?\s*/i, "")
-        .replace(/\s*```$/, "");
+    let cleaned = text.trim();
+
+    // Remove Markdown JSON code fences if Gemini adds them.
+    cleaned = cleaned
+        .replace(/^```(?:json)?[ \t]*\r?\n?/i, "")
+        .replace(/\r?\n?```[ \t]*$/i, "")
+        .trim();
 
     let parsed;
 
     try {
         parsed = JSON.parse(cleaned);
-    } catch {
-        throw new Error(
-            "The AI returned invalid question data. Please regenerate."
-        );
+    } catch (error) {
+        // Handle responses that contain extra text around the JSON object.
+        const firstBrace = cleaned.indexOf("{");
+        const lastBrace = cleaned.lastIndexOf("}");
+
+        if (firstBrace === -1 || lastBrace <= firstBrace) {
+            console.error(
+                "Gemini question response did not contain a JSON object."
+            );
+
+            throw new Error(
+                "The AI returned invalid question data. Please regenerate."
+            );
+        }
+
+        try {
+            parsed = JSON.parse(
+                cleaned.slice(firstBrace, lastBrace + 1)
+            );
+        } catch {
+            console.error(
+                "Gemini returned malformed JSON for question generation."
+            );
+
+            throw new Error(
+                "The AI returned invalid question data. Please regenerate."
+            );
+        }
     }
 
     if (!parsed || !Array.isArray(parsed.questions)) {
@@ -512,87 +541,6 @@ function parseGeneratedQuestions(text) {
     return parsed.questions;
 }
 
-function validateGeneratedQuestion(question, subject) {
-    if (!question || typeof question !== "object") {
-        return null;
-    }
-
-    const questionText =
-        typeof question.question === "string"
-            ? question.question.trim()
-            : "";
-
-    const answer =
-        typeof question.correctAnswer === "string"
-            ? question.correctAnswer.trim()
-            : "";
-
-    const explanation =
-        typeof question.explanation === "string"
-            ? question.explanation.trim()
-            : "";
-
-    const type =
-        typeof question.type === "string"
-            ? question.type.trim().toLowerCase()
-            : "multiple-choice";
-
-    const allowedTypes = new Set([
-        "multiple-choice",
-        "true-false",
-        "short-answer"
-    ]);
-
-    if (
-        !questionText ||
-        questionText.length > 1500 ||
-        !answer ||
-        answer.length > 1000 ||
-        !allowedTypes.has(type)
-    ) {
-        return null;
-    }
-
-    let options = [];
-
-    if (type === "multiple-choice") {
-        if (!Array.isArray(question.options)) {
-            return null;
-        }
-
-        options = question.options
-            .filter(value => typeof value === "string")
-            .map(value => value.trim())
-            .filter(Boolean)
-            .slice(0, 6);
-
-        if (
-            options.length < 2 ||
-            options.length > 6 ||
-            !options.includes(answer)
-        ) {
-            return null;
-        }
-    }
-
-    if (type === "true-false") {
-        if (!["true", "false"].includes(answer.toLowerCase())) {
-            return null;
-        }
-
-        options = ["True", "False"];
-    }
-
-    return {
-        question: questionText,
-        type,
-        options,
-        correctAnswer: answer,
-        explanation: explanation.slice(0, 2000),
-        subject,
-        points: 1
-    };
-}
 
 // ======================================================
 // GENERATE GRADEFlow GAMES QUESTIONS
