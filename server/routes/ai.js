@@ -479,66 +479,97 @@ router.post("/chat", async (req, res) => {
     }
 });
 
-// ======================================================
-// QUIZ QUESTION GENERATION HELPERS
+        // ======================================================
+// VALIDATE GENERATED QUIZ QUESTIONS
 // ======================================================
 
-function parseGeneratedQuestions(text) {
-    if (typeof text !== "string" || !text.trim()) {
-        throw new Error(
-            "The AI returned an empty response. Please regenerate."
-        );
+function validateGeneratedQuestion(question, subject) {
+    if (!question || typeof question !== "object") {
+        return null;
     }
 
-    let cleaned = text.trim();
+    const questionText =
+        typeof question.question === "string"
+            ? question.question.trim()
+            : "";
 
-    // Remove Markdown JSON code fences if Gemini adds them.
-    cleaned = cleaned
-        .replace(/^```(?:json)?[ \t]*\r?\n?/i, "")
-        .replace(/\r?\n?```[ \t]*$/i, "")
-        .trim();
+    const correctAnswer =
+        typeof question.correctAnswer === "string"
+            ? question.correctAnswer.trim()
+            : "";
 
-    let parsed;
+    const explanation =
+        typeof question.explanation === "string"
+            ? question.explanation.trim()
+            : "";
 
-    try {
-        parsed = JSON.parse(cleaned);
-    } catch (error) {
-        // Handle responses that contain extra text around the JSON object.
-        const firstBrace = cleaned.indexOf("{");
-        const lastBrace = cleaned.lastIndexOf("}");
+    const allowedTypes = new Set([
+        "multiple-choice",
+        "true-false",
+        "short-answer"
+    ]);
 
-        if (firstBrace === -1 || lastBrace <= firstBrace) {
-            console.error(
-                "Gemini question response did not contain a JSON object."
-            );
+    const type =
+        typeof question.type === "string"
+            ? question.type.trim().toLowerCase()
+            : "multiple-choice";
 
-            throw new Error(
-                "The AI returned invalid question data. Please regenerate."
-            );
+    if (
+        !questionText ||
+        !correctAnswer ||
+        !allowedTypes.has(type)
+    ) {
+        return null;
+    }
+
+    let options = [];
+
+    if (type === "multiple-choice") {
+        if (!Array.isArray(question.options)) {
+            return null;
         }
 
-        try {
-            parsed = JSON.parse(
-                cleaned.slice(firstBrace, lastBrace + 1)
-            );
-        } catch {
-            console.error(
-                "Gemini returned malformed JSON for question generation."
-            );
+        options = question.options
+            .filter(option => typeof option === "string")
+            .map(option => option.trim())
+            .filter(Boolean);
 
-            throw new Error(
-                "The AI returned invalid question data. Please regenerate."
-            );
+        if (
+            options.length < 2 ||
+            options.length > 6 ||
+            new Set(options).size !== options.length ||
+            !options.includes(correctAnswer)
+        ) {
+            return null;
         }
     }
 
-    if (!parsed || !Array.isArray(parsed.questions)) {
-        throw new Error(
-            "The AI response did not contain a questions list."
-        );
+    if (type === "true-false") {
+        const normalizedAnswer = correctAnswer.toLowerCase();
+
+        if (
+            normalizedAnswer !== "true" &&
+            normalizedAnswer !== "false"
+        ) {
+            return null;
+        }
+
+        options = ["True", "False"];
     }
 
-    return parsed.questions;
+    if (type === "short-answer") {
+        options = [];
+    }
+
+    return {
+        question: questionText,
+        type,
+        options,
+        correctAnswer,
+        explanation,
+        subject,
+        points: 1
+    };
 }
 
 
