@@ -39,6 +39,127 @@ const sendLabel = $("sendLabel");
 const messagesEl = $("messages");
 const welcomeEl = $("welcome");
 const errorBanner = $("errorBanner");
+
+const voiceBtn = $("voiceBtn");
+const voiceLabel = $("voiceLabel");
+const voiceStatus = $("voiceStatus");
+
+const SpeechRecognition =
+  window.SpeechRecognition ||
+  window.webkitSpeechRecognition;
+
+let recognition = null;
+let isListening = false;
+let voiceSubmitted = false;
+
+if (SpeechRecognition && voiceBtn) {
+  recognition = new SpeechRecognition();
+
+  recognition.lang = navigator.language || "en-US";
+  recognition.continuous = false;
+  recognition.interimResults = true;
+
+  recognition.onstart = () => {
+    isListening = true;
+    voiceSubmitted = false;
+
+    voiceBtn.classList.add("listening");
+    voiceBtn.setAttribute("aria-pressed", "true");
+    voiceLabel.textContent = "Listening…";
+
+    voiceStatus.textContent =
+      "Speak now. Your message will be sent when you finish.";
+    clearError();
+  };
+
+  recognition.onresult = (event) => {
+    let finalTranscript = "";
+    let interimTranscript = "";
+
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const transcript = event.results[i][0].transcript;
+
+      if (event.results[i].isFinal) {
+        finalTranscript += transcript;
+      } else {
+        interimTranscript += transcript;
+      }
+    }
+
+    if (finalTranscript.trim()) {
+      const message = finalTranscript.trim();
+
+      if (!voiceSubmitted) {
+        voiceSubmitted = true;
+        input.value = message;
+        recognition.stop();
+
+        // Uses the existing Gemini chat and message-saving logic.
+        sendMessage(message);
+      }
+    } else if (interimTranscript.trim()) {
+      input.value = interimTranscript.trim();
+    }
+  };
+
+  recognition.onerror = (event) => {
+    if (event.error === "aborted") return;
+
+    if (event.error === "not-allowed" ||
+        event.error === "service-not-allowed") {
+      showError(
+        "Microphone access was denied. Allow microphone access in Chrome site settings."
+      );
+    } else if (event.error === "no-speech") {
+      voiceStatus.textContent = "No speech detected. Tap Voice to try again.";
+    } else {
+      showError(
+        `Voice input failed: ${event.error}. You can still type your message.`
+      );
+    }
+  };
+
+  recognition.onend = () => {
+    isListening = false;
+
+    voiceBtn.classList.remove("listening");
+    voiceBtn.setAttribute("aria-pressed", "false");
+    voiceLabel.textContent = "Voice";
+
+    if (!busy) {
+      voiceStatus.textContent =
+        "Enter to send · Shift + Enter for a new line";
+    }
+  };
+
+  voiceBtn.addEventListener("click", () => {
+    if (busy) return;
+
+    if (isListening) {
+      recognition.stop();
+      return;
+    }
+
+    input.value = "";
+    clearError();
+
+    try {
+      recognition.start();
+    } catch (error) {
+      console.error("Could not start voice input:", error);
+      showError(
+        "Could not start the microphone. Wait a moment and try again."
+      );
+    }
+  });
+} else if (voiceBtn) {
+  voiceBtn.addEventListener("click", () => {
+    showError(
+      "Voice input is not supported in this browser. Try an updated version of Chrome."
+    );
+  });
+}
+
 const chatHistoryList = $("savedChatList");
 
 let currentUser = null;
@@ -187,10 +308,57 @@ function addMessage(role, text, attachments = []) {
     body.appendChild(link);
   }
 
+ 
+  // Add text-to-speech controls to every AI response.
+  if (role === "assistant" && text && "speechSynthesis" in window) {
+    const speakButton = document.createElement("button");
+    speakButton.type = "button";
+    speakButton.className = "speak-reply-btn";
+    speakButton.textContent = "🔊 Speak";
+    speakButton.setAttribute("aria-label", "Read this AI reply aloud");
+
+    speakButton.addEventListener("click", () => {
+      // Stop the current speech if this button is already speaking.
+      if (speakButton.dataset.speaking === "true") {
+        window.speechSynthesis.cancel();
+        return;
+      }
+
+      // Stop any other reply currently being spoken.
+      window.speechSynthesis.cancel();
+
+      // Reset all speech buttons.
+      document.querySelectorAll(".speak-reply-btn").forEach((button) => {
+        button.dataset.speaking = "false";
+        button.textContent = "🔊 Speak";
+      });
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = "en-US";
+      utterance.rate = 1;
+      utterance.pitch = 1;
+
+      speakButton.dataset.speaking = "true";
+      speakButton.textContent = "⏹ Stop";
+
+      const resetButton = () => {
+        speakButton.dataset.speaking = "false";
+        speakButton.textContent = "🔊 Speak";
+      };
+
+      utterance.onend = resetButton;
+      utterance.onerror = resetButton;
+
+      window.speechSynthesis.speak(utterance);
+    });
+
+    body.appendChild(speakButton);
+  }
+
   row.append(avatar, body);
   messagesEl.appendChild(row);
-
   scrollMessages();
+
 }
 
 /* =========================================
