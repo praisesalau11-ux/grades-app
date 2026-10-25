@@ -479,7 +479,92 @@ router.post("/chat", async (req, res) => {
     }
 });
 
-        // ======================================================
+// ======================================================
+// PARSE GENERATED QUIZ QUESTIONS
+// ======================================================
+
+function parseGeneratedQuestions(text) {
+    if (typeof text !== "string" || !text.trim()) {
+        throw new Error(
+            "The AI returned an empty response. Please regenerate the quiz."
+        );
+    }
+
+    let cleaned = text.trim();
+
+    // Remove Markdown code fences if Gemini includes them.
+    cleaned = cleaned
+        .replace(/^```(?:json)?[ \t]*\r?\n?/i, "")
+        .replace(/\r?\n?```[ \t]*$/i, "")
+        .trim();
+
+    let parsed;
+
+    // First, try parsing the entire response.
+    try {
+        parsed = JSON.parse(cleaned);
+    } catch {
+        // Try to extract a JSON object or array.
+        const firstObject = cleaned.indexOf("{");
+        const lastObject = cleaned.lastIndexOf("}");
+        const firstArray = cleaned.indexOf("[");
+        const lastArray = cleaned.lastIndexOf("]");
+
+        let jsonText = "";
+
+        if (
+            firstObject !== -1 &&
+            lastObject > firstObject
+        ) {
+            jsonText = cleaned.slice(
+                firstObject,
+                lastObject + 1
+            );
+        } else if (
+            firstArray !== -1 &&
+            lastArray > firstArray
+        ) {
+            jsonText = cleaned.slice(
+                firstArray,
+                lastArray + 1
+            );
+        }
+
+        if (!jsonText) {
+            throw new Error(
+                "The AI response did not contain valid quiz JSON. Please regenerate."
+            );
+        }
+
+        try {
+            parsed = JSON.parse(jsonText);
+        } catch {
+            throw new Error(
+                "The AI returned invalid quiz JSON. Please regenerate."
+            );
+        }
+    }
+
+    let questions;
+
+    if (Array.isArray(parsed)) {
+        questions = parsed;
+    } else if (
+        parsed &&
+        typeof parsed === "object" &&
+        Array.isArray(parsed.questions)
+    ) {
+        questions = parsed.questions;
+    } else {
+        throw new Error(
+            'The AI response must contain a "questions" array.'
+        );
+    }
+
+    return questions;
+}
+
+// ======================================================
 // VALIDATE GENERATED QUIZ QUESTIONS
 // ======================================================
 
@@ -571,7 +656,6 @@ function validateGeneratedQuestion(question, subject) {
         points: 1
     };
 }
-
 
 // ======================================================
 // GENERATE GRADEFlow GAMES QUESTIONS
