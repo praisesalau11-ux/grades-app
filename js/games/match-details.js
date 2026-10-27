@@ -2,18 +2,26 @@
 import { auth, db } from "../firebase.js";
 
 import {
-  doc,
-  getDoc,
-  getDocs,
-  collection,
-  updateDoc,
-  serverTimestamp
+    collection,
+    doc,
+    getDoc,
+    getDocs,
+    onSnapshot,
+    query,
+    where,
+    setDoc,
+    updateDoc,
+    serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const $ = (id) => document.getElementById(id);
 
 let loadedMatchId = "";
 let loadedMatch = null;
+let loadedQuestions = [];
+let currentUser = null;
+let isHost = false;
+let authReady = false;
 
 /* =========================
    AUTHENTICATION
@@ -24,6 +32,9 @@ auth.onAuthStateChanged(async (user) => {
     window.location.href = "../login.html";
     return;
   }
+
+  currentUser = user;
+  authReady = true;
 
   await loadMatch(user);
 });
@@ -41,11 +52,10 @@ async function loadMatch(user) {
   }
 
   loadedMatchId = matchId;
-
-  showMessage("Loading your match…");
+  showMessage("Loading match details…");
 
   try {
-    const matchRef = doc(db, "matches", loadedMatchId);
+    const matchRef = doc(db, "matches", matchId);
     const matchSnapshot = await getDoc(matchRef);
 
     if (!matchSnapshot.exists()) {
@@ -55,16 +65,27 @@ async function loadMatch(user) {
 
     const match = matchSnapshot.data();
 
-    if (match.hostUid !== user.uid) {
-      showMessage("You do not have permission to view this match.", true);
+    isHost = match.hostUid === user.uid;
+
+    // Only the host can view drafts.
+    // Other users may view published public matches.
+    const isPublicPublishedMatch =
+      match.status === "published" &&
+      match.visibility === "public";
+
+    if (!isHost && !isPublicPublishedMatch) {
+      showMessage(
+        "This match is not publicly available, or you do not have permission to view it.",
+        true
+      );
       return;
     }
 
     const questionsSnapshot = await getDocs(
-      collection(db, "matches", loadedMatchId, "questions")
+      collection(db, "matches", matchId, "questions")
     );
 
-    const questions = questionsSnapshot.docs
+    loadedQuestions = questionsSnapshot.docs
       .map((questionDoc) => ({
         id: questionDoc.id,
         ...questionDoc.data()
@@ -73,12 +94,16 @@ async function loadMatch(user) {
 
     loadedMatch = match;
 
-    renderMatch(match, questions);
+    renderMatch(match, loadedQuestions);
+
+    await loadParticipants();
+
     showMessage("");
   } catch (error) {
     console.error("Match details error:", error);
+
     showMessage(
-      error.message || "Could not load this match. Check your connection.",
+      "Could not load this match. Check your connection and Firestore permissions.",
       true
     );
   }
@@ -124,32 +149,44 @@ function renderMatch(match, questions) {
     );
   }
 
-  /* Edit Draft button */
-
+  // Host-only draft editing.
   const editDraftButton = $("editDraftButton");
 
   if (editDraftButton) {
-    const isDraft = match.status === "draft";
+    const canEdit = isHost && match.status === "draft";
 
-    editDraftButton.hidden = !isDraft;
+    editDraftButton.hidden = !canEdit;
     editDraftButton.href =
       `edit-draft.html?id=${encodeURIComponent(loadedMatchId)}`;
   }
 
-  /* Publish button */
+  // Only the host may publish.
+  const publishButton = $("publishMatchButton");
 
-  const publishMatchButton = $("publishMatchButton");
-
-  if (publishMatchButton) {
-    publishMatchButton.hidden = match.status !== "draft";
+  if (publishButton) {
+    publishButton.hidden = !isHost || match.status !== "draft";
   }
 
-  renderQuestions(questions);
+  // A player can join only a published public match.
+  const joinButton = $("joinMatchButton");
 
-  const matchContent = $("matchContent");
+  if (joinButton) {
+    joinButton.hidden =
+      isHost ||
+      match.status !== "published" ||
+      match.visibility !== "public";
 
-  if (matchContent) {
-    matchContent.hidden = false;
+    joinButton.textContent = "Join Match";
+    joinButton.disabled = false;
+  }
+
+  // Do not expose answers or explanations to competitors.
+  renderQuestions(questions, isHost);
+
+  const content = $("matchContent");
+
+  if (content) {
+    content.hidden = false;
   }
 }
 
@@ -157,7 +194,7 @@ function renderMatch(match, questions) {
    DISPLAY QUESTIONS
 ========================= */
 
-function renderQuestions(questions) {
+function renderQuestions(questions, showAnswers) {
   const container = $("questionsList");
 
   if (!container) return;
@@ -166,8 +203,8 @@ function renderQuestions(questions) {
 
   if (questions.length === 0) {
     const empty = document.createElement("p");
-    empty.className = "empty-message";
-    empty.textContent = "No questions have been added to this match yet.";
+    empty.className = "empty-questions";
+    empty.textContent = "No questions have been added yet.";
     container.appendChild(empty);
     return;
   }
@@ -176,32 +213,45 @@ function renderQuestions(questions) {
     const card = document.createElement("article");
     card.className = "question-card";
 
-    const heading = document.createElement("h3");
-    heading.textContent = `Question ${index + 1}`;
+    const top = document.createElement("div");
+    top.className = "question-top";
+
+    const number = document.createElement("span");
+    number.className = "question-number";
+    number.textContent = `QUESTION ${index + 1}`;
+
+    top.appendChild(number);
+
+    if (question.subject) {
+      const subject = document.createElement("span");
+      subject.className = "question-subject";
+      subject.textContent = question.subject;
+      top.appendChild(subject);
+    }
 
     const questionText = document.createElement("p");
+    questionText.className = "question-text";
     questionText.textContent =
       question.question || "Question text not provided.";
 
-    card.append(heading, questionText);
+    card.append(top, questionText);
 
     if (Array.isArray(question.options)) {
       const optionsList = document.createElement("ol");
-      optionsList.type = "A";
+      optionsList.className = "options-list";
 
-      question.options.forEach((option) => {
+      question.options.forEach((option, optionIndex) => {
         const item = document.createElement("li");
 
-        if (typeof option === "string") {
-          item.textContent = option;
-        } else if (option && typeof option === "object") {
-          item.textContent =
-            option.text ??
-            option.label ??
-            option.value ??
-            JSON.stringify(option);
-        } else {
-          item.textContent = String(option ?? "");
+        const optionText = getOptionText(option);
+
+        item.textContent = `${String.fromCharCode(65 + optionIndex)}. ${optionText}`;
+
+        if (
+          showAnswers &&
+          isCorrectOption(question.correctAnswer, option, optionIndex)
+        ) {
+          item.classList.add("correct-option");
         }
 
         optionsList.appendChild(item);
@@ -210,27 +260,241 @@ function renderQuestions(questions) {
       card.appendChild(optionsList);
     }
 
-    if (question.correctAnswer !== undefined) {
-      const answer = document.createElement("p");
-      answer.className = "correct-answer";
+    if (showAnswers && question.correctAnswer !== undefined) {
+      const answer = document.createElement("div");
+      answer.className = "answer-box";
 
-      answer.textContent =
-        "Correct answer: " +
-        getAnswerText(question.correctAnswer, question.options);
+      const label = document.createElement("strong");
+      label.textContent = "Correct answer: ";
+
+      answer.append(label, document.createTextNode(
+        getAnswerText(question.correctAnswer, question.options)
+      ));
 
       card.appendChild(answer);
     }
 
-    if (question.explanation) {
-      const explanation = document.createElement("p");
-      explanation.className = "question-explanation";
-      explanation.textContent = `Explanation: ${question.explanation}`;
+    if (showAnswers && question.explanation) {
+      const explanation = document.createElement("div");
+      explanation.className = "explanation-box";
+
+      const label = document.createElement("strong");
+      label.textContent = "Explanation: ";
+
+      explanation.append(
+        label,
+        document.createTextNode(String(question.explanation))
+      );
+
       card.appendChild(explanation);
     }
 
     container.appendChild(card);
   });
 }
+
+/* =========================
+   PARTICIPANTS
+========================= */
+
+async function loadParticipants() {
+  const panel = $("participantsPanel");
+  const list = $("participantsList");
+
+  if (!panel || !list || !loadedMatchId) return;
+
+  panel.hidden = false;
+  list.replaceChildren();
+
+  try {
+    const participantsRef = collection(
+      db,
+      "matches",
+      loadedMatchId,
+      "participants"
+    );
+
+    const participantsSnapshot = await getDocs(participantsRef);
+
+    const participants = participantsSnapshot.docs.map((participantDoc) => ({
+      id: participantDoc.id,
+      ...participantDoc.data()
+    }));
+
+    setText(
+      "participantsSummary",
+      `${participants.length} participant${participants.length === 1 ? "" : "s"}`
+    );
+
+    if (participants.length === 0) {
+      const empty = document.createElement("p");
+      empty.className = "empty-questions";
+      empty.textContent = "No players have joined this match yet.";
+      list.appendChild(empty);
+    } else {
+      participants.forEach((participant, index) => {
+        const card = document.createElement("article");
+        card.className = "question-card";
+
+        const name = document.createElement("strong");
+        name.textContent =
+          participant.displayName ||
+          `Player ${index + 1}`;
+
+        const status = document.createElement("p");
+        status.textContent = `Status: ${participant.status || "joined"}`;
+
+        card.append(name, status);
+        list.appendChild(card);
+      });
+    }
+
+    // Hide the join button if this user has already joined.
+    const joinButton = $("joinMatchButton");
+
+    if (joinButton && !isHost) {
+      const alreadyJoined = participants.some(
+        (participant) => participant.id === currentUser.uid
+      );
+
+      if (alreadyJoined) {
+        joinButton.textContent = "Already Joined";
+        joinButton.disabled = true;
+      }
+    }
+  } catch (error) {
+    console.error("Participants loading error:", error);
+
+    setText(
+      "participantsSummary",
+      "Participant information is currently unavailable."
+    );
+
+    // The match details can still be used even if this list fails.
+  }
+}
+
+/* =========================
+   JOIN MATCH
+========================= */
+
+const joinButton = $("joinMatchButton");
+
+joinButton?.addEventListener("click", async () => {
+  const user = auth.currentUser;
+
+  if (!user || !authReady) {
+    alert("Please sign in before joining this match.");
+    return;
+  }
+
+  if (!loadedMatchId || !loadedMatch) {
+    alert("Match details are not ready yet.");
+    return;
+  }
+
+  if (isHost) {
+    alert("You cannot join your own match as a competitor.");
+    return;
+  }
+
+  if (
+    loadedMatch.status !== "published" ||
+    loadedMatch.visibility !== "public"
+  ) {
+    alert("This match is not open for public joining.");
+    return;
+  }
+
+  const originalText = joinButton.textContent;
+
+  joinButton.disabled = true;
+  joinButton.textContent = "Joining…";
+
+  try {
+    // Re-check the current match before attempting to join.
+    const matchRef = doc(db, "matches", loadedMatchId);
+    const matchSnapshot = await getDoc(matchRef);
+
+    if (!matchSnapshot.exists()) {
+      throw new Error("This match no longer exists.");
+    }
+
+    const match = matchSnapshot.data();
+
+    if (
+      match.status !== "published" ||
+      match.visibility !== "public"
+    ) {
+      throw new Error("This match is no longer open for public joining.");
+    }
+
+    if (match.hostUid === user.uid) {
+      throw new Error("The host cannot join their own match.");
+    }
+
+    // Respect competitor capacity when the field is configured.
+    const capacity = Number(match.competitorSlots);
+
+    if (Number.isFinite(capacity) && capacity > 0) {
+      const participantSnapshot = await getDocs(
+        collection(db, "matches", loadedMatchId, "participants")
+      );
+
+      const existingParticipant = participantSnapshot.docs.some(
+        (participantDoc) => participantDoc.id === user.uid
+      );
+
+      if (!existingParticipant && participantSnapshot.size >= capacity) {
+        throw new Error("This match is full.");
+      }
+    }
+
+    const participantRef = doc(
+      db,
+      "matches",
+      loadedMatchId,
+      "participants",
+      user.uid
+    );
+
+    const existing = await getDoc(participantRef);
+
+    if (existing.exists()) {
+      joinButton.textContent = "Already Joined";
+      alert("You have already joined this match.");
+      await loadParticipants();
+      return;
+    }
+
+    const displayName =
+      user.displayName ||
+      user.email?.split("@")[0] ||
+      "GradeFlow Player";
+
+    await setDoc(participantRef, {
+      uid: user.uid,
+      displayName,
+      status: "joined",
+      joinedAt: serverTimestamp()
+    });
+
+    alert("You joined the match successfully.");
+
+    joinButton.textContent = "Already Joined";
+    await loadParticipants();
+  } catch (error) {
+    console.error("Join match error:", error);
+
+    alert(
+      error.message ||
+      "Could not join this match. Check your connection and Firestore rules."
+    );
+
+    joinButton.textContent = originalText;
+    joinButton.disabled = false;
+  }
+});
 
 /* =========================
    HELPERS
@@ -265,22 +529,58 @@ function formatDate(value) {
   return date.toLocaleString();
 }
 
+function getOptionText(option) {
+  if (typeof option === "string") return option;
+
+  if (option && typeof option === "object") {
+    return String(
+      option.text ??
+      option.label ??
+      option.value ??
+      JSON.stringify(option)
+    );
+  }
+
+  return String(option ?? "");
+}
+
 function getAnswerText(answer, options) {
   if (typeof answer === "number" && Array.isArray(options)) {
-    const option = options[answer];
-
-    if (option !== undefined) {
-      return typeof option === "string"
-        ? option
-        : option?.text ?? option?.label ?? String(answer);
-    }
+    return getOptionText(options[answer] ?? answer);
   }
 
   if (answer && typeof answer === "object") {
-    return answer.text ?? answer.label ?? JSON.stringify(answer);
+    return String(
+      answer.text ??
+      answer.label ??
+      answer.value ??
+      JSON.stringify(answer)
+    );
   }
 
   return String(answer);
+}
+
+function isCorrectOption(answer, option, index) {
+  if (typeof answer === "number") return answer === index;
+
+  if (typeof answer === "string") {
+    return (
+      answer === String(index) ||
+      answer === String.fromCharCode(65 + index) ||
+      answer === getOptionText(option)
+    );
+  }
+
+  if (answer && typeof answer === "object") {
+    return (
+      answer.text === getOptionText(option) ||
+      answer.label === getOptionText(option) ||
+      answer.value === getOptionText(option)
+    );
+  }
+
+  return false;
 }
 
 function showMessage(message, isError = false) {
@@ -294,11 +594,6 @@ function showMessage(message, isError = false) {
   element.textContent = message;
   element.hidden = !message;
   element.classList.toggle("message-error", isError);
-
-  if (isError) {
-    const matchContent = $("matchContent");
-    if (matchContent) matchContent.hidden = true;
-  }
 }
 
 /* =========================
@@ -317,7 +612,6 @@ copyMatchIdButton?.addEventListener("click", async () => {
     await navigator.clipboard.writeText(loadedMatchId);
     alert("Match ID copied.");
   } catch (error) {
-    console.error("Copy match ID error:", error);
     prompt("Copy your match ID:", loadedMatchId);
   }
 });
@@ -331,21 +625,21 @@ const publishMatchButton = $("publishMatchButton");
 publishMatchButton?.addEventListener("click", async () => {
   const user = auth.currentUser;
 
-  if (!user) {
-    alert("Please sign in before publishing this match.");
+  if (!user || !loadedMatchId) {
+    alert("Please sign in and reload the match.");
     return;
   }
 
-  if (!loadedMatchId) {
-    alert("The match ID is missing. Reload the page and try again.");
+  if (!isHost || loadedMatch?.status !== "draft") {
+    alert("Only the host can publish a draft match.");
     return;
   }
 
-  const confirmed = window.confirm(
+  if (!window.confirm(
     "Publish this match? You will no longer be able to edit it using Edit Draft."
-  );
-
-  if (!confirmed) return;
+  )) {
+    return;
+  }
 
   const originalText = publishMatchButton.textContent;
 
@@ -362,12 +656,8 @@ publishMatchButton?.addEventListener("click", async () => {
 
     const match = matchSnapshot.data();
 
-    if (match.hostUid !== user.uid) {
-      throw new Error("You are not allowed to publish this match.");
-    }
-
-    if (match.status !== "draft") {
-      throw new Error("Only draft matches can be published.");
+    if (match.hostUid !== user.uid || match.status !== "draft") {
+      throw new Error("Only the host can publish a draft match.");
     }
 
     const questionsSnapshot = await getDocs(
@@ -375,9 +665,7 @@ publishMatchButton?.addEventListener("click", async () => {
     );
 
     if (questionsSnapshot.empty) {
-      throw new Error(
-        "This match has no questions. Add questions before publishing."
-      );
+      throw new Error("Add questions before publishing this match.");
     }
 
     await updateDoc(matchRef, {
@@ -387,14 +675,13 @@ publishMatchButton?.addEventListener("click", async () => {
     });
 
     alert("Match published successfully.");
-
     await loadMatch(user);
   } catch (error) {
     console.error("Publish match error:", error);
 
     alert(
       error.message ||
-      "Could not publish this match. Check your connection and Firestore rules."
+      "Could not publish this match. Check your Firestore rules."
     );
   } finally {
     publishMatchButton.disabled = false;

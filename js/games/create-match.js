@@ -1,4 +1,3 @@
-
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
   collection,
@@ -1228,16 +1227,31 @@ import { auth, db } from "../firebase.js";
           generatedQuestions
         );
 
-        closeReview();
+        if (!matchId) {
+          throw new Error(
+            "The match was saved without returning a match ID."
+          );
+        }
 
-        setDraftStatus("Match saved as draft");
+        console.info("GradeFlow Games match saved:", matchId);
+        closeReview();
+        setDraftStatus("Match saved. Opening lobby...");
 
         showToast(
-          `Match saved to Firebase as a draft. Match ID: ${matchId}`,
+          "Match saved successfully. Opening your match lobby...",
           "success"
         );
 
-        console.info("GradeFlow Games match saved:", matchId);
+        // This assumes match-lobby.html is in the same directory
+        // as the create-match HTML page.
+        const lobbyUrl = new URL(
+          "./match-lobby.html",
+          window.location.href
+        );
+
+        lobbyUrl.searchParams.set("matchId", matchId);
+        window.location.assign(lobbyUrl.href);
+        return;
       } catch (error) {
         console.error("Could not save GradeFlow Games match:", error);
 
