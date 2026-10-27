@@ -118,30 +118,36 @@
         </section>
 
         <section class="bottom-actions">
-          <a class="btn btn-secondary" href="my-matches.html">
-            ← Back to My Matches
-          </a>
-          <button id="copyMatchIdButton" class="btn btn-primary" type="button">
-            Copy match ID
-          </button>
-          <a id="editDraftButton" class="btn btn-primary" href="#" hidden>
-            Edit draft
-          </a>
-          <button
-  id="publishMatchButton"
-  class="btn btn-primary"
-  type="button"
-  hidden
->
-  Publish Match
-</button>
-        </section>
+  <a class="btn btn-secondary" href="my-matches.html">
+    ← Back to My Matches
+  </a>
 
-        <p class="match-id-line">
-          Match ID: <code id="matchIdText"></code>
-        </p>
-      </div>
-    </main>
+  <button id="copyMatchIdButton" class="btn btn-primary" type="button">
+    Copy match ID
+  </button>
+
+  <a id="editDraftButton" class="btn btn-primary" href="#" hidden>
+    Edit draft
+  </a>
+
+  <button id="publishMatchButton" class="btn btn-primary" type="button" hidden>
+    Publish Match
+  </button>
+
+  <button id="joinMatchButton" class="btn btn-primary" type="button" hidden>
+    Join Match
+  </button>
+</section>
+
+<section id="participantsPanel" class="panel" hidden>
+  <div class="section-heading">
+    <span class="eyebrow">PLAYERS</span>
+    <h2>Participants</h2>
+    <p id="participantsSummary">Loading participants…</p>
+  </div>
+
+  <div id="participantsList" class="questions-list"></div>
+</section>
   </div>
 
   <script type="module" src="../../js/games/match-details.js"></script>

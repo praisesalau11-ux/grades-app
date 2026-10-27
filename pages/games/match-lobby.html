@@ -1,0 +1,157 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b0d12">
+    <title>Match Lobby | GradeFlow Games</title>
+    <link rel="stylesheet" href="../../css/games/match-lobby.css">
+</head>
+<body>
+    <main class="app-shell">
+        <header class="topbar">
+            <a class="brand" href="../games.html">
+                <span class="brand-mark">G</span>
+                <span>GradeFlow <strong>Games</strong></span>
+            </a>
+            <a class="back-link" href="../games.html">← Games</a>
+        </header>
+
+        <section id="availableMatchesView" class="available-view" hidden>
+            <div class="page-heading">
+                <p class="eyebrow">PLAY WITH OTHERS</p>
+                <h1>Available matches</h1>
+                <p>Find a match and join the competition.</p>
+            </div>
+            <div id="matchesListStatus" class="notice" role="status"></div>
+            <div id="availableMatchesList" class="matches-grid"></div>
+            <button id="refreshMatchesButton" class="button button-secondary" type="button">Refresh matches</button>
+        </section>
+
+        <section id="loadingState" class="state-card">
+            <div class="loader"></div>
+            <h2>Loading match</h2>
+            <p>Retrieving match information…</p>
+        </section>
+
+        <section id="errorState" class="state-card" hidden>
+            <h2 id="errorTitle">Unable to load match</h2>
+            <p id="errorMessage">Please try again.</p>
+            <button id="retryButton" class="button button-primary" type="button">Try again</button>
+        </section>
+
+        <section id="lobbyContent" hidden>
+            <div id="statusBanner" class="status-banner" hidden>
+                <span id="statusMessage"></span>
+            </div>
+
+            <section class="hero-card">
+                <div class="hero-topline">
+                    <span id="matchStatusBadge" class="badge">Published</span>
+                    <span id="matchDifficultyBadge" class="badge badge-muted">Medium</span>
+                    <span id="matchTypeBadge" class="badge badge-muted">Competition</span>
+                </div>
+
+                <p class="eyebrow">MATCH LOBBY</p>
+                <h1 id="matchTitle">Match title</h1>
+                <p id="matchDescription">Match description</p>
+
+                <div class="host-row">
+                    <div id="hostAvatar" class="avatar">H</div>
+                    <div>
+                        <span class="muted-label">HOSTED BY</span>
+                        <strong id="hostName">Host</strong>
+                    </div>
+                </div>
+            </section>
+
+            <section class="details-grid">
+                <article class="detail-card">
+                    <span class="detail-label">Subjects</span>
+                    <div id="subjectList" class="subject-list">—</div>
+                </article>
+                <article class="detail-card">
+                    <span class="detail-label">Questions</span>
+                    <strong id="questionCount">—</strong>
+                </article>
+                <article class="detail-card">
+                    <span class="detail-label">Difficulty</span>
+                    <strong id="difficultyValue">—</strong>
+                </article>
+                <article class="detail-card">
+                    <span class="detail-label">Question type</span>
+                    <strong id="questionTypeValue">—</strong>
+                </article>
+            </section>
+
+            <section id="predictionsRow" class="detail-card predictions-card" hidden>
+                <span class="detail-label">Predictions</span>
+                <strong id="predictionsValue">—</strong>
+            </section>
+
+            <section class="panel">
+                <div class="panel-heading">
+                    <div>
+                        <p class="eyebrow">COMPETITORS</p>
+                        <h2>Players in this match</h2>
+                    </div>
+                    <span id="playerCount" class="count-pill">0 players</span>
+                </div>
+                <p class="muted-text">Approved players appear here after they join.</p>
+                <div id="participantsList" class="participants-list">
+                    <p class="empty-state">No players have joined yet.</p>
+                </div>
+            </section>
+
+            <section class="panel">
+                <div class="panel-heading">
+                    <div>
+                        <p class="eyebrow">YOUR ACCESS</p>
+                        <h2>Join this match</h2>
+                    </div>
+                    <span id="youStatus" class="badge badge-muted">Not joined</span>
+                </div>
+
+                <p id="joinHint" class="muted-text">Choose whether to apply or join this match.</p>
+
+                <button id="joinButton" class="button button-primary" type="button">
+                    <span id="joinButtonText">Join match</span>
+                </button>
+            </section>
+
+            <section id="applicationsPanel" class="panel" hidden>
+                <div class="panel-heading">
+                    <div>
+                        <p class="eyebrow">HOST CONTROLS</p>
+                        <h2>Player applications</h2>
+                    </div>
+                    <span id="applicationCount" class="count-pill">0 pending</span>
+                </div>
+                <p class="muted-text">Review each request before allowing a player into the match.</p>
+                <div id="applicationsList" class="applications-list">
+                    <p class="empty-state">No applications yet.</p>
+                </div>
+            </section>
+
+            <section class="panel match-id-panel">
+                <div>
+                    <p class="eyebrow">MATCH IDENTIFIER</p>
+                    <code id="matchIdValue">—</code>
+                </div>
+                <button id="copyMatchIdButton" class="button button-secondary" type="button">
+                    <span id="copyButtonText">Copy ID</span>
+                </button>
+            </section>
+        </section>
+
+        <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+        <footer class="footer">
+            <span>© <span id="currentYear"></span> GradeFlow Games</span>
+        </footer>
+    </main>
+
+    <script type="module" src="../../js/games/match-lobby.js"></script>
+</body>
+</html>
