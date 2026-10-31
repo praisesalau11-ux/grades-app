@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101114">
+  <title>GradeFlow — Quiz Match</title>
+  <link rel="stylesheet" href="../../css/games/play-match.css">
+</head>
+<body>
+  <main class="game-shell">
+    <header class="topbar">
+      <a class="brand" href="../../match-lobby.html">GradeFlow</a>
+      <span id="matchFormat" class="format-label">QUIZ MATCH</span>
+      <button id="exitButton" class="exit-button" type="button">Exit</button>
+    </header>
+
+    <section id="loadingScreen" class="state-screen">
+      <div class="spinner"></div>
+      <h2>Preparing your match</h2>
+      <p id="loadingMessage">Checking your access…</p>
+    </section>
+
+    <section id="errorScreen" class="state-screen hidden">
+      <div class="error-icon">!</div>
+      <h2 id="errorTitle">Unable to enter match</h2>
+      <p id="errorMessage">Your access could not be verified.</p>
+      <button id="backButton" class="primary-button" type="button">
+        Return to lobby
+      </button>
+    </section>
+
+    <section id="gameScreen" class="hidden">
+      <div class="match-heading">
+        <div>
+          <p class="eyebrow">NOW PLAYING</p>
+          <h1 id="matchTitle">Quiz Match</h1>
+          <p id="matchDetails" class="muted"></p>
+        </div>
+        <div class="score-card">
+          <span>Your score</span>
+          <strong id="scoreDisplay">0</strong>
+        </div>
+      </div>
+
+      <div class="progress-area">
+        <div class="progress-label">
+          <span id="questionCounter">Question 1 of 10</span>
+          <span id="timerDisplay">00:30</span>
+        </div>
+        <div class="progress-track">
+          <div id="progressBar" class="progress-fill"></div>
+        </div>
+      </div>
+
+      <article class="question-card">
+        <div class="question-meta">
+          <span id="subjectLabel">SUBJECT</span>
+          <span id="pointsLabel">10 points</span>
+        </div>
+
+        <h2 id="questionText">Question will appear here.</h2>
+        <div id="optionsContainer" class="options-container"></div>
+
+        <div id="feedbackBox" class="feedback-box hidden"></div>
+
+        <button id="nextButton" class="primary-button hidden" type="button">
+          Next question
+        </button>
+      </article>
+    </section>
+
+    <section id="resultScreen" class="state-screen hidden">
+      <p class="eyebrow">MATCH COMPLETED</p>
+      <h1>Quiz finished</h1>
+      <div class="final-score">
+        <span>Your final score</span>
+        <strong id="finalScore">0</strong>
+      </div>
+      <p id="resultSummary" class="muted"></p>
+      <button id="resultBackButton" class="primary-button" type="button">
+        Return to lobby
+      </button>
+    </section>
+  </main>
+
+  <script type="module" src="../../js/games/play-match.js"></script>
+</body>
+</html>
