@@ -1,0 +1,559 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#171713">
+  <meta name="description" content="Get help using GradeFlow. Find answers, troubleshoot issues and contact support.">
+
+  <title>Help Centre | GradeFlow</title>
+
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/help.css">
+</head>
+
+<body>
+  <div class="help-page">
+
+    <header class="help-header">
+      <a href="../dashboard.html" class="brand">
+        <span class="brand-icon">G</span>
+        <span>GradeFlow</span>
+      </a>
+
+      <a href="../dashboard.html" class="back-link">
+        <span>←</span> Back to Dashboard
+      </a>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-label">GRADEFlow SUPPORT</div>
+
+        <h1>How can we <span>help you?</span></h1>
+
+        <p>
+          Find answers, learn how to use GradeFlow, and get support
+          whenever you need it.
+        </p>
+
+        <div class="search-container">
+          <span class="search-icon">⌕</span>
+
+          <input
+            type="search"
+            id="helpSearch"
+            placeholder="Search for help, features or questions..."
+            autocomplete="off"
+            aria-label="Search help articles"
+          >
+
+          <button id="clearSearch" type="button" aria-label="Clear search">
+            ×
+          </button>
+        </div>
+
+        <p class="search-hint" id="searchHint">
+          Try searching for GPA, password, history or settings.
+        </p>
+      </section>
+
+      <section class="category-section">
+        <div class="section-heading">
+          <div>
+            <span class="eyebrow">EXPLORE SUPPORT</span>
+            <h2>Browse help topics</h2>
+          </div>
+        </div>
+
+        <div class="category-grid">
+
+          <button class="category-card" data-category="getting-started">
+            <span class="category-icon">🚀</span>
+            <strong>Getting Started</strong>
+            <small>Learn the basics of GradeFlow</small>
+          </button>
+
+          <button class="category-card" data-category="calculator">
+            <span class="category-icon">🧮</span>
+            <strong>GPA Calculator</strong>
+            <small>Calculate and understand your GPA</small>
+          </button>
+
+          <button class="category-card" data-category="academic">
+            <span class="category-icon">📚</span>
+            <strong>Academic Tools</strong>
+            <small>Subjects, semesters and study tools</small>
+          </button>
+
+          <button class="category-card" data-category="records">
+            <span class="category-icon">📊</span>
+            <strong>Records & Analytics</strong>
+            <small>History, reports and performance</small>
+          </button>
+
+          <button class="category-card" data-category="account">
+            <span class="category-icon">👤</span>
+            <strong>Account & Settings</strong>
+            <small>Manage your account and preferences</small>
+          </button>
+
+          <button class="category-card" data-category="community">
+            <span class="category-icon">💬</span>
+            <strong>Community & AI</strong>
+            <small>Messages, groups and AI assistance</small>
+          </button>
+
+        </div>
+      </section>
+
+      <section class="faq-section">
+        <div class="section-heading">
+          <div>
+            <span class="eyebrow">HELP ARTICLES</span>
+            <h2>Frequently asked questions</h2>
+            <p>Choose a question to view its answer.</p>
+          </div>
+
+          <button id="resetSearch" class="reset-button" type="button">
+            Show all questions
+          </button>
+        </div>
+
+        <div id="noResults" class="no-results" hidden>
+          <span>🔎</span>
+          <h3>No matching questions found</h3>
+          <p>Try another search term or contact GradeFlow support.</p>
+        </div>
+
+        <!-- GETTING STARTED -->
+        <div class="faq-category" data-category="getting-started">
+          <h3 class="category-title">🚀 Getting Started</h3>
+
+          <article class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              What is GradeFlow?
+              <span class="faq-arrow">+</span>
+            </button>
+            <div class="faq-answer">
+              <p>
+                GradeFlow is an academic management tool designed to help
+                students calculate GPA, organise academic records, monitor
+                performance and manage their study activities.
+              </p>
+            </div>
+          </article>
+
+          <article class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              How do I get started?
+              <span class="faq-arrow">+</span>
+            </button>
+            <div class="faq-answer">
+              <p>
+                Sign in or create an account, complete your profile if
+                requested, and use the dashboard to access the available
+                academic tools.
+              </p>
+            </div>
+          </article>
+
+          <article class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              What can I do from the dashboard?
+              <span class="faq-arrow">+</span>
+            </button>
+            <div class="faq-answer">
+              <p>
+                The dashboard provides access to GradeFlow features such as
+                the GPA calculator, subjects, history, analytics, goals,
+                reports, study planning and account settings.
+              </p>
+            </div>
+          </article>
+        </div>
+
+        <!-- CALCULATOR -->
+        <div class="faq-category" data-category="calculator">
+          <h3 class="category-title">🧮 GPA Calculator</h3>
+
+          <article class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              How do I calculate my GPA?
+              <span class="faq-arrow">+</span>
+            </button>
+            <div class="faq-answer">
+              <p>
+                Open the GPA Calculator, enter your subjects, grades and
+                credit units, then use the calculate option to see your
+                result. Make sure your grading scale matches your school.
+              </p>
+            </div>
+          </article>
+
+          <article class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              What is a credit unit?
+              <span class="faq-arrow">+</span>
+            </button>
+            <div class="faq-answer">
+              <p>
+                A credit unit represents the academic weight assigned to
+                a course. GPA calculations use credit units to determine
+                how much each course contributes to the result.
+              </p>
+            </div>
+          </article>
+
+          <article class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              Can I change the grading scale?
+              <span class="faq-arrow">+</span>
+            </button>
+            <div class="faq-answer">
+              <p>
+                GradeFlow provides grading-scale settings. Select the scale
+                that matches your institution before calculating your GPA.
+                Using the wrong scale can produce an inaccurate result.
+              </p>
+            </div>
+          </article>
+
+          <article class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              Why is my GPA different from my school's result?
+              <span class="faq-arrow">+</span>
+            </button>
+            <div class="faq-answer">
+              <p>
+                Check your grades, credit units, grading scale and rounding
+                method. Your institution may also apply rules that are not
+                included in your calculator settings.
+              </p>
+            </div>
+          </article>
+        </div>
+
+        <!-- ACADEMIC TOOLS -->
+        <div class="faq-category" data-category="academic">
+          <h3 class="category-title">📚 Academic Tools</h3>
+
+          <article class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              How do I organise my subjects and semesters?
+              <span class="faq-arrow">+</span>
+            </button>
+            <div class="faq-answer">
+              <p>
+                Open Subjects & Semesters from the dashboard. Use the
+                available controls to organise your academic subjects
+                and semester information.
+              </p>
+            </div>
+          </article>
+
+          <article class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              What are study goals?
+              <span class="faq-arrow">+</span>
+            </button>
+            <div class="faq-answer">
+              <p>
+                Study goals help you define academic targets and monitor
+                your progress towards them.
+              </p>
+            </div>
+          </article>
+
+          <article class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              What is the Study Planner?
+              <span class="faq-arrow">+</span>
+            </button>
+            <div class="faq-answer">
+              <p>
+                The Study Planner is designed to help you organise your
+                study activities and create a more structured study routine.
+              </p>
+            </div>
+          </article>
+
+          <article class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              What are Study Recommendations and Improvement Plans?
+              <span class="faq-arrow">+</span>
+            </button>
+            <div class="faq-answer">
+              <p>
+                These tools are intended to help you identify areas to work
+                on and organise actions that can improve your academic
+                performance.
+              </p>
+            </div>
+          </article>
+        </div>
+
+        <!-- RECORDS AND ANALYTICS -->
+        <div class="faq-category" data-category="records">
+          <h3 class="category-title">📊 Records & Analytics</h3>
+
+          <article class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              Where can I find my saved calculations?
+              <span class="faq-arrow">+</span>
+            </button>
+            <div class="faq-answer">
+              <p>
+                Open History from the dashboard to view saved calculation
+                records. You can use the available search and date filters
+                to find records.
+              </p>
+            </div>
+          </article>
+
+          <article class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              What does Performance show?
+              <span class="faq-arrow">+</span>
+            </button>
+            <div class="faq-answer">
+              <p>
+                The Performance page presents academic information such as
+                GPA trends, latest results, subject performance and saved
+                records, depending on the data available in your account.
+              </p>
+            </div>
+          </article>
+
+          <article class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              What are Reports and Analytics?
+              <span class="faq-arrow">+</span>
+            </button>
+            <div class="faq-answer">
+              <p>
+                Analytics helps you understand your academic information.
+                Reports are intended to present your academic records in
+                a more organised format.
+              </p>
+            </div>
+          </article>
+        </div>
+
+        <!-- ACCOUNT -->
+        <div class="faq-category" data-category="account">
+          <h3 class="category-title">👤 Account & Settings</h3>
+
+          <article class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              How do I update my profile?
+              <span class="faq-arrow">+</span>
+            </button>
+            <div class="faq-answer">
+              <p>
+                Open My Profile from the dashboard and use the available
+                profile controls to update your personal or academic details.
+              </p>
+            </div>
+          </article>
+
+          <article class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              How do I change between dark and light themes?
+              <span class="faq-arrow">+</span>
+            </button>
+            <div class="faq-answer">
+              <p>
+                Open Settings and use the theme preference if it is
+                available in your version of GradeFlow.
+              </p>
+            </div>
+          </article>
+
+          <article class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              How do I reset my password?
+              <span class="faq-arrow">+</span>
+            </button>
+            <div class="faq-answer">
+              <p>
+                Use the password reset option on the login page or in
+                Settings if available. Follow the instructions sent to
+                your registered email address.
+              </p>
+            </div>
+          </article>
+
+          <article class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              Can I export my academic history?
+              <span class="faq-arrow">+</span>
+            </button>
+            <div class="faq-answer">
+              <p>
+                If the export option is available in your Settings page,
+                use it to export your saved academic history.
+              </p>
+            </div>
+          </article>
+        </div>
+
+        <!-- COMMUNITY AND AI -->
+        <div class="faq-category" data-category="community">
+          <h3 class="category-title">💬 Community & AI</h3>
+
+          <article class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              What is the AI Academic Assistant?
+              <span class="faq-arrow">+</span>
+            </button>
+            <div class="faq-answer">
+              <p>
+                The AI Academic Assistant is designed to help with
+                academic questions and learning-related tasks. Always
+                verify important academic information.
+              </p>
+            </div>
+          </article>
+
+          <article class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              What are Study Groups?
+              <span class="faq-arrow">+</span>
+            </button>
+            <div class="faq-answer">
+              <p>
+                Study Groups are intended to help students connect and
+                collaborate around their academic activities.
+              </p>
+            </div>
+          </article>
+
+          <article class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              Where can I find my messages and notifications?
+              <span class="faq-arrow">+</span>
+            </button>
+            <div class="faq-answer">
+              <p>
+                Use the Messages and Notifications sections from the
+                dashboard to access those features.
+              </p>
+            </div>
+          </article>
+        </div>
+
+        <!-- TROUBLESHOOTING -->
+        <div class="faq-category" data-category="troubleshooting">
+          <h3 class="category-title">🛠️ Troubleshooting</h3>
+
+          <article class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              GradeFlow is not loading. What should I do?
+              <span class="faq-arrow">+</span>
+            </button>
+            <div class="faq-answer">
+              <p>
+                Check your internet connection, refresh the page and try
+                again. If the problem continues, try another browser or
+                contact support with details about the problem.
+              </p>
+            </div>
+          </article>
+
+          <article class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              My saved records are not appearing. Why?
+              <span class="faq-arrow">+</span>
+            </button>
+            <div class="faq-answer">
+              <p>
+                Confirm that you are signed in to the correct account.
+                Check your internet connection and refresh the page.
+                If records remain missing, contact support.
+              </p>
+            </div>
+          </article>
+
+          <article class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              I found a bug. How do I report it?
+              <span class="faq-arrow">+</span>
+            </button>
+            <div class="faq-answer">
+              <p>
+                Contact GradeFlow support through WhatsApp or email.
+                Describe what you were doing, what happened, and what
+                you expected to happen. Include a screenshot if useful.
+              </p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- CONTACT SUPPORT -->
+      <section class="contact-section">
+        <div class="contact-heading">
+          <span class="eyebrow">NEED MORE HELP?</span>
+          <h2>Talk to GradeFlow Support</h2>
+          <p>
+            Couldn't find the answer? Contact support using one of
+            the options below.
+          </p>
+        </div>
+
+        <div class="contact-grid">
+
+          <a
+            class="contact-card whatsapp-card"
+            href="https://wa.me/2348150224702?text=Hello%20GradeFlow%20Support%2C%20I%20need%20help%20with%20GradeFlow."
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span class="contact-icon">☏</span>
+            <strong>WhatsApp Support</strong>
+            <span>08150224702</span>
+            <small>Chat with support →</small>
+          </a>
+
+          <a
+            class="contact-card"
+            href="tel:+2348150224702"
+          >
+            <span class="contact-icon">☎</span>
+            <strong>Phone Support</strong>
+            <span>08150224702</span>
+            <small>Call support →</small>
+          </a>
+
+          <a
+            class="contact-card"
+            href="mailto:praisesalau11@gmail.com?subject=GradeFlow%20Support"
+          >
+            <span class="contact-icon">✉</span>
+            <strong>Email Support</strong>
+            <span>praisesalau11@gmail.com</span>
+            <small>Send an email →</small>
+          </a>
+
+        </div>
+
+        <p class="support-note">
+          When reporting a problem, never send your password or
+          verification codes.
+        </p>
+      </section>
+    </main>
+
+    <footer class="help-footer">
+      <a href="../dashboard.html">GradeFlow</a>
+      <span>Academic organisation made simpler.</span>
+      <span>© <span id="currentYear"></span> GradeFlow</span>
+    </footer>
+
+  </div>
+
+  <script type="module" src="../js/help.js"></script>
+</body>
+</html>

@@ -1,0 +1,144 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#171713">
+  <title>Support Administration | GradeFlow</title>
+
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/support.css">
+  <link rel="stylesheet" href="../css/admin-support.css">
+</head>
+<body>
+
+  <header class="support-header">
+    <a href="../dashboard.html" class="support-brand">
+      <span class="brand-mark">G</span>
+      GradeFlow Admin
+    </a>
+    <a href="../dashboard.html" class="back-link">Dashboard</a>
+  </header>
+
+  <main class="admin-layout">
+    <section class="support-intro">
+      <span class="eyebrow">ADMINISTRATION</span>
+      <h1>Support management</h1>
+      <p>Review student requests, respond to conversations and manage ticket status.</p>
+    </section>
+
+    <div id="adminNotice" class="notice" role="status" hidden></div>
+
+    <section class="admin-stats">
+      <div class="stat-card">
+        <span>Total tickets</span>
+        <strong id="totalTickets">0</strong>
+      </div>
+      <div class="stat-card">
+        <span>Open</span>
+        <strong id="openTickets">0</strong>
+      </div>
+      <div class="stat-card">
+        <span>In progress</span>
+        <strong id="progressTickets">0</strong>
+      </div>
+      <div class="stat-card">
+        <span>Resolved</span>
+        <strong id="resolvedTickets">0</strong>
+      </div>
+    </section>
+
+    <section class="admin-workspace">
+      <div class="support-panel admin-ticket-panel">
+        <div class="panel-heading">
+          <div>
+            <span class="eyebrow">INCOMING REQUESTS</span>
+            <h2>All tickets</h2>
+          </div>
+        </div>
+
+        <input
+          id="adminSearch"
+          class="admin-search"
+          type="search"
+          placeholder="Search subjects or student emails..."
+        >
+
+        <div class="filter-row">
+          <select id="statusFilter" aria-label="Filter by status">
+            <option value="all">All statuses</option>
+            <option value="open">Open</option>
+            <option value="in-progress">In progress</option>
+            <option value="resolved">Resolved</option>
+          </select>
+
+          <select id="priorityFilter" aria-label="Filter by priority">
+            <option value="all">All priorities</option>
+            <option value="low">Low</option>
+            <option value="normal">Normal</option>
+            <option value="high">High</option>
+          </select>
+        </div>
+
+        <div id="adminTicketList" class="ticket-list">
+          <p class="empty-state">Loading tickets...</p>
+        </div>
+      </div>
+
+      <div class="support-panel admin-conversation-panel">
+        <div class="conversation-heading">
+          <div>
+            <span class="eyebrow">TICKET DETAILS</span>
+            <h2 id="adminConversationTitle">Select a ticket</h2>
+            <p id="adminConversationMeta">Choose a ticket to view its conversation.</p>
+          </div>
+        </div>
+
+        <div id="ticketControls" class="ticket-controls" hidden>
+          <div>
+            <label for="adminStatus">Status</label>
+            <select id="adminStatus">
+              <option value="open">Open</option>
+              <option value="in-progress">In progress</option>
+              <option value="resolved">Resolved</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="adminPriority">Priority</label>
+            <select id="adminPriority">
+              <option value="low">Low</option>
+              <option value="normal">Normal</option>
+              <option value="high">High</option>
+            </select>
+          </div>
+
+          <button id="saveTicketChanges" class="primary-button" type="button">
+            Save changes
+          </button>
+        </div>
+
+        <div id="adminMessageList" class="message-list">
+          <p class="empty-state">Select a ticket to view its messages.</p>
+        </div>
+
+        <form id="adminReplyForm" class="reply-form" hidden>
+          <textarea
+            id="adminReplyMessage"
+            rows="2"
+            maxlength="3000"
+            placeholder="Reply to the student..."
+            required
+          ></textarea>
+          <button id="adminSendReply" class="primary-button" type="submit">
+            Send reply
+          </button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="../js/admin-support.js"></script>
+</body>
+</html>
