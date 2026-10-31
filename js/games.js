@@ -1,4 +1,3 @@
-
 "use strict";
 
 /*
@@ -8,8 +7,8 @@
  * Styles:   css/games.css
  * Modules:  pages/games/
  *
- * This file manages homepage navigation only.
- * It does not replace individual module controllers.
+ * Manages homepage navigation and shared schedule helpers.
+ * Individual modules remain responsible for loading and displaying games.
  */
 
 (() => {
@@ -20,64 +19,47 @@
 
   let toastTimer = null;
 
-  /*
-   * Central module registry.
-   *
-   * When a module is created, it can use its registered path.
-   * The page checker determines whether the destination currently exists.
-   */
-
   const GAME_MODULES = {
     "match-lobby": {
       name: "Match Lobby",
       path: "games/match-lobby.html"
     },
-
     "live-match": {
       name: "Live Match",
       path: "games/live-match.html"
     },
-
     "watch-match": {
       name: "Watch Matches",
       path: "games/watch-match.html"
     },
-
     "my-matches": {
       name: "My Matches",
       path: "games/my-matches.html"
     },
-
     "games-profile": {
       name: "Games Profile",
       path: "games/games-profile.html"
     },
-
     "leaderboard": {
       name: "Leaderboard",
       path: "games/leaderboard.html"
     },
-
     "hall-of-fame": {
       name: "Hall of Fame",
       path: "games/hall-of-fame.html"
     },
-
     "sponsorships": {
       name: "Sponsorships",
       path: "games/sponsorships.html"
     },
-
     "games-wallet": {
       name: "Games Wallet",
       path: "games/games-wallet.html"
     },
-
     "games-search": {
       name: "Games Search",
       path: "games/games-search.html"
     },
-
     "games-notifications": {
       name: "Games Notifications",
       path: "games/games-notifications.html"
@@ -85,8 +67,96 @@
   };
 
   /*
-   * Display a message on the homepage.
+   * Shared date helpers.
+   * Supports Firestore Timestamps, ISO date strings,
+   * JavaScript Date objects and millisecond timestamps.
    */
+
+  function getDate(value) {
+    if (value == null || value === "") return null;
+
+    if (typeof value.toDate === "function") {
+      const date = value.toDate();
+      return Number.isNaN(date.getTime()) ? null : date;
+    }
+
+    if (typeof value === "number") {
+      const date = new Date(value);
+      return Number.isNaN(date.getTime()) ? null : date;
+    }
+
+    if (value instanceof Date) {
+      return Number.isNaN(value.getTime()) ? null : value;
+    }
+
+    if (typeof value === "string") {
+      const date = new Date(value);
+      return Number.isNaN(date.getTime()) ? null : date;
+    }
+
+    if (typeof value === "object" && value.seconds != null) {
+      const date = new Date(Number(value.seconds) * 1000);
+      return Number.isNaN(date.getTime()) ? null : date;
+    }
+
+    return null;
+  }
+
+  /*
+   * New and old game creators may use different field names.
+   */
+
+  function getScheduledDate(game) {
+    if (!game || typeof game !== "object") return null;
+
+    const possibleFields = [
+      game.scheduledAt,
+      game.startDateTime,
+      game.scheduledStart,
+      game.startTime,
+      game.startDate
+    ];
+
+    for (const value of possibleFields) {
+      const date = getDate(value);
+      if (date) return date;
+    }
+
+    return null;
+  }
+
+  function getScheduleStatus(game) {
+    if (game?.status === "completed") return "completed";
+    if (game?.status === "live") return "live";
+
+    const scheduledDate = getScheduledDate(game);
+
+    if (scheduledDate && scheduledDate.getTime() > Date.now()) {
+      return "scheduled";
+    }
+
+    return "lobby";
+  }
+
+  function formatSchedule(game) {
+    const date = getScheduledDate(game);
+
+    if (!date) return "Start time not set";
+
+    return date.toLocaleString([], {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit"
+    });
+  }
+
+  function scheduleHasNotPassed(game) {
+    const date = getScheduledDate(game);
+
+    return Boolean(date && date.getTime() > Date.now());
+  }
 
   function showToast(message) {
     if (!toast) {
@@ -104,62 +174,29 @@
     }, 4000);
   }
 
-  /*
-   * Close the mobile sidebar.
-   */
-
   function closeSidebar() {
-    if (sidebar) {
-      sidebar.classList.remove("open");
-    }
-
-    if (sidebarOverlay) {
-      sidebarOverlay.classList.remove("show");
-    }
-
-    if (menuToggle) {
-      menuToggle.setAttribute("aria-expanded", "false");
-    }
-
+    sidebar?.classList.remove("open");
+    sidebarOverlay?.classList.remove("show");
+    menuToggle?.setAttribute("aria-expanded", "false");
     document.body.style.overflow = "";
   }
-
-  /*
-   * Toggle the mobile sidebar.
-   */
 
   function toggleSidebar() {
     if (!sidebar) return;
 
     const isOpen = sidebar.classList.toggle("open");
 
-    if (sidebarOverlay) {
-      sidebarOverlay.classList.toggle("show", isOpen);
-    }
-
-    if (menuToggle) {
-      menuToggle.setAttribute(
-        "aria-expanded",
-        String(isOpen)
-      );
-    }
+    sidebarOverlay?.classList.toggle("show", isOpen);
+    menuToggle?.setAttribute("aria-expanded", String(isOpen));
 
     document.body.style.overflow = isOpen ? "hidden" : "";
   }
 
-  if (menuToggle) {
-    menuToggle.addEventListener("click", toggleSidebar);
-  }
-
-  if (sidebarOverlay) {
-    sidebarOverlay.addEventListener("click", closeSidebar);
-  }
+  menuToggle?.addEventListener("click", toggleSidebar);
+  sidebarOverlay?.addEventListener("click", closeSidebar);
 
   /*
    * Check whether a registered page exists.
-   *
-   * HEAD avoids downloading the entire page.
-   * GET is used as a fallback if HEAD is not supported.
    */
 
   async function pageExists(path) {
@@ -178,12 +215,11 @@
 
       if (response.ok) return true;
 
-      if (response.status !== 405 &&
-          response.status !== 501) {
+      if (response.status !== 405 && response.status !== 501) {
         return false;
       }
     } catch (error) {
-      // Try GET below.
+      // Fall back to GET.
     }
 
     try {
@@ -199,10 +235,6 @@
     }
   }
 
-  /*
-   * Update a module's availability labels.
-   */
-
   function updateModuleStatus(moduleId, available) {
     document
       .querySelectorAll(`[data-game-route="${moduleId}"]`)
@@ -217,17 +249,8 @@
       });
   }
 
-  /*
-   * Check registered modules when the homepage loads.
-   *
-   * This updates the status labels without preventing the page
-   * from opening if a network request fails.
-   */
-
   async function checkModulePages() {
     const entries = Object.entries(GAME_MODULES);
-
-    if (entries.length === 0) return;
 
     await Promise.all(
       entries.map(async ([moduleId, module]) => {
@@ -237,13 +260,6 @@
     );
   }
 
-  /*
-   * Navigate to a module only if its page exists.
-   *
-   * Existing pages open normally.
-   * Missing pages display a useful message instead of a broken route.
-   */
-
   async function openModule(moduleId, link) {
     const module = GAME_MODULES[moduleId];
 
@@ -252,42 +268,35 @@
       return;
     }
 
-    const originalText = link.dataset.originalText || link.textContent;
-    link.dataset.originalText = originalText;
     link.setAttribute("aria-busy", "true");
 
-    const available = await pageExists(module.path);
+    try {
+      const available = await pageExists(module.path);
 
-    link.removeAttribute("aria-busy");
+      if (available) {
+        const destination = new URL(
+          module.path,
+          window.location.href
+        );
 
-    if (available) {
-      const destination = new URL(
-        module.path,
-        window.location.href
+        closeSidebar();
+        window.location.assign(destination.href);
+        return;
+      }
+
+      updateModuleStatus(moduleId, false);
+
+      showToast(
+        `${module.name} is registered in GradeFlow Games, ` +
+        "but its page has not been created yet."
       );
-
-      closeSidebar();
-      window.location.assign(destination.href);
-      return;
+    } finally {
+      link.removeAttribute("aria-busy");
     }
-
-    updateModuleStatus(moduleId, false);
-
-    showToast(
-      `${module.name} is registered in GradeFlow Games, ` +
-      "but its page has not been created yet. " +
-      "You can continue using the available modules."
-    );
   }
-
-  /*
-   * Connect all sidebar, hero, profile, and module-card links
-   * that have a data-game-route attribute.
-   */
 
   document.querySelectorAll("[data-game-route]").forEach((link) => {
     link.addEventListener("click", (event) => {
-      // Preserve normal browser actions such as opening a new tab.
       if (
         event.button !== 0 ||
         event.metaKey ||
@@ -300,40 +309,24 @@
 
       event.preventDefault();
 
-      const moduleId = link.dataset.gameRoute;
-
-      openModule(moduleId, link).catch((error) => {
+      openModule(link.dataset.gameRoute, link).catch((error) => {
         console.error("Games navigation error:", error);
         showToast("Could not open this module. Check your connection.");
       });
     });
   });
 
-  /*
-   * Mark the homepage Overview link as active.
-   */
-
   document.querySelectorAll(".side-nav .nav-link").forEach((link) => {
-    const href = link.getAttribute("href");
-
-    if (href === "games.html") {
+    if (link.getAttribute("href") === "games.html") {
       link.classList.add("active");
     }
   });
-
-  /*
-   * Keep the interface usable when the browser changes size.
-   */
 
   window.addEventListener("resize", () => {
     if (window.innerWidth > 760) {
       closeSidebar();
     }
   });
-
-  /*
-   * Allow Escape to close the mobile navigation.
-   */
 
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
@@ -342,19 +335,19 @@
   });
 
   /*
-   * Public registry for future Games code.
-   * Other scripts may inspect the registered routes.
+   * Public helpers for other GradeFlow Games scripts.
    */
 
   window.GradeFlowGames = Object.freeze({
     modules: GAME_MODULES,
     checkModulePages,
-    showToast
+    showToast,
+    getDate,
+    getScheduledDate,
+    getScheduleStatus,
+    formatSchedule,
+    scheduleHasNotPassed
   });
-
-  /*
-   * Start the homepage controller.
-   */
 
   checkModulePages();
 

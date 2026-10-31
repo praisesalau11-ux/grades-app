@@ -1,4 +1,3 @@
-
 /* ==========================================
    GradeFlow — Dashboard Controller
    File: js/dashboard.js

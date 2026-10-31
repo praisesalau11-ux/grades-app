@@ -1,4 +1,3 @@
-
 "use strict";
 
 import { auth, db } from "./firebase.js";
@@ -21,12 +20,20 @@ const publishedMessage = $("publishedGamesMessage");
 const hostedMessage = $("hostedGamesMessage");
 const refreshButton = $("refreshPublishedGames");
 
+/* ==========================================
+   MESSAGE HELPERS
+========================================== */
+
 function setMessage(element, message) {
   if (element) {
     element.textContent = message;
     element.hidden = !message;
   }
 }
+
+/* ==========================================
+   DATE HELPERS
+========================================== */
 
 function formatDate(value) {
   if (!value) return "";
@@ -45,23 +52,39 @@ function formatDate(value) {
   });
 }
 
+/* ==========================================
+   ELEMENT HELPERS
+========================================== */
+
 function createElement(tag, className, text) {
   const element = document.createElement(tag);
 
-  if (className) element.className = className;
-  if (text !== undefined) element.textContent = String(text);
+  if (className) {
+    element.className = className;
+  }
+
+  if (text !== undefined) {
+    element.textContent = String(text);
+  }
 
   return element;
 }
+
+/* ==========================================
+   MATCH CARD
+========================================== */
 
 function createMatchCard(match, id, isHosted) {
   const card = createElement("article", "home-match-card");
 
   const top = createElement("div", "home-match-card-top");
+
   const badge = createElement(
     "span",
     `home-match-badge ${
-      match.status === "published" ? "badge-published" : "badge-draft"
+      match.status === "published"
+        ? "badge-published"
+        : "badge-draft"
     }`,
     match.status === "published" ? "Published" : "Draft"
   );
@@ -100,10 +123,15 @@ function createMatchCard(match, id, isHosted) {
     if (!value) return;
 
     const item = createElement("span", "home-match-meta-item");
+
     item.appendChild(
       createElement("strong", "", `${label}: `)
     );
-    item.appendChild(document.createTextNode(String(value)));
+
+    item.appendChild(
+      document.createTextNode(String(value))
+    );
+
     metadata.appendChild(item);
   });
 
@@ -150,19 +178,23 @@ function createMatchCard(match, id, isHosted) {
       actions.appendChild(editLink);
     }
   } else {
-    const note = createElement(
-      "span",
-      "home-match-note",
-      "Player joining will be available when the Match Lobby is connected."
+    actions.appendChild(
+      createElement(
+        "span",
+        "home-match-note",
+        "Player joining will be available when the Match Lobby is connected."
+      )
     );
-
-    actions.appendChild(note);
   }
 
   card.appendChild(actions);
 
   return card;
 }
+
+/* ==========================================
+   RENDER MATCH LIST
+========================================== */
 
 function renderList(container, matches, isHosted, messageElement) {
   if (!container) return;
@@ -176,6 +208,7 @@ function renderList(container, matches, isHosted, messageElement) {
         ? "You haven't hosted any matches yet. Create a match to get started."
         : "No published games are available yet."
     );
+
     return;
   }
 
@@ -188,10 +221,15 @@ function renderList(container, matches, isHosted, messageElement) {
   });
 }
 
+/* ==========================================
+   SORT MATCHES
+========================================== */
+
 function sortMatches(matches) {
   return matches.sort((a, b) => {
     const getTime = (match) => {
-      const value = match.data.publishedAt || match.data.createdAt;
+      const value =
+        match.data.publishedAt || match.data.createdAt;
 
       if (!value) return 0;
 
@@ -200,15 +238,92 @@ function sortMatches(matches) {
       }
 
       const date = new Date(value);
-      return Number.isNaN(date.getTime()) ? 0 : date.getTime();
+
+      return Number.isNaN(date.getTime())
+        ? 0
+        : date.getTime();
     };
 
     return getTime(b) - getTime(a);
   });
 }
 
+/* ==========================================
+   LOAD PUBLISHED GAMES
+========================================== */
+
+async function loadPublishedGames() {
+  const publishedQuery = query(
+    collection(db, "matches"),
+    where("status", "==", "published"),
+    where("visibility", "==", "public")
+  );
+
+  const snapshot = await getDocs(publishedQuery);
+
+  return snapshot.docs.map((item) => ({
+    id: item.id,
+    data: item.data()
+  }));
+}
+
+/* ==========================================
+   LOAD GAMES HOSTED BY CURRENT USER
+========================================== */
+
+async function loadHostedGames(user) {
+  if (!user) return [];
+
+  const hostedQuery = query(
+    collection(db, "matches"),
+    where("hostUid", "==", user.uid)
+  );
+
+  const snapshot = await getDocs(hostedQuery);
+
+  return snapshot.docs.map((item) => ({
+    id: item.id,
+    data: item.data()
+  }));
+}
+
+/* ==========================================
+   UPDATE HOSTED MATCH COUNT
+========================================== */
+
+function updateHostedCount(count) {
+  const hostedCount = $("hostedMatchesCount");
+
+  if (hostedCount) {
+    hostedCount.textContent = String(count);
+  }
+}
+
+/* ==========================================
+   LOAD HOMEPAGE MATCHES
+========================================== */
+
 async function loadHomepageMatches() {
   if (loading) return;
+
+  if (!currentUser) {
+    setMessage(
+      publishedMessage,
+      "Sign in to GradeFlow to explore published games."
+    );
+
+    setMessage(
+      hostedMessage,
+      "Sign in to view the games you host."
+    );
+
+    if (publishedList) publishedList.replaceChildren();
+    if (hostedList) hostedList.replaceChildren();
+
+    updateHostedCount(0);
+
+    return;
+  }
 
   loading = true;
 
@@ -220,96 +335,104 @@ async function loadHomepageMatches() {
   setMessage(publishedMessage, "Loading published games…");
   setMessage(hostedMessage, "Loading your hosted games…");
 
-  try {
-    /*
-     * Only published matches are requested for the public list.
-     */
+  /*
+   * Load each list independently.
+   * One failed query will no longer hide the result
+   * of the other successful query.
+   */
 
-    const publishedQuery = query(
-      collection(db, "matches"),
-      where("status", "==", "published")
-    );
-
-    const publishedSnapshot = await getDocs(publishedQuery);
-
-    const publishedMatches = publishedSnapshot.docs.map((item) => ({
-      id: item.id,
-      data: item.data()
+  const publishedResult = await loadPublishedGames()
+    .then((matches) => ({
+      success: true,
+      matches
+    }))
+    .catch((error) => ({
+      success: false,
+      error
     }));
 
-    /*
-     * Hosted matches are requested separately for the signed-in user.
-     * This includes both drafts and published matches.
-     */
+  const hostedResult = await loadHostedGames(currentUser)
+    .then((matches) => ({
+      success: true,
+      matches
+    }))
+    .catch((error) => ({
+      success: false,
+      error
+    }));
 
-    let hostedMatches = [];
+  /* Published games */
 
-    if (currentUser) {
-      const hostedQuery = query(
-        collection(db, "matches"),
-        where("hostUid", "==", currentUser.uid)
-      );
-
-      const hostedSnapshot = await getDocs(hostedQuery);
-
-      hostedMatches = hostedSnapshot.docs.map((item) => ({
-        id: item.id,
-        data: item.data()
-      }));
-    }
-
-    const sortedPublished = sortMatches(publishedMatches);
-    const sortedHosted = sortMatches(hostedMatches);
-
+  if (publishedResult.success) {
     renderList(
       publishedList,
-      sortedPublished,
+      sortMatches(publishedResult.matches),
       false,
       publishedMessage
     );
+  } else {
+    console.error(
+      "Could not load published GradeFlow Games:",
+      publishedResult.error
+    );
 
+    if (publishedList) publishedList.replaceChildren();
+
+    setMessage(
+      publishedMessage,
+      publishedResult.error?.code === "permission-denied"
+        ? "Permission denied while loading published games. Check the matches read rule and query."
+        : "Could not load published games. Check the browser console."
+    );
+  }
+
+  /* Hosted games */
+
+  if (hostedResult.success) {
     renderList(
       hostedList,
-      sortedHosted,
+      sortMatches(hostedResult.matches),
       true,
       hostedMessage
     );
 
-    const hostedCount = $("hostedMatchesCount");
-
-    if (hostedCount) {
-      hostedCount.textContent = String(hostedMatches.length);
-    }
-  } catch (error) {
-    console.error("Could not load GradeFlow Games matches:", error);
-
-    setMessage(
-      publishedMessage,
-      "Could not load published games. Check your connection and Firestore rules."
+    updateHostedCount(hostedResult.matches.length);
+  } else {
+    console.error(
+      "Could not load hosted GradeFlow Games:",
+      hostedResult.error
     );
+
+    if (hostedList) hostedList.replaceChildren();
 
     setMessage(
       hostedMessage,
-      "Could not load your hosted games. Check your connection and Firestore rules."
+      hostedResult.error?.code === "permission-denied"
+        ? "Permission denied while loading your hosted games. Check hostUid and the matches read rule."
+        : "Could not load your hosted games. Check the browser console."
     );
-  } finally {
-    loading = false;
+  }
 
-    if (refreshButton) {
-      refreshButton.disabled = false;
-      refreshButton.textContent = "↻ Refresh";
-    }
+  loading = false;
+
+  if (refreshButton) {
+    refreshButton.disabled = false;
+    refreshButton.textContent = "↻ Refresh";
   }
 }
 
-/* Wait for Firebase authentication before loading matches. */
+/* ==========================================
+   AUTHENTICATION
+========================================== */
 
 auth.onAuthStateChanged((user) => {
   currentUser = user;
   loadHomepageMatches();
 });
 
-/* Refresh both lists. */
+/* ==========================================
+   REFRESH BUTTON
+========================================== */
 
 refreshButton?.addEventListener("click", () => {
   loadHomepageMatches();
