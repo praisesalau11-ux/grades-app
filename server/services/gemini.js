@@ -123,7 +123,10 @@ export async function askGemini({
     prompt,
     attachments = [],
     systemInstruction = "",
-    temperature = 0.7
+    temperature = 0.7,
+    responseMimeType,
+    responseSchema,
+    maxOutputTokens = 4096
 }) {
     if (!API_KEY) {
         throw new Error("GEMINI_API_KEY is not configured.");
@@ -161,10 +164,12 @@ export async function askGemini({
             }
         ],
 
-        generationConfig: {
-            temperature,
-            maxOutputTokens: 4096
-        }
+       generationConfig: {
+    temperature,
+    maxOutputTokens,
+    ...(responseMimeType ? { responseMimeType } : {}),
+    ...(responseSchema ? { responseSchema } : {})
+}
     };
 
     // Send instructions through Gemini's dedicated field.
