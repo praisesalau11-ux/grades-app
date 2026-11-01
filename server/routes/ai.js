@@ -889,6 +889,205 @@ router.post("/generate-questions", async (req, res) => {
 });
 
 // ======================================================
+// GRADEFLOW QUIZ MODE
+// POST /api/ai/quiz
+// Returns validated multiple-choice quiz JSON.
+// ======================================================
+
+router.post("/quiz", async (req, res) => {
+    try {
+        const claims = await authenticateFirebaseRequest(req, res);
+        if (!claims) return;
+
+        const subject = cleanText(req.body?.subject, 100);
+        const difficulty = cleanText(
+            req.body?.difficulty,
+            30
+        ).toLowerCase();
+        const level = cleanText(req.body?.level, 60);
+        const count = Number(req.body?.count);
+
+        if (!subject || !level) {
+            return res.status(400).json({
+                error: "Choose a subject and school level."
+            });
+        }
+
+        if (!Number.isInteger(count) || count < 1 || count > 20) {
+            return res.status(400).json({
+                error: "Question count must be between 1 and 20."
+            });
+        }
+
+        const allowedDifficulties = new Set([
+            "easy",
+            "medium",
+            "hard",
+            "mixed"
+        ]);
+
+        if (!allowedDifficulties.has(difficulty)) {
+            return res.status(400).json({
+                error: "Choose a valid quiz difficulty."
+            });
+        }
+
+        const responseSchema = {
+            type: "OBJECT",
+            properties: {
+                questions: {
+                    type: "ARRAY",
+                    items: {
+                        type: "OBJECT",
+                        properties: {
+                            question: {
+                                type: "STRING"
+                            },
+                            options: {
+                                type: "ARRAY",
+                                items: {
+                                    type: "STRING"
+                                }
+                            },
+                            answerIndex: {
+                                type: "INTEGER",
+                                
+                            },
+                            explanation: {
+                                type: "STRING"
+                            }
+                        },
+                        required: [
+                            "question",
+                            "options",
+                            "answerIndex",
+                            "explanation"
+                        ]
+                    }
+                }
+            },
+            required: ["questions"]
+        };
+
+        const prompt = [
+            "Generate a multiple-choice practice quiz for GradeFlow.",
+            `Subject: ${subject}.`,
+            `Difficulty: ${difficulty}.`,
+            `School level: ${level}.`,
+            `Generate exactly ${count} questions.`,
+            "Each question must have exactly four distinct answer options.",
+            "answerIndex must be 0, 1, 2, or 3 and identify the correct option.",
+            "Give a concise, factually correct explanation.",
+            "Do not repeat questions.",
+            "Use language appropriate for the specified school level.",
+            "Check every question and correct answer before responding."
+        ].join("\n");
+
+        const result = await askGemini({
+            prompt,
+
+            systemInstruction: [
+                "You are GradeFlow Quiz Generator.",
+                "Generate accurate educational multiple-choice questions.",
+                "Follow the supplied response schema exactly.",
+                "Do not add commentary or information outside the JSON structure.",
+                "Never invent an answer when uncertain.",
+                "Ensure each answerIndex points to the correct option."
+            ].join(" "),
+
+            temperature: 0.2,
+            maxOutputTokens: 8192,
+            responseMimeType: "application/json",
+            responseSchema
+        });
+
+        let parsed;
+
+        try {
+            parsed = JSON.parse(result.text);
+        } catch {
+            console.error(
+                "Quiz Mode returned invalid JSON:",
+                result.text.slice(0, 1500)
+            );
+
+            return res.status(502).json({
+                error: "The AI returned invalid quiz data. Please try again."
+            });
+        }
+
+        if (
+            !parsed ||
+            !Array.isArray(parsed.questions) ||
+            parsed.questions.length !== count
+        ) {
+            return res.status(502).json({
+                error: "The AI did not generate the requested number of questions. Please try again."
+            });
+        }
+
+        const questions = parsed.questions.map(question => {
+            if (
+                !question ||
+                typeof question.question !== "string" ||
+                !question.question.trim() ||
+                !Array.isArray(question.options) ||
+                question.options.length !== 4 ||
+                !question.options.every(
+                    option =>
+                        typeof option === "string" &&
+                        option.trim().length > 0
+                ) ||
+                new Set(
+                    question.options.map(option =>
+                        option.trim().toLowerCase()
+                    )
+                ).size !== 4 ||
+                !Number.isInteger(question.answerIndex) ||
+                question.answerIndex < 0 ||
+                question.answerIndex > 3 ||
+                typeof question.explanation !== "string" ||
+                !question.explanation.trim()
+            ) {
+                return null;
+            }
+
+            return {
+                question: question.question.trim(),
+                options: question.options.map(option => option.trim()),
+                answerIndex: question.answerIndex,
+                explanation: question.explanation.trim()
+            };
+        });
+
+        if (questions.some(question => question === null)) {
+            return res.status(502).json({
+                error: "Some generated questions failed validation. Please try again."
+            });
+        }
+
+        return res.json({
+            success: true,
+            questions,
+            count: questions.length
+        });
+
+    } catch (error) {
+        console.error("GradeFlow Quiz Mode error:", error);
+
+        if (error.message?.includes("GEMINI_API_KEY")) {
+            return res.status(503).json({
+                error: "Gemini is not configured on the backend."
+            });
+        }
+
+        return res.status(500).json({
+            error: "Quiz generation failed. Please try again."
+        });
+    }
+});
+
+// ======================================================
 // EXPORT ROUTER
 // ======================================================
 
