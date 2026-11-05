@@ -1,12 +1,10 @@
-
-import { auth, db } from "./firebase.js";
+import { auth, db, storage } from "./firebase.js";
 
 import {
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 import {
-  addDoc,
   collection,
   doc,
   onSnapshot,
@@ -15,6 +13,14 @@ import {
   serverTimestamp,
   updateDoc
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+import {
+  MAX_ATTACHMENT_SIZE,
+  validateSupportFile,
+  sendSupportMessage,
+  renderSupportMessages,
+  formatDate
+} from "./support-messaging.js";
 
 const adminNotice = document.getElementById("adminNotice");
 const adminTicketList = document.getElementById("adminTicketList");
@@ -41,6 +47,14 @@ const adminReplyForm = document.getElementById("adminReplyForm");
 const adminReplyMessage = document.getElementById("adminReplyMessage");
 const adminSendReply = document.getElementById("adminSendReply");
 
+const imageInput = document.getElementById("adminImageAttachment");
+const fileInput = document.getElementById("adminFileAttachment");
+const audioInput = document.getElementById("adminAudioAttachment");
+
+const recordButton = document.getElementById("adminRecordVoice");
+const recordingState = document.getElementById("adminRecordingState");
+const attachmentPreview = document.getElementById("adminAttachmentPreview");
+
 let currentAdmin = null;
 let ticketsCache = [];
 let selectedTicketId = null;
@@ -48,15 +62,15 @@ let selectedTicketId = null;
 let stopTicketsListener = null;
 let stopMessagesListener = null;
 
+let selectedFile = null;
+let mediaRecorder = null;
+let mediaStream = null;
+let recordedChunks = [];
+
 function showNotice(message, type = "success") {
   adminNotice.textContent = message;
   adminNotice.className = `notice ${type}`;
   adminNotice.hidden = false;
-}
-
-function formatDate(timestamp) {
-  if (!timestamp?.toDate) return "Just now";
-  return timestamp.toDate().toLocaleString();
 }
 
 function validStatus(status) {
@@ -69,15 +83,15 @@ function updateStats() {
   totalTickets.textContent = ticketsCache.length;
 
   openTickets.textContent = ticketsCache.filter(
-    (ticket) => validStatus(ticket.status) === "open"
+    ticket => validStatus(ticket.status) === "open"
   ).length;
 
   progressTickets.textContent = ticketsCache.filter(
-    (ticket) => validStatus(ticket.status) === "in-progress"
+    ticket => validStatus(ticket.status) === "in-progress"
   ).length;
 
   resolvedTickets.textContent = ticketsCache.filter(
-    (ticket) => validStatus(ticket.status) === "resolved"
+    ticket => validStatus(ticket.status) === "resolved"
   ).length;
 }
 
@@ -86,20 +100,18 @@ function getFilteredTickets() {
   const status = statusFilter.value;
   const priority = priorityFilter.value;
 
-  return ticketsCache.filter((ticket) => {
+  return ticketsCache.filter(ticket => {
     const matchesSearch =
       !search ||
       (ticket.subject || "").toLowerCase().includes(search) ||
       (ticket.userEmail || "").toLowerCase().includes(search) ||
       (ticket.category || "").toLowerCase().includes(search);
 
-    const matchesStatus =
-      status === "all" || ticket.status === status;
-
-    const matchesPriority =
-      priority === "all" || ticket.priority === priority;
-
-    return matchesSearch && matchesStatus && matchesPriority;
+    return (
+      matchesSearch &&
+      (status === "all" || ticket.status === status) &&
+      (priority === "all" || ticket.priority === priority)
+    );
   });
 }
 
@@ -107,11 +119,14 @@ function renderAdminTickets() {
   updateStats();
 
   const tickets = getFilteredTickets();
+
   adminTicketList.replaceChildren();
 
   if (!tickets.length) {
     const empty = document.createElement("p");
+
     empty.className = "empty-state";
+
     empty.textContent = ticketsCache.length
       ? "No tickets match these filters."
       : "There are no support tickets yet.";
@@ -120,14 +135,12 @@ function renderAdminTickets() {
     return;
   }
 
-  tickets.forEach((ticket) => {
+  tickets.forEach(ticket => {
     const button = document.createElement("button");
-    button.type = "button";
-    button.className = "ticket-card";
 
-    if (ticket.id === selectedTicketId) {
-      button.classList.add("selected");
-    }
+    button.type = "button";
+    button.className =
+      `ticket-card${ticket.id === selectedTicketId ? " selected" : ""}`;
 
     const top = document.createElement("div");
     top.className = "ticket-card-top";
@@ -137,6 +150,7 @@ function renderAdminTickets() {
 
     const status = document.createElement("span");
     const state = validStatus(ticket.status);
+
     status.className = `status status-${state}`;
     status.textContent = state.replace("-", " ");
 
@@ -166,7 +180,7 @@ function renderAdminTickets() {
 }
 
 function listenToAllTickets() {
-  if (stopTicketsListener) stopTicketsListener();
+  stopTicketsListener?.();
 
   const ticketsQuery = query(
     collection(db, "supportTickets"),
@@ -175,8 +189,8 @@ function listenToAllTickets() {
 
   stopTicketsListener = onSnapshot(
     ticketsQuery,
-    (snapshot) => {
-      ticketsCache = snapshot.docs.map((item) => ({
+    snapshot => {
+      ticketsCache = snapshot.docs.map(item => ({
         id: item.id,
         ...item.data()
       }));
@@ -185,7 +199,7 @@ function listenToAllTickets() {
 
       if (selectedTicketId) {
         const selected = ticketsCache.find(
-          (ticket) => ticket.id === selectedTicketId
+          ticket => ticket.id === selectedTicketId
         );
 
         if (selected) {
@@ -196,7 +210,7 @@ function listenToAllTickets() {
         }
       }
     },
-    (error) => {
+    error => {
       console.error("Admin ticket listener error:", error);
 
       showNotice(
@@ -209,14 +223,16 @@ function listenToAllTickets() {
 
 function openAdminConversation(ticketId) {
   const ticket = ticketsCache.find(
-    (item) => item.id === ticketId
+    item => item.id === ticketId
   );
 
   if (!ticket) return;
 
   selectedTicketId = ticketId;
 
-  conversationTitle.textContent = ticket.subject;
+  conversationTitle.textContent =
+    ticket.subject || "Support ticket";
+
   conversationMeta.textContent =
     `${ticket.userEmail || ticket.userId} · ${ticket.category}`;
 
@@ -228,9 +244,7 @@ function openAdminConversation(ticketId) {
 
   renderAdminTickets();
 
-  if (stopMessagesListener) {
-    stopMessagesListener();
-  }
+  stopMessagesListener?.();
 
   messageList.innerHTML =
     '<p class="empty-state">Loading conversation...</p>';
@@ -242,48 +256,22 @@ function openAdminConversation(ticketId) {
 
   stopMessagesListener = onSnapshot(
     messagesQuery,
-    (snapshot) => {
-      messageList.replaceChildren();
-
-      if (snapshot.empty) {
-        const empty = document.createElement("p");
-        empty.className = "empty-state";
-        empty.textContent = "No messages in this conversation.";
-        messageList.appendChild(empty);
-        return;
-      }
-
-      snapshot.docs.forEach((messageDoc) => {
-        const message = messageDoc.data();
-
-        const bubble = document.createElement("div");
-        bubble.className =
-          message.senderRole === "admin"
-            ? "message admin"
-            : "message user";
-
-        const author = document.createElement("span");
-        author.className = "message-author";
-        author.textContent =
-          message.senderRole === "admin"
-            ? "You · GradeFlow Support"
-            : `Student · ${ticket.userEmail || "User"}`;
-
-        const text = document.createElement("p");
-        text.className = "message-text";
-        text.textContent = message.message || "";
-
-        const time = document.createElement("span");
-        time.className = "message-time";
-        time.textContent = formatDate(message.createdAt);
-
-        bubble.append(author, text, time);
-        messageList.appendChild(bubble);
+    snapshot => {
+      renderSupportMessages({
+        snapshot,
+        container: messageList,
+        storage,
+        currentUser: currentAdmin,
+        currentRole: "admin",
+        otherAuthor: `Student · ${ticket.userEmail || "User"}`,
+        db,
+        ticketId,
+        onNotice: (message, type) => {
+          showNotice(message, type || "success");
+        }
       });
-
-      messageList.scrollTop = messageList.scrollHeight;
     },
-    (error) => {
+    error => {
       console.error("Admin message listener error:", error);
       showNotice("Could not load this conversation.", "error");
     }
@@ -295,27 +283,165 @@ function openAdminConversation(ticketId) {
   });
 }
 
-function closeAdminConversation() {
-  selectedTicketId = null;
+function clearSelectedAttachment() {
+  selectedFile = null;
 
-  if (stopMessagesListener) {
-    stopMessagesListener();
-    stopMessagesListener = null;
-  }
+  [imageInput, fileInput, audioInput].forEach(input => {
+    input.value = "";
+  });
 
-  conversationTitle.textContent = "Select a ticket";
-  conversationMeta.textContent = "Choose a ticket to view its conversation.";
-
-  ticketControls.hidden = true;
-  adminReplyForm.hidden = true;
-
-  messageList.innerHTML =
-    '<p class="empty-state">Select a ticket to view its messages.</p>';
-
-  renderAdminTickets();
+  attachmentPreview.hidden = true;
+  attachmentPreview.replaceChildren();
 }
 
-// Filters.
+function setSelectedAttachment(file) {
+  const problem = validateSupportFile(file);
+
+  if (problem) {
+    showNotice(problem, "error");
+    clearSelectedAttachment();
+    return;
+  }
+
+  selectedFile = file;
+  attachmentPreview.replaceChildren();
+
+  const label = document.createElement("span");
+
+  label.textContent =
+    `${file.name || "Voice recording"} · ${(file.size / 1024 / 1024).toFixed(2)} MB`;
+
+  const remove = document.createElement("button");
+
+  remove.type = "button";
+  remove.textContent = "Remove";
+
+  remove.addEventListener("click", clearSelectedAttachment);
+
+  attachmentPreview.append(label, remove);
+  attachmentPreview.hidden = false;
+}
+
+imageInput.addEventListener("change", () => {
+  fileInput.value = audioInput.value = "";
+
+  if (imageInput.files[0]) {
+    setSelectedAttachment(imageInput.files[0]);
+  }
+});
+
+fileInput.addEventListener("change", () => {
+  imageInput.value = audioInput.value = "";
+
+  if (fileInput.files[0]) {
+    setSelectedAttachment(fileInput.files[0]);
+  }
+});
+
+audioInput.addEventListener("change", () => {
+  imageInput.value = fileInput.value = "";
+
+  if (audioInput.files[0]) {
+    setSelectedAttachment(audioInput.files[0]);
+  }
+});
+
+async function startVoiceRecording() {
+  if (
+    !navigator.mediaDevices?.getUserMedia ||
+    !window.MediaRecorder
+  ) {
+    showNotice(
+      "Voice recording is not supported by this browser. Try a current browser over HTTPS.",
+      "error"
+    );
+    return;
+  }
+
+  try {
+    mediaStream = await navigator.mediaDevices.getUserMedia({
+      audio: true
+    });
+
+    const preferred =
+      MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
+        ? "audio/webm;codecs=opus"
+        : "";
+
+    mediaRecorder = new MediaRecorder(
+      mediaStream,
+      preferred ? { mimeType: preferred } : undefined
+    );
+
+    recordedChunks = [];
+
+    mediaRecorder.addEventListener("dataavailable", event => {
+      if (event.data.size) {
+        recordedChunks.push(event.data);
+      }
+    });
+
+    mediaRecorder.addEventListener("stop", () => {
+      const rawType = mediaRecorder.mimeType || "audio/webm";
+      const type = rawType.split(";")[0].toLowerCase();
+
+      const blob = new Blob(recordedChunks, { type });
+
+      const extension = type.includes("mp4")
+        ? "m4a"
+        : type.includes("ogg")
+          ? "ogg"
+          : "webm";
+
+      const file = new File(
+        [blob],
+        `voice-message-${Date.now()}.${extension}`,
+        { type }
+      );
+
+      mediaStream?.getTracks().forEach(track => track.stop());
+      mediaStream = null;
+
+      recordButton.textContent = "Record voice";
+      recordingState.textContent = "";
+
+      if (file.size > MAX_ATTACHMENT_SIZE) {
+        showNotice(
+          "Recording exceeded 10 MB. Record a shorter message.",
+          "error"
+        );
+      } else {
+        setSelectedAttachment(file);
+      }
+    });
+
+    mediaRecorder.start();
+
+    recordButton.textContent = "Stop recording";
+    recordingState.textContent = "Recording…";
+
+  } catch (error) {
+    console.error("Voice recording error:", error);
+
+    mediaStream?.getTracks().forEach(track => track.stop());
+    mediaStream = null;
+
+    showNotice(
+      "Microphone access failed. Allow microphone permission and try again.",
+      "error"
+    );
+  }
+}
+
+recordButton.addEventListener("click", () => {
+  if (mediaRecorder?.state === "recording") {
+    mediaRecorder.stop();
+  } else {
+    startVoiceRecording();
+  }
+});
+
+// Ticket filters.
 adminSearch.addEventListener("input", renderAdminTickets);
 statusFilter.addEventListener("change", renderAdminTickets);
 priorityFilter.addEventListener("change", renderAdminTickets);
@@ -325,7 +451,7 @@ saveTicketChanges.addEventListener("click", async () => {
   if (!currentAdmin || !selectedTicketId) return;
 
   saveTicketChanges.disabled = true;
-  saveTicketChanges.textContent = "Saving...";
+  saveTicketChanges.textContent = "Saving…";
 
   try {
     await updateDoc(
@@ -342,6 +468,7 @@ saveTicketChanges.addEventListener("click", async () => {
   } catch (error) {
     console.error("Ticket update failed:", error);
     showNotice("Could not update this ticket.", "error");
+
   } finally {
     saveTicketChanges.disabled = false;
     saveTicketChanges.textContent = "Save changes";
@@ -349,50 +476,80 @@ saveTicketChanges.addEventListener("click", async () => {
 });
 
 // Send an admin reply.
-adminReplyForm.addEventListener("submit", async (event) => {
+adminReplyForm.addEventListener("submit", async event => {
   event.preventDefault();
 
   const message = adminReplyMessage.value.trim();
 
-  if (!currentAdmin || !selectedTicketId || !message) return;
+  if (
+    !currentAdmin ||
+    !selectedTicketId ||
+    (!message && !selectedFile)
+  ) {
+    showNotice(
+      "Write a reply or attach a file first.",
+      "error"
+    );
+    return;
+  }
 
   adminSendReply.disabled = true;
-  adminSendReply.textContent = "Sending...";
+  adminSendReply.textContent = "Sending…";
 
   try {
-    await addDoc(
-      collection(db, "supportTickets", selectedTicketId, "messages"),
-      {
-        senderId: currentAdmin.uid,
-        senderRole: "admin",
-        message,
-        createdAt: serverTimestamp()
-      }
-    );
-
-    await updateDoc(
-      doc(db, "supportTickets", selectedTicketId),
-      {
-        updatedAt: serverTimestamp()
-      }
-    );
+    await sendSupportMessage({
+      db,
+      storage,
+      ticketId: selectedTicketId,
+      user: currentAdmin,
+      role: "admin",
+      message,
+      file: selectedFile
+    });
 
     adminReplyMessage.value = "";
+    clearSelectedAttachment();
+
+    showNotice("Reply sent to the student.");
 
   } catch (error) {
     console.error("Admin reply failed:", error);
+
     showNotice(
+      error.message ||
       "Could not send the reply. Check your admin permissions.",
       "error"
     );
+
   } finally {
     adminSendReply.disabled = false;
     adminSendReply.textContent = "Send reply";
   }
 });
 
-// Authentication and admin verification.
-onAuthStateChanged(auth, async (user) => {
+function closeAdminConversation() {
+  selectedTicketId = null;
+
+  stopMessagesListener?.();
+  stopMessagesListener = null;
+
+  conversationTitle.textContent = "Select a ticket";
+
+  conversationMeta.textContent =
+    "Choose a ticket to view its conversation.";
+
+  ticketControls.hidden = true;
+  adminReplyForm.hidden = true;
+
+  messageList.innerHTML =
+    '<p class="empty-state">Select a ticket to view its messages.</p>';
+
+  clearSelectedAttachment();
+  renderAdminTickets();
+}
+
+// Admin authentication and verification.
+onAuthStateChanged(auth, async user => {
   currentAdmin = null;
 
   if (!user) {
@@ -403,7 +560,7 @@ onAuthStateChanged(auth, async (user) => {
   try {
     const token = await user.getIdToken(true);
 
-    const adminResponse = await fetch(
+    const response = await fetch(
       `https://firestore.googleapis.com/v1/projects/grades-calculator-72499/databases/(default)/documents/admins/${encodeURIComponent(user.uid)}`,
       {
         headers: {
@@ -412,25 +569,29 @@ onAuthStateChanged(auth, async (user) => {
       }
     );
 
-    if (!adminResponse.ok) {
-      if (adminResponse.status === 404 || adminResponse.status === 403) {
+    if (!response.ok) {
+      if (response.status === 404 || response.status === 403) {
         document.querySelector(".admin-layout").innerHTML =
           "<section class='support-panel'><h2>Access denied</h2><p>Your account is not authorised to manage GradeFlow support tickets.</p><a href='../dashboard.html'>Return to dashboard</a></section>";
+
         return;
       }
 
-      throw new Error(`Admin verification failed: ${adminResponse.status}`);
+      throw new Error(
+        `Admin verification failed: ${response.status}`
+      );
     }
 
-    const adminDocument = await adminResponse.json();
-
+    const adminDocument = await response.json();
     const fields = adminDocument.fields || {};
-    const role = fields.role?.stringValue;
-    const active = fields.active?.booleanValue;
 
-    if (role !== "admin" || active !== true) {
+    if (
+      fields.role?.stringValue !== "admin" ||
+      fields.active?.booleanValue !== true
+    ) {
       document.querySelector(".admin-layout").innerHTML =
         "<section class='support-panel'><h2>Access denied</h2><p>Your account is not authorised to manage GradeFlow support tickets.</p><a href='../dashboard.html'>Return to dashboard</a></section>";
+
       return;
     }
 
@@ -450,4 +611,6 @@ onAuthStateChanged(auth, async (user) => {
 window.addEventListener("beforeunload", () => {
   stopTicketsListener?.();
   stopMessagesListener?.();
+
+  mediaStream?.getTracks().forEach(track => track.stop());
 });

@@ -5,7 +5,7 @@ import {
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-const AI_API_URL = "https://grades-app-6qgy.onrender.com/api/ai/chat";
+const AI_API_URL = "https://grades-app-6qgy.onrender.com/api/ai/quiz";
 const $ = (id) => document.getElementById(id);
 
 const setupPanel = $("setupPanel");
@@ -50,6 +50,7 @@ $("retryBtn").addEventListener("click", () => {
 
 quizForm.addEventListener("submit", submitQuiz);
 
+
 async function startQuiz() {
   if (!currentUser) {
     setStatus("Sign in to GradeFlow before generating a quiz.", true);
@@ -57,11 +58,22 @@ async function startQuiz() {
   }
 
   quizSettings = {
-    subject: $("subject").value,
+    subject: $("subject").value.trim(),
     difficulty: $("difficulty").value,
     count: Number($("questionCount").value),
-    level: $("level").value
+    level: $("level").value.trim()
   };
+
+  if (
+    !quizSettings.subject ||
+    !quizSettings.level ||
+    !Number.isInteger(quizSettings.count) ||
+    quizSettings.count < 1 ||
+    quizSettings.count > 20
+  ) {
+    setStatus("Please select a valid subject, school level, and question count.", true);
+    return;
+  }
 
   startBtn.disabled = true;
   startBtn.textContent = "Generating quiz...";
@@ -76,15 +88,7 @@ async function startQuiz() {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
       },
-      body: JSON.stringify({
-        message: buildQuizPrompt(quizSettings),
-        history: [],
-        academicContext: {
-          history: [],
-          goals: []
-        },
-        attachments: []
-      })
+      body: JSON.stringify(quizSettings)
     });
 
     const data = await response.json().catch(() => ({}));
@@ -95,19 +99,50 @@ async function startQuiz() {
       );
     }
 
-    if (typeof data.reply !== "string" || !data.reply.trim()) {
-      throw new Error("The AI returned an empty response. Please try again.");
-    }
-
-    quizQuestions = parseQuestions(data.reply);
-
-    if (quizQuestions.length < quizSettings.count) {
+    if (
+      data.success !== true ||
+      !Array.isArray(data.questions) ||
+      data.questions.length !== quizSettings.count
+    ) {
       throw new Error(
-        "The AI returned too few valid questions. Please generate the quiz again."
+        data.error ||
+        "The server returned an incomplete quiz. Please try again."
       );
     }
 
-    quizQuestions = quizQuestions.slice(0, quizSettings.count);
+    // Validate the server response before displaying questions.
+    const validQuestions = data.questions.every((question) => {
+      return (
+        question &&
+        typeof question.question === "string" &&
+        question.question.trim().length > 0 &&
+        Array.isArray(question.options) &&
+        question.options.length === 4 &&
+        question.options.every(
+          (option) =>
+            typeof option === "string" &&
+            option.trim().length > 0
+        ) &&
+        new Set(
+          question.options.map((option) =>
+            option.trim().toLowerCase()
+          )
+        ).size === 4 &&
+        Number.isInteger(question.answerIndex) &&
+        question.answerIndex >= 0 &&
+        question.answerIndex <= 3 &&
+        typeof question.explanation === "string" &&
+        question.explanation.trim().length > 0
+      );
+    });
+
+    if (!validQuestions) {
+      throw new Error(
+        "Some questions returned by the AI are invalid. Please generate the quiz again."
+      );
+    }
+
+    quizQuestions = data.questions;
 
     renderQuiz();
 
@@ -115,18 +150,27 @@ async function startQuiz() {
     resultsPanel.hidden = true;
     quizPanel.hidden = false;
 
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    setStatus("");
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+
   } catch (error) {
     console.error("GradeFlow Quiz Mode error:", error);
+
     setStatus(
       error.message || "Could not generate the quiz. Please try again.",
       true
     );
+
   } finally {
     startBtn.disabled = !currentUser;
     startBtn.textContent = "Generate quiz";
   }
 }
+
 
 function buildQuizPrompt(settings) {
   return [
