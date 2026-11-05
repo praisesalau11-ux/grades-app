@@ -1,0 +1,87 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#111210">
+  <title>AI Study Studio | GradeFlow</title>
+  <link rel="stylesheet" href="../css/study-studio.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <main class="studio">
+    <header class="topbar">
+      <a class="brand" href="../dashboard.html">
+        <span class="brand-mark">G</span>
+        <span>Grade<span class="gold">Flow</span></span>
+      </a>
+      <a class="back-link" href="../dashboard.html">← Dashboard</a>
+    </header>
+
+    <section class="hero">
+      <p class="eyebrow">GRADEFlow LEARNING TOOLS</p>
+      <h1>AI Study Studio<span>.</span></h1>
+      <p>Upload your study materials. Organize your documents and prepare for smarter learning.</p>
+    </section>
+
+    <section class="upload-panel">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">YOUR LIBRARY</p>
+          <h2>Upload study material</h2>
+        </div>
+        <span class="file-limit">PDF · MAX 5 MB</span>
+      </div>
+
+      <label class="upload-zone" for="pdfInput" id="uploadZone">
+        <span class="upload-icon">↑</span>
+        <strong>Choose a PDF document</strong>
+        <span>Click to browse your device</span>
+        <span class="file-types">PDF files only · Maximum size 5 MB</span>
+      </label>
+
+      <input id="pdfInput" type="file" accept="application/pdf,.pdf" hidden>
+
+      <div class="selected-file" id="selectedFile" hidden>
+        <div>
+          <strong id="selectedFileName"></strong>
+          <small id="selectedFileSize"></small>
+        </div>
+        <button type="button" class="text-button" id="removeFile">Remove</button>
+      </div>
+
+      <div class="upload-actions">
+        <button class="primary-button" id="uploadButton" type="button" disabled>
+          Upload PDF
+        </button>
+        <span id="uploadStatus" role="status" aria-live="polite"></span>
+      </div>
+    </section>
+
+    <section class="library-section">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">SAVED DOCUMENTS</p>
+          <h2>My study materials</h2>
+        </div>
+        <button class="refresh-button" id="refreshButton" type="button">↻ Refresh</button>
+      </div>
+
+      <div id="libraryStatus" class="library-status" role="status">
+        Loading your documents...
+      </div>
+
+      <div class="document-grid" id="documentGrid"></div>
+    </section>
+
+    <footer>
+      GradeFlow · Your academic progress, clearly organized.
+    </footer>
+  </main>
+
+  <script type="module" src="../js/study-studio.js"></script>
+</body>
+</html>

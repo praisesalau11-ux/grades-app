@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,17 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#171713">
   <title>My Support Tickets | GradeFlow</title>
-
   <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/support.css">
 </head>
 <body>
-
   <header class="support-header">
-    <a href="../dashboard.html" class="support-brand">
-      <span class="brand-mark">G</span>
-      GradeFlow
-    </a>
+    <a href="../dashboard.html" class="support-brand"><span class="brand-mark">G</span>GradeFlow</a>
     <a href="help.html" class="back-link">Help Centre</a>
   </header>
 
@@ -31,24 +25,10 @@
 
     <section class="support-columns">
       <div class="support-panel">
-        <div class="panel-heading">
-          <div>
-            <span class="eyebrow">NEW REQUEST</span>
-            <h2>Create a ticket</h2>
-          </div>
-        </div>
-
+        <div class="panel-heading"><div><span class="eyebrow">NEW REQUEST</span><h2>Create a ticket</h2></div></div>
         <form id="ticketForm">
           <label for="ticketSubject">Subject</label>
-          <input
-            id="ticketSubject"
-            name="subject"
-            type="text"
-            maxlength="120"
-            placeholder="Briefly describe your issue"
-            required
-          >
-
+          <input id="ticketSubject" name="subject" type="text" maxlength="120" placeholder="Briefly describe your issue" required>
           <label for="ticketCategory">Category</label>
           <select id="ticketCategory" name="category" required>
             <option value="">Choose a category</option>
@@ -59,81 +39,49 @@
             <option value="Payments">Payments</option>
             <option value="Other">Other</option>
           </select>
-
           <label for="ticketPriority">Priority</label>
           <select id="ticketPriority" name="priority" required>
-            <option value="normal">Normal</option>
-            <option value="low">Low</option>
-            <option value="high">High</option>
+            <option value="normal">Normal</option><option value="low">Low</option><option value="high">High</option>
           </select>
-
           <label for="ticketDescription">Describe the problem</label>
-          <textarea
-            id="ticketDescription"
-            name="description"
-            rows="6"
-            maxlength="4000"
-            placeholder="Explain what happened and what you expected..."
-            required
-          ></textarea>
-
-          <button id="submitTicket" class="primary-button" type="submit">
-            Submit support ticket
-          </button>
+          <textarea id="ticketDescription" name="description" rows="6" maxlength="3000" placeholder="Explain what happened and what you expected..." required></textarea>
+          <button id="submitTicket" class="primary-button" type="submit">Submit support ticket</button>
         </form>
       </div>
 
       <div class="support-panel tickets-panel">
-        <div class="panel-heading">
-          <div>
-            <span class="eyebrow">YOUR REQUESTS</span>
-            <h2>My tickets</h2>
-          </div>
-          <span id="ticketCount" class="count-pill">0</span>
-        </div>
-
-        <div id="ticketList" class="ticket-list">
-          <p class="empty-state">Loading your tickets...</p>
-        </div>
+        <div class="panel-heading"><div><span class="eyebrow">YOUR REQUESTS</span><h2>My tickets</h2></div><span id="ticketCount" class="count-pill">0</span></div>
+        <div id="ticketList" class="ticket-list"><p class="empty-state">Loading your tickets...</p></div>
       </div>
     </section>
 
     <section id="conversationPanel" class="support-panel conversation-panel" hidden>
       <div class="conversation-heading">
-        <div>
-          <span class="eyebrow">SUPPORT CONVERSATION</span>
-          <h2 id="conversationTitle">Ticket conversation</h2>
-          <p id="conversationMeta"></p>
-        </div>
-        <button id="closeConversation" class="secondary-button" type="button">
-          Close
-        </button>
+        <div><span class="eyebrow">SUPPORT CONVERSATION</span><h2 id="conversationTitle">Ticket conversation</h2><p id="conversationMeta"></p></div>
+        <button id="closeConversation" class="secondary-button" type="button">Close</button>
       </div>
-
-      <div id="messageList" class="message-list" aria-live="polite">
-        <p class="empty-state">Loading conversation...</p>
-      </div>
-
+      <div id="messageList" class="message-list" aria-live="polite"><p class="empty-state">Loading conversation...</p></div>
       <form id="replyForm" class="reply-form">
-        <textarea
-          id="replyMessage"
-          rows="2"
-          maxlength="3000"
-          placeholder="Write your reply..."
-          required
-        ></textarea>
-        <button id="sendReply" class="primary-button" type="submit">
-          Send reply
-        </button>
+        <div class="composer-main">
+          <textarea id="replyMessage" rows="2" maxlength="3000" placeholder="Write your reply..."></textarea>
+          <div class="composer-tools">
+            <label class="tool-button" for="imageAttachment">Add image</label>
+            <input id="imageAttachment" class="hidden-file" type="file" accept="image/jpeg,image/png,image/webp">
+            <label class="tool-button" for="fileAttachment">Attach file</label>
+            <input id="fileAttachment" class="hidden-file" type="file" accept=".pdf,.txt,.csv,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip">
+            <label class="tool-button" for="audioAttachment">Add audio</label>
+            <input id="audioAttachment" class="hidden-file" type="file" accept="audio/*">
+            <button id="recordVoice" class="tool-button" type="button">Record voice</button>
+            <span id="recordingState" class="recording-state" aria-live="polite"></span>
+          </div>
+          <div id="attachmentPreview" class="attachment-preview" hidden></div>
+        </div>
+        <button id="sendReply" class="primary-button" type="submit">Send reply</button>
       </form>
     </section>
   </main>
 
-  <footer class="support-footer">
-    <a href="../dashboard.html">GradeFlow</a>
-    <span>Support for your academic journey.</span>
-  </footer>
-
+  <footer class="support-footer"><a href="../dashboard.html">GradeFlow</a><span>Support for your academic journey.</span></footer>
   <script type="module" src="../js/support.js"></script>
 </body>
 </html>

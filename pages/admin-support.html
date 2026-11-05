@@ -1,16 +1,17 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#171713">
+
   <title>Support Administration | GradeFlow</title>
 
   <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/support.css">
   <link rel="stylesheet" href="../css/admin-support.css">
 </head>
+
 <body>
 
   <header class="support-header">
@@ -18,10 +19,12 @@
       <span class="brand-mark">G</span>
       GradeFlow Admin
     </a>
+
     <a href="../dashboard.html" class="back-link">Dashboard</a>
   </header>
 
   <main class="admin-layout">
+
     <section class="support-intro">
       <span class="eyebrow">ADMINISTRATION</span>
       <h1>Support management</h1>
@@ -35,14 +38,17 @@
         <span>Total tickets</span>
         <strong id="totalTickets">0</strong>
       </div>
+
       <div class="stat-card">
         <span>Open</span>
         <strong id="openTickets">0</strong>
       </div>
+
       <div class="stat-card">
         <span>In progress</span>
         <strong id="progressTickets">0</strong>
       </div>
+
       <div class="stat-card">
         <span>Resolved</span>
         <strong id="resolvedTickets">0</strong>
@@ -50,7 +56,9 @@
     </section>
 
     <section class="admin-workspace">
+
       <div class="support-panel admin-ticket-panel">
+
         <div class="panel-heading">
           <div>
             <span class="eyebrow">INCOMING REQUESTS</span>
@@ -66,6 +74,7 @@
         >
 
         <div class="filter-row">
+
           <select id="statusFilter" aria-label="Filter by status">
             <option value="all">All statuses</option>
             <option value="open">Open</option>
@@ -79,25 +88,32 @@
             <option value="normal">Normal</option>
             <option value="high">High</option>
           </select>
+
         </div>
 
         <div id="adminTicketList" class="ticket-list">
           <p class="empty-state">Loading tickets...</p>
         </div>
+
       </div>
 
       <div class="support-panel admin-conversation-panel">
+
         <div class="conversation-heading">
           <div>
             <span class="eyebrow">TICKET DETAILS</span>
             <h2 id="adminConversationTitle">Select a ticket</h2>
-            <p id="adminConversationMeta">Choose a ticket to view its conversation.</p>
+            <p id="adminConversationMeta">
+              Choose a ticket to view its conversation.
+            </p>
           </div>
         </div>
 
         <div id="ticketControls" class="ticket-controls" hidden>
+
           <div>
             <label for="adminStatus">Status</label>
+
             <select id="adminStatus">
               <option value="open">Open</option>
               <option value="in-progress">In progress</option>
@@ -107,6 +123,7 @@
 
           <div>
             <label for="adminPriority">Priority</label>
+
             <select id="adminPriority">
               <option value="low">Low</option>
               <option value="normal">Normal</option>
@@ -114,31 +131,109 @@
             </select>
           </div>
 
-          <button id="saveTicketChanges" class="primary-button" type="button">
+          <button
+            id="saveTicketChanges"
+            class="primary-button"
+            type="button"
+          >
             Save changes
           </button>
+
         </div>
 
         <div id="adminMessageList" class="message-list">
-          <p class="empty-state">Select a ticket to view its messages.</p>
+          <p class="empty-state">
+            Select a ticket to view its messages.
+          </p>
         </div>
 
         <form id="adminReplyForm" class="reply-form" hidden>
-          <textarea
-            id="adminReplyMessage"
-            rows="2"
-            maxlength="3000"
-            placeholder="Reply to the student..."
-            required
-          ></textarea>
-          <button id="adminSendReply" class="primary-button" type="submit">
+
+          <div class="composer-main">
+
+            <textarea
+              id="adminReplyMessage"
+              rows="2"
+              maxlength="3000"
+              placeholder="Reply to the student..."
+            ></textarea>
+
+            <div class="composer-tools">
+
+              <label class="tool-button" for="adminImageAttachment">
+                Add image
+              </label>
+
+              <input
+                id="adminImageAttachment"
+                class="hidden-file"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+              >
+
+              <label class="tool-button" for="adminFileAttachment">
+                Attach file
+              </label>
+
+              <input
+                id="adminFileAttachment"
+                class="hidden-file"
+                type="file"
+                accept=".pdf,.txt,.csv,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip"
+              >
+
+              <label class="tool-button" for="adminAudioAttachment">
+                Add audio
+              </label>
+
+              <input
+                id="adminAudioAttachment"
+                class="hidden-file"
+                type="file"
+                accept="audio/*"
+              >
+
+              <button
+                id="adminRecordVoice"
+                class="tool-button"
+                type="button"
+              >
+                Record voice
+              </button>
+
+              <span
+                id="adminRecordingState"
+                class="recording-state"
+                aria-live="polite"
+              ></span>
+
+            </div>
+
+            <div
+              id="adminAttachmentPreview"
+              class="attachment-preview"
+              hidden
+            ></div>
+
+          </div>
+
+          <button
+            id="adminSendReply"
+            class="primary-button"
+            type="submit"
+          >
             Send reply
           </button>
+
         </form>
+
       </div>
+
     </section>
+
   </main>
 
   <script type="module" src="../js/admin-support.js"></script>
+
 </body>
 </html>
