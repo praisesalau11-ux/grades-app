@@ -17,7 +17,7 @@ import rateLimit from "express-rate-limit";
 
 import authRoutes from "./routes/auth.js";
 import aiRoutes from "./routes/ai.js";
-
+import studyStudioRoutes from "./routes/study-studio.js";
 
 /* ==========================================
    APP
@@ -242,6 +242,14 @@ app.use(
     aiRoutes
 );
 
+/* ==========================================
+   STUDY STUDIO ROUTES
+========================================== */
+
+app.use(
+    "/api/study-studio",
+    studyStudioRoutes
+);
 
 /* ==========================================
    404 HANDLER
