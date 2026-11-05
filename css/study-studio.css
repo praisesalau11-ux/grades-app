@@ -1,0 +1,387 @@
+
+:root {
+  --bg: #111210;
+  --surface: #191a17;
+  --raised: #20211d;
+  --border: #30312b;
+  --text: #f4f2eb;
+  --soft: #c1c0b7;
+  --muted: #92938a;
+  --gold: #d5b16b;
+  --gold-light: #e6c989;
+  --danger: #df8f86;
+  --success: #87bd98;
+  --radius: 16px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "DM Sans", sans-serif;
+  line-height: 1.6;
+}
+
+button, input {
+  font: inherit;
+}
+
+button, a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button:focus-visible, a:focus-visible, input:focus-visible {
+  outline: 2px solid var(--gold-light);
+  outline-offset: 3px;
+}
+
+.studio {
+  width: min(1100px, calc(100% - 40px));
+  margin: auto;
+}
+
+.topbar {
+  height: 76px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: Manrope, sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.brand-mark {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: 11px;
+  background: var(--gold);
+  color: #171714;
+}
+
+.gold, .hero h1 span {
+  color: var(--gold);
+}
+
+.back-link, .refresh-button {
+  color: var(--soft);
+  font-size: 12px;
+}
+
+.back-link:hover, .refresh-button:hover {
+  color: var(--gold-light);
+}
+
+.hero {
+  padding: 65px 0 38px;
+}
+
+.eyebrow {
+  margin: 0 0 9px;
+  color: var(--gold);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.hero h1 {
+  margin: 0;
+  font-family: Manrope, sans-serif;
+  font-size: clamp(32px, 6vw, 55px);
+  letter-spacing: -2px;
+  line-height: 1.15;
+}
+
+.hero > p:last-child {
+  max-width: 550px;
+  margin-top: 14px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.upload-panel, .library-section {
+  margin-bottom: 25px;
+  padding: 25px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.section-heading h2 {
+  margin: 0;
+  font-family: Manrope, sans-serif;
+  font-size: 19px;
+}
+
+.file-limit {
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.upload-zone {
+  display: flex;
+  min-height: 210px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 25px;
+  border: 1px dashed #56503f;
+  border-radius: 13px;
+  background: rgba(213, 177, 107, .035);
+  text-align: center;
+  cursor: pointer;
+  transition: background .2s, border-color .2s;
+}
+
+.upload-zone:hover, .upload-zone.dragover {
+  border-color: var(--gold);
+  background: rgba(213, 177, 107, .09);
+}
+
+.upload-icon {
+  display: grid;
+  width: 46px;
+  height: 46px;
+  place-items: center;
+  margin-bottom: 5px;
+  border: 1px solid rgba(213, 177, 107, .25);
+  border-radius: 14px;
+  background: rgba(213, 177, 107, .1);
+  color: var(--gold);
+  font-size: 25px;
+}
+
+.upload-zone strong {
+  font-size: 13px;
+}
+
+.upload-zone > span:not(.upload-icon) {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.file-types {
+  margin-top: 5px;
+}
+
+.selected-file {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 15px;
+  padding: 13px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--raised);
+}
+
+.selected-file > div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.selected-file strong {
+  overflow-wrap: anywhere;
+  font-size: 12px;
+}
+
+.selected-file small {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.text-button {
+  flex: 0 0 auto;
+  border: 0;
+  background: transparent;
+  color: var(--danger);
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.upload-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 13px;
+  margin-top: 18px;
+}
+
+.primary-button {
+  min-height: 43px;
+  padding: 0 20px;
+  border: 1px solid var(--gold);
+  border-radius: 10px;
+  background: var(--gold);
+  color: #171714;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.primary-button:hover:not(:disabled) {
+  background: var(--gold-light);
+}
+
+.primary-button:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+#uploadStatus, .library-status {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.library-status {
+  padding: 15px 0;
+}
+
+.document-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 13px;
+}
+
+.document-card {
+  min-width: 0;
+  padding: 17px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--raised);
+}
+
+.document-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.pdf-icon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  place-items: center;
+  border-radius: 10px;
+  background: rgba(213, 177, 107, .1);
+  color: var(--gold);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.document-info {
+  min-width: 0;
+  flex: 1;
+}
+
+.document-info strong {
+  display: block;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+}
+
+.document-info small {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.document-actions {
+  display: flex;
+  gap: 15px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.document-actions button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--gold-light);
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.document-actions .delete-button {
+  color: var(--danger);
+}
+
+.empty-state {
+  grid-column: 1 / -1;
+  padding: 30px 15px;
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+}
+
+footer {
+  padding: 20px 0 35px;
+  color: var(--muted);
+  font-size: 10px;
+  text-align: center;
+}
+
+@media (max-width: 650px) {
+  .studio {
+    width: min(100% - 26px, 1100px);
+  }
+
+  .hero {
+    padding: 43px 0 25px;
+  }
+
+  .upload-panel, .library-section {
+    padding: 17px;
+  }
+
+  .section-heading h2 {
+    font-size: 16px;
+  }
+
+  .document-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .file-limit {
+    font-size: 9px;
+  }
+}

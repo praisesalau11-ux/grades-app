@@ -1,4 +1,3 @@
-
 .admin-layout {
   width: min(1450px, calc(100% - 36px));
   margin: 45px auto 75px;
@@ -130,4 +129,34 @@
   .ticket-controls button {
     grid-column: 1 / -1;
   }
+}
+
+/* Support attachment image frame */
+
+.message-image-frame {
+  width: 100%;
+  max-width: 420px;
+  aspect-ratio: 4 / 3;
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  background: rgba(128, 128, 128, 0.08);
+}
+
+/* Actual image */
+
+.message-image-frame .message-attachment.image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: inherit;
+}
+
+/* Attachment holder */
+
+.message-attachment-holder {
+  width: 100%;
+  max-width: 420px;
+  margin-top: 8px;
 }
