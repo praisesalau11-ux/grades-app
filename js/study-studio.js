@@ -82,17 +82,13 @@ let answeredQuestions = [];
 let currentQuestion = null;
 let currentScore = 0;
 
-let currentQuestionIndex = 0;
-
 
 /* ==========================================
    HELPERS
 ========================================== */
 
 function formatBytes(bytes) {
-  if (bytes < 1024) {
-    return `${bytes} B`;
-  }
+  if (bytes < 1024) return `${bytes} B`;
 
   if (bytes < 1024 * 1024) {
     return `${(bytes / 1024).toFixed(1)} KB`;
@@ -103,9 +99,7 @@ function formatBytes(bytes) {
 
 
 function formatDate(timestamp) {
-  if (!timestamp?.toDate) {
-    return "Recently added";
-  }
+  if (!timestamp?.toDate) return "Recently added";
 
   return timestamp.toDate().toLocaleDateString(undefined, {
     day: "numeric",
@@ -135,7 +129,6 @@ function setQuestionStatus(message, isError = false) {
 
 function clearSelectedFile() {
   selectedFile = null;
-
   pdfInput.value = "";
 
   selectedFileBox.hidden = true;
@@ -229,9 +222,7 @@ uploadZone.addEventListener("drop", event => {
 
   const file = event.dataTransfer.files?.[0];
 
-  if (file) {
-    selectFile(file);
-  }
+  if (file) selectFile(file);
 });
 
 
@@ -245,9 +236,7 @@ async function uploadPdf() {
     return;
   }
 
-  if (!selectedFile || isUploading) {
-    return;
-  }
+  if (!selectedFile || isUploading) return;
 
   isUploading = true;
   uploadButton.disabled = true;
@@ -273,7 +262,6 @@ async function uploadPdf() {
 
     await uploadBytes(storageReference, selectedFile, {
       contentType: "application/pdf",
-
       customMetadata: {
         ownerUid: uid,
         documentId
@@ -318,10 +306,7 @@ async function uploadPdf() {
     }
 
     setStatus(
-      error.code === "storage/unauthorized" ||
-      error.code === "permission-denied"
-        ? "Permission denied. Check Firebase Storage and Firestore rules."
-        : error.message || "Upload failed. Try again.",
+      error.message || "Upload failed. Try again.",
       true
     );
 
@@ -369,7 +354,6 @@ async function loadMaterials() {
         "No study materials yet. Upload your first PDF above.";
 
       documentGrid.appendChild(empty);
-
       return;
     }
 
@@ -407,7 +391,7 @@ async function loadMaterials() {
       actions.className = "document-actions";
 
 
-      /* OPEN PDF */
+      // OPEN PDF
 
       const openButton = document.createElement("button");
 
@@ -439,7 +423,7 @@ async function loadMaterials() {
       });
 
 
-      /* GENERATE QUESTIONS */
+      // GENERATE QUESTIONS
 
       const generateButton = document.createElement("button");
 
@@ -451,7 +435,7 @@ async function loadMaterials() {
       });
 
 
-      /* DELETE PDF */
+      // DELETE PDF
 
       const deleteButton = document.createElement("button");
 
@@ -508,7 +492,7 @@ async function loadMaterials() {
     console.error("Library loading error:", error);
 
     libraryStatus.textContent =
-      "Could not load your library. Check your Firestore rules and connection.";
+      "Could not load your library. Check Firestore permissions and connection.";
   }
 }
 
@@ -566,6 +550,12 @@ async function generateQuestions(material, button) {
   setQuestionStatus("Preparing your PDF for AI analysis...");
 
   try {
+    if (!material?.storagePath) {
+      throw new Error("This document has no saved Storage path.");
+    }
+
+    // Download saved PDF from Firebase Storage.
+
     const fileReference = ref(storage, material.storagePath);
 
     const bytes = await getBytes(
@@ -581,6 +571,8 @@ async function generateQuestions(material, button) {
       throw new Error("This PDF exceeds the 5 MB limit.");
     }
 
+    // Validate actual PDF signature.
+
     const header = new TextDecoder().decode(
       bytes.slice(0, 5)
     );
@@ -589,13 +581,37 @@ async function generateQuestions(material, button) {
       throw new Error("The saved document is not a valid PDF.");
     }
 
+    // Convert PDF to Base64.
+
     const pdfBase64 = bytesToBase64(bytes);
+
+    if (!pdfBase64 || typeof pdfBase64 !== "string") {
+      throw new Error("PDF conversion failed.");
+    }
+
+    const fileName =
+      material.name ||
+      material.safeFileName ||
+      "study-material.pdf";
+
+    // Obtain fresh Firebase authentication token.
+
+    const token = await currentUser.getIdToken(true);
+
+    // Diagnostic log: never log the actual PDF data.
+
+    console.log("Study Studio request:", {
+      fileName,
+      pdfBase64Type: typeof pdfBase64,
+      pdfBase64Length: pdfBase64.length,
+      pdfSizeBytes: bytes.length
+    });
 
     setQuestionStatus(
       "GradeFlow AI is reading your material and creating questions..."
     );
 
-    const token = await currentUser.getIdToken(true);
+    // Send PDF to backend.
 
     const response = await fetch(GENERATE_ENDPOINT, {
       method: "POST",
@@ -606,7 +622,7 @@ async function generateQuestions(material, button) {
       },
 
       body: JSON.stringify({
-        fileName: material.name,
+        fileName,
         pdfBase64
       })
     });
@@ -616,14 +632,18 @@ async function generateQuestions(material, button) {
     try {
       result = await response.json();
     } catch {
-      throw new Error("The AI server returned an invalid response.");
+      throw new Error(
+        `AI server returned an invalid response. HTTP ${response.status}`
+      );
     }
 
     if (!response.ok || !result.success) {
+      console.error("Study Studio API response:", result);
+
       throw new Error(
         result.error ||
         result.message ||
-        "Question generation failed."
+        `Question generation failed. HTTP ${response.status}`
       );
     }
 
@@ -636,7 +656,7 @@ async function generateQuestions(material, button) {
 
     startQuestionSession(
       result.questions,
-      material.name
+      fileName
     );
 
   } catch (error) {
@@ -660,87 +680,77 @@ async function generateQuestions(material, button) {
    START QUESTION SESSION
 ========================================== */
 
-function startQuestionSession(questions, fileName) {
+function startQuestionSession(questions, sourceName) {
   currentQuestions = questions.map((question, index) => ({
     ...question,
-    _id: `question-${index}`
+    _id: question._id || `question-${index + 1}`
   }));
 
   answeredQuestions = [];
 
   currentQuestion = null;
   currentScore = 0;
-  currentQuestionIndex = 0;
 
-  questionSource.textContent = `Source: ${fileName}`;
+  questionSource.textContent = `Source: ${sourceName}`;
 
-  setQuestionStatus(
-    `${currentQuestions.length} questions generated successfully.`
-  );
+  questionSection.hidden = false;
 
   updateProgress();
+
+  setQuestionStatus(
+    "Your adaptive revision session is ready."
+  );
 
   showNextQuestion();
 }
 
 
 /* ==========================================
-   ADAPTIVE QUESTION SELECTION
+   GET NEXT ADAPTIVE QUESTION
 ========================================== */
 
 function getNextQuestion() {
-  const unanswered = currentQuestions.filter(question =>
-    !answeredQuestions.includes(question._id)
+  const answeredIds = new Set(
+    answeredQuestions.map(answer => answer.id)
+  );
+
+  const unanswered = currentQuestions.filter(
+    question => !answeredIds.has(question._id)
   );
 
   if (!unanswered.length) {
     return null;
   }
 
-  if (!answeredQuestions.length) {
+  if (!currentQuestion) {
     return (
-      unanswered.find(q => q.difficulty === "easy") ||
+      unanswered.find(question => question.difficulty === "easy") ||
       unanswered[0]
     );
   }
 
-  const lastQuestion = currentQuestion;
-
-  if (!lastQuestion) {
-    return unanswered[0];
-  }
-
   const lastAnswer = answeredQuestions.find(
-    item => item.id === lastQuestion._id
+    item => item.id === currentQuestion._id
   );
 
-  let preferredDifficulty = lastQuestion.difficulty;
+  let preferredDifficulty = currentQuestion.difficulty;
 
   if (lastAnswer) {
-    if (!lastAnswer.correct) {
-      preferredDifficulty = "easy";
-    } else {
-      preferredDifficulty = "hard";
-    }
+    preferredDifficulty = lastAnswer.correct
+      ? "hard"
+      : "easy";
   }
 
   const preferred = unanswered.find(
-    q => q.difficulty === preferredDifficulty
+    question => question.difficulty === preferredDifficulty
   );
 
   if (preferred) return preferred;
 
-  const difficultyOrder = ["easy", "medium", "hard"];
-
-  for (const difficulty of difficultyOrder) {
-    const match = unanswered.find(
-      q => q.difficulty === difficulty
-    );
-
-    if (match) return match;
-  }
-
-  return unanswered[0];
+  return (
+    unanswered.find(question => question.difficulty === "medium") ||
+    unanswered[0]
+  );
 }
 
 
@@ -756,8 +766,6 @@ function showNextQuestion() {
     return;
   }
 
-  currentQuestionIndex++;
-
   renderQuestion(currentQuestion);
   updateProgress();
 }
@@ -769,7 +777,6 @@ function showNextQuestion() {
 
 function updateProgress() {
   const total = currentQuestions.length;
-
   const answered = answeredQuestions.length;
 
   const percentage = total
@@ -809,14 +816,17 @@ function renderQuestion(question) {
     question.difficulty || "General";
 
   const type = document.createElement("span");
+
   type.className = "question-tag";
   type.textContent = question.type || "Question";
 
   meta.append(difficulty, type);
 
   const questionText = document.createElement("h3");
+
   questionText.className = "question-text";
-  questionText.textContent = question.question;
+  questionText.textContent =
+    question.question || "Question unavailable.";
 
   card.append(meta, questionText);
 
@@ -827,32 +837,18 @@ function renderQuestion(question) {
 
   const optionButtons = [];
 
-  if (
+  const isMultipleChoice =
     question.type === "multiple-choice" &&
-    Array.isArray(question.options)
-  ) {
-    question.options.forEach((option, index) => {
-      const optionButton = createOptionButton(
-        String.fromCharCode(65 + index),
-        option
-      );
+    Array.isArray(question.options);
 
-      optionButton.addEventListener("click", () => {
-        selectedAnswer = option;
+  const isTrueFalse = question.type === "true-false";
 
-        optionButtons.forEach(button => {
-          button.classList.remove("selected");
-        });
+  if (isMultipleChoice || isTrueFalse) {
+    const options = isMultipleChoice
+      ? question.options
+      : ["True", "False"];
 
-        optionButton.classList.add("selected");
-      });
-
-      optionButtons.push(optionButton);
-      optionsContainer.appendChild(optionButton);
-    });
-
-  } else if (question.type === "true-false") {
-    ["True", "False"].forEach((option, index) => {
+    options.forEach((option, index) => {
       const optionButton = createOptionButton(
         String.fromCharCode(65 + index),
         option
@@ -889,6 +885,7 @@ function renderQuestion(question) {
   card.appendChild(optionsContainer);
 
   const feedback = document.createElement("div");
+
   feedback.className = "answer-feedback";
   feedback.hidden = true;
 
@@ -896,10 +893,12 @@ function renderQuestion(question) {
   actions.className = "question-actions";
 
   const submitButton = document.createElement("button");
+
   submitButton.className = "primary-button";
   submitButton.textContent = "Check answer";
 
   const nextButton = document.createElement("button");
+
   nextButton.className = "secondary-button";
   nextButton.textContent = "Next question";
   nextButton.disabled = true;
@@ -909,7 +908,11 @@ function renderQuestion(question) {
       selectedAnswer === null ||
       String(selectedAnswer).trim() === ""
     ) {
-      setQuestionStatus("Choose or enter an answer first.", true);
+      setQuestionStatus(
+        "Choose or enter an answer first.",
+        true
+      );
+
       return;
     }
 
@@ -929,6 +932,8 @@ function renderQuestion(question) {
       correct: isCorrect
     });
 
+    // Mark selected and correct answers.
+
     optionButtons.forEach(optionButton => {
       optionButton.disabled = true;
 
@@ -939,6 +944,7 @@ function renderQuestion(question) {
         normalizeAnswer(question.correctAnswer)
       ) {
         optionButton.classList.add("correct");
+
       } else if (
         normalizeAnswer(value) ===
         normalizeAnswer(selectedAnswer) &&
@@ -948,8 +954,11 @@ function renderQuestion(question) {
       }
     });
 
-    if (optionsContainer.querySelector("textarea")) {
-      optionsContainer.querySelector("textarea").disabled = true;
+    const answerInput =
+      optionsContainer.querySelector("textarea");
+
+    if (answerInput) {
+      answerInput.disabled = true;
     }
 
     feedback.hidden = false;
@@ -995,7 +1004,9 @@ function renderQuestion(question) {
     updateProgress();
 
     setQuestionStatus(
-      isCorrect ? "Well done." : "Review the explanation before continuing."
+      isCorrect
+        ? "Well done."
+        : "Review the explanation before continuing."
     );
   });
 
@@ -1009,6 +1020,10 @@ function renderQuestion(question) {
 }
 
 
+/* ==========================================
+   CREATE OPTION BUTTON
+========================================== */
+
 function createOptionButton(letter, value) {
   const button = document.createElement("button");
 
@@ -1018,10 +1033,12 @@ function createOptionButton(letter, value) {
   button.dataset.value = String(value);
 
   const badge = document.createElement("span");
+
   badge.className = "option-letter";
   badge.textContent = letter;
 
   const text = document.createElement("span");
+
   text.textContent = String(value);
 
   button.append(badge, text);
@@ -1068,24 +1085,27 @@ function showSessionComplete() {
   setQuestionStatus("Revision session completed.");
 
   const completion = document.createElement("div");
+
   completion.className = "session-complete";
 
   const heading = document.createElement("h3");
   heading.textContent = "Session complete";
 
   const message = document.createElement("p");
+
   message.textContent =
     "You have completed all the generated questions.";
 
   const score = document.createElement("div");
+
   score.className = "final-score";
   score.textContent = `${currentScore} points`;
-
-  const summary = document.createElement("p");
 
   const correctCount = answeredQuestions.filter(
     answer => answer.correct
   ).length;
+
+  const summary = document.createElement("p");
 
   summary.textContent =
     `${correctCount} correct answers out of ${answeredQuestions.length}.`;
