@@ -505,17 +505,34 @@ refreshButton.addEventListener("click", loadMaterials);
 ========================================== */
 
 function bytesToBase64(bytes) {
-  let binary = "";
+    try {
+        if (!(bytes instanceof Uint8Array)) {
+            bytes = new Uint8Array(bytes);
+        }
 
-  const chunkSize = 0x8000;
+        if (bytes.length === 0) {
+            throw new Error("The PDF file is empty.");
+        }
 
-  for (let i = 0; i < bytes.length; i += chunkSize) {
-    const chunk = bytes.subarray(i, i + chunkSize);
+        let binary = "";
+        const chunkSize = 0x8000;
 
-    binary += String.fromCharCode(...chunk);
-  }
+        for (let i = 0; i < bytes.length; i += chunkSize) {
+            const chunk = bytes.subarray(
+                i,
+                Math.min(i + chunkSize, bytes.length)
+            );
 
-  return btoa(binary);
+            binary += String.fromCharCode(...chunk);
+        }
+
+        return btoa(binary);
+    } catch (error) {
+        console.error("PDF Base64 conversion failed:", error);
+        throw new Error(
+            "PDF conversion failed: " + error.message
+        );
+    }
 }
 
 
