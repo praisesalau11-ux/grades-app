@@ -1,3 +1,4 @@
+
 import { auth, db, storage } from "./firebase.js";
 
 import {
@@ -505,34 +506,17 @@ refreshButton.addEventListener("click", loadMaterials);
 ========================================== */
 
 function bytesToBase64(bytes) {
-    try {
-        if (!(bytes instanceof Uint8Array)) {
-            bytes = new Uint8Array(bytes);
-        }
+  let binary = "";
 
-        if (bytes.length === 0) {
-            throw new Error("The PDF file is empty.");
-        }
+  const chunkSize = 0x8000;
 
-        let binary = "";
-        const chunkSize = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    const chunk = bytes.subarray(i, i + chunkSize);
 
-        for (let i = 0; i < bytes.length; i += chunkSize) {
-            const chunk = bytes.subarray(
-                i,
-                Math.min(i + chunkSize, bytes.length)
-            );
+    binary += String.fromCharCode(...chunk);
+  }
 
-            binary += String.fromCharCode(...chunk);
-        }
-
-        return btoa(binary);
-    } catch (error) {
-        console.error("PDF Base64 conversion failed:", error);
-        throw new Error(
-            "PDF conversion failed: " + error.message
-        );
-    }
+  return btoa(binary);
 }
 
 
@@ -697,10 +681,10 @@ async function generateQuestions(material, button) {
    START QUESTION SESSION
 ========================================== */
 
-function startQuestionSession(questions, sourceName) {
+function startQuestionSession(questions, fileName) {
   currentQuestions = questions.map((question, index) => ({
     ...question,
-    _id: question._id || `question-${index + 1}`
+    _id: `question-${index}`
   }));
 
   answeredQuestions = [];
@@ -708,40 +692,32 @@ function startQuestionSession(questions, sourceName) {
   currentQuestion = null;
   currentScore = 0;
 
-  questionSource.textContent = `Source: ${sourceName}`;
-
-  questionSection.hidden = false;
-
-  updateProgress();
+  questionSource.textContent = `Source: ${fileName}`;
 
   setQuestionStatus(
-    "Your adaptive revision session is ready."
+    `${currentQuestions.length} questions generated successfully.`
   );
+
+  updateProgress();
 
   showNextQuestion();
 }
 
 
 /* ==========================================
-   GET NEXT ADAPTIVE QUESTION
+   ADAPTIVE QUESTION SELECTION
 ========================================== */
 
 function getNextQuestion() {
-  const answeredIds = new Set(
-    answeredQuestions.map(answer => answer.id)
+  const unanswered = currentQuestions.filter(question =>
+    !answeredQuestions.some(answer => answer.id === question._id)
   );
 
-  const unanswered = currentQuestions.filter(
-    question => !answeredIds.has(question._id)
-  );
-
-  if (!unanswered.length) {
-    return null;
-  }
+  if (!unanswered.length) return null;
 
   if (!currentQuestion) {
     return (
-      unanswered.find(question => question.difficulty === "easy") ||
+      unanswered.find(q => q.difficulty === "easy") ||
       unanswered[0]
     );
   }
@@ -759,15 +735,13 @@ function getNextQuestion() {
   }
 
   const preferred = unanswered.find(
-    question => question.difficulty === preferredDifficulty
+    q => q.difficulty === preferredDifficulty
   );
 
   if (preferred) return preferred;
 
-  return (
-    unanswered.find(question => question.difficulty === "medium") ||
-    unanswered[0]
-  );
+  return unanswered.find(q => q.difficulty === "medium") ||
+    unanswered[0];
 }
 
 
@@ -842,8 +816,7 @@ function renderQuestion(question) {
   const questionText = document.createElement("h3");
 
   questionText.className = "question-text";
-  questionText.textContent =
-    question.question || "Question unavailable.";
+  questionText.textContent = question.question || "Question unavailable.";
 
   card.append(meta, questionText);
 
@@ -925,11 +898,7 @@ function renderQuestion(question) {
       selectedAnswer === null ||
       String(selectedAnswer).trim() === ""
     ) {
-      setQuestionStatus(
-        "Choose or enter an answer first.",
-        true
-      );
-
+      setQuestionStatus("Choose or enter an answer first.", true);
       return;
     }
 
@@ -971,8 +940,7 @@ function renderQuestion(question) {
       }
     });
 
-    const answerInput =
-      optionsContainer.querySelector("textarea");
+    const answerInput = optionsContainer.querySelector("textarea");
 
     if (answerInput) {
       answerInput.disabled = true;
