@@ -130,8 +130,12 @@ function parseQuestions(text) {
    QUESTION VALIDATION
 ========================================== */
 
-function validateQuestion(question) {
-    if (!question || typeof question !== "object") {
+
+function validateQuestion(question, index = 0) {
+    const errors = [];
+
+    if (!question || typeof question !== "object" || Array.isArray(question)) {
+        console.error(`Study Studio: Question ${index + 1} is not an object.`);
         return null;
     }
 
@@ -140,50 +144,72 @@ function validateQuestion(question) {
     const explanation = cleanString(question.explanation, 2000);
     const sourceEvidence = cleanString(question.sourceEvidence, 1000);
 
-    const type = cleanString(question.type, 40).toLowerCase();
-    const difficulty = cleanString(question.difficulty, 20).toLowerCase();
+    let type = cleanString(question.type, 40).toLowerCase();
+    let difficulty = cleanString(question.difficulty, 20).toLowerCase();
 
-    const allowedTypes = [
-        "multiple-choice",
-        "true-false",
-        "short-answer"
-    ];
+    // Normalize common AI-generated type variations.
+    const typeAliases = {
+        "multiple choice": "multiple-choice",
+        "multiple_choice": "multiple-choice",
+        "mcq": "multiple-choice",
+        "true false": "true-false",
+        "true_false": "true-false",
+        "short answer": "short-answer",
+        "short_answer": "short-answer"
+    };
 
-    const allowedDifficulties = [
-        "easy",
-        "medium",
-        "hard"
-    ];
+    type = typeAliases[type] || type;
 
-    if (
-        !text ||
-        !correctAnswer ||
-        !explanation ||
-        !sourceEvidence ||
-        !allowedTypes.includes(type) ||
-        !allowedDifficulties.includes(difficulty)
-    ) {
-        return null;
+    if (!text) errors.push("Missing question text");
+    if (!correctAnswer) errors.push("Missing correct answer");
+    if (!explanation) errors.push("Missing explanation");
+    if (!sourceEvidence) errors.push("Missing source evidence");
+
+    if (!["multiple-choice", "true-false", "short-answer"].includes(type)) {
+        errors.push(`Invalid question type: ${type || "empty"}`);
+    }
+
+    if (!["easy", "medium", "hard"].includes(difficulty)) {
+        errors.push(`Invalid difficulty: ${difficulty || "empty"}`);
     }
 
     let options = [];
 
     if (type === "multiple-choice") {
         if (!Array.isArray(question.options)) {
-            return null;
-        }
+            errors.push("Multiple-choice options are not an array");
+        } else {
+            options = question.options
+                .filter(option => typeof option === "string")
+                .map(option => option.trim())
+                .filter(Boolean);
 
-        options = question.options
-            .filter(option => typeof option === "string")
-            .map(option => option.trim())
-            .filter(Boolean);
+            if (options.length !== 4) {
+                errors.push(`Expected 4 options, received ${options.length}`);
+            }
 
-        if (
-            options.length !== 4 ||
-            new Set(options.map(option => option.toLowerCase())).size !== 4 ||
-            !options.includes(correctAnswer)
-        ) {
-            return null;
+            const normalizedOptions = options.map(option =>
+                option.toLowerCase()
+            );
+
+            if (new Set(normalizedOptions).size !== options.length) {
+                errors.push("Duplicate multiple-choice options");
+            }
+
+            // Match the correct answer without case sensitivity.
+            const matchingOption = options.find(option =>
+                option.toLowerCase() === correctAnswer.toLowerCase()
+            );
+
+            if (!matchingOption) {
+                errors.push("Correct answer does not match an option");
+            } else {
+                // Use the exact spelling of the matching option.
+                // This prevents harmless capitalization differences.
+                if (errors.length === 0) {
+                    question.correctAnswer = matchingOption;
+                }
+            }
         }
     }
 
@@ -191,17 +217,31 @@ function validateQuestion(question) {
         const answer = correctAnswer.toLowerCase();
 
         if (answer !== "true" && answer !== "false") {
-            return null;
+            errors.push("True-false answer must be True or False");
+        } else {
+            options = ["True", "False"];
         }
-
-        options = ["True", "False"];
     }
 
-    if (
-        type === "short-answer" &&
-        Array.isArray(question.options) &&
-        question.options.length > 0
-    ) {
+    if (type === "short-answer") {
+        if (
+            question.options !== undefined &&
+            (!Array.isArray(question.options) || question.options.length > 0)
+        ) {
+            errors.push("Short-answer options must be an empty array");
+        }
+
+        options = [];
+    }
+
+    if (errors.length > 0) {
+        console.error("Study Studio: Question validation failed:", {
+            questionNumber: index + 1,
+            type,
+            difficulty,
+            errors
+        });
+
         return null;
     }
 
@@ -210,7 +250,10 @@ function validateQuestion(question) {
         type,
         difficulty,
         options,
-        correctAnswer,
+        correctAnswer:
+            type === "multiple-choice"
+                ? question.correctAnswer.trim()
+                : correctAnswer,
         explanation,
         sourceEvidence,
         points: 1
@@ -468,14 +511,29 @@ router.post("/generate-questions", async (req, res) => {
             pdfBase64
         );
 
-        const questions = rawQuestions.map(validateQuestion);
+        const questions = rawQuestions.map((question, index) =>
+    validateQuestion(question, index)
+);
 
-        if (questions.some(question => question === null)) {
-            return res.status(502).json({
-                success: false,
-                error: "Some generated questions failed validation. Please try again."
-            });
-        }
+        const invalidQuestions = questions
+    .map((question, index) => ({
+        questionNumber: index + 1,
+        valid: question !== null
+    }))
+    .filter(item => !item.valid);
+
+if (invalidQuestions.length > 0) {
+    console.error("Study Studio validation summary:", {
+        totalQuestions: questions.length,
+        invalidCount: invalidQuestions.length,
+        invalidQuestions
+    });
+
+    return res.status(502).json({
+        success: false,
+        error: "Some generated questions failed validation. Check the server logs."
+    });
+}
 
         const difficultyCounts = {
             easy: questions.filter(q => q.difficulty === "easy").length,
