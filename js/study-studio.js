@@ -83,6 +83,22 @@ let answeredQuestions = [];
 let currentQuestion = null;
 let currentScore = 0;
 
+let currentMaterialId = null;
+let currentQuestionSetId = null;
+let sessionStartedAt = null;
+let sessionSaved = false;
+
+// EXAMINATION MODE STATE
+const DEFAULT_EXAM_DURATION = 15;
+
+let studyMode = "practice";
+let examDurationMinutes = DEFAULT_EXAM_DURATION;
+let examTimeRemaining = DEFAULT_EXAM_DURATION * 60;
+let examTimer = null;
+let examCurrentIndex = 0;
+let examAnswers = {};
+let examMarkedQuestions = new Set();
+let examSubmitted = false;
 
 /* ==========================================
    HELPERS
@@ -321,6 +337,427 @@ async function uploadPdf() {
 uploadButton.addEventListener("click", uploadPdf);
 
 
+
+/* ==========================================
+   STUDY SETS AND SESSION PERSISTENCE
+========================================== */
+
+async function saveQuestionSet(material, questions) {
+  if (!currentUser || !material.documentId) {
+    throw new Error("Missing user or study material ID.");
+  }
+
+  const setsRef = collection(
+    db,
+    "users",
+    currentUser.uid,
+    "studyMaterials",
+    material.documentId,
+    "questionSets"
+  );
+
+  const setRef = doc(setsRef);
+
+  await setDoc(setRef, {
+    setId: setRef.id,
+    materialId: material.documentId,
+    materialName: material.name || "Study material",
+    questions,
+    questionCount: questions.length,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp()
+  });
+
+  return setRef.id;
+}
+
+
+async function loadLatestQuestionSet(material, button) {
+  if (!currentUser || !material.documentId) return;
+
+  const originalText = button.textContent;
+
+  button.disabled = true;
+  button.textContent = "Loading...";
+
+  try {
+    const setsRef = collection(
+      db,
+      "users",
+      currentUser.uid,
+      "studyMaterials",
+      material.documentId,
+      "questionSets"
+    );
+
+    const setsQuery = query(
+      setsRef,
+      orderBy("createdAt", "desc")
+    );
+
+    const snapshot = await getDocs(setsQuery);
+
+    if (snapshot.empty) {
+      setQuestionStatus(
+        "No saved question sets yet. Generate questions first.",
+        true
+      );
+
+      questionSection.hidden = false;
+      return;
+    }
+
+    const savedSet = snapshot.docs[0];
+    const data = savedSet.data();
+
+    if (
+      !Array.isArray(data.questions) ||
+      data.questions.length === 0
+    ) {
+      throw new Error("This saved question set is empty or invalid.");
+    }
+
+    questionSection.hidden = false;
+
+    showGenerationComplete(
+  data.questions,
+  material.name || data.materialName || "Study material",
+  {
+    materialId: material.documentId,
+    setId: savedSet.id,
+    saved: true
+  }
+);
+
+    questionSection.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+
+  } catch (error) {
+    console.error("Load saved questions error:", error);
+
+    setQuestionStatus(
+      error.message || "Could not load saved questions.",
+      true
+    );
+
+  } finally {
+    button.disabled = false;
+    button.textContent = originalText;
+  }
+}
+
+
+/* ==========================================
+   SAVE COMPLETED QUIZ SESSION
+========================================== */
+
+async function saveCompletedStudySession() {
+  if (sessionSaved) return true;
+
+  if (!currentUser || !currentMaterialId) {
+    console.warn("Session cannot be saved: missing material ID.");
+    return false;
+  }
+
+  sessionSaved = true;
+
+ const totalQuestions = currentQuestions.length;
+
+  const correctCount = answeredQuestions.filter(
+    answer => answer.correct
+  ).length;
+
+  const percentage = totalQuestions
+    ? Math.round((correctCount / totalQuestions) * 100)
+    : 0;
+
+  const sessionRef = doc(
+    collection(
+      db,
+      "users",
+      currentUser.uid,
+      "studyMaterials",
+      currentMaterialId,
+      "studySessions"
+    )
+  );
+
+  const answers = answeredQuestions.map(answer => ({
+    question: answer.question,
+    difficulty: answer.difficulty,
+    type: answer.type,
+    mode: studyMode,
+    userAnswer: answer.userAnswer,
+    correctAnswer: answer.correctAnswer,
+    correct: answer.correct,
+    explanation: answer.explanation || "",
+    sourceEvidence: answer.sourceEvidence || ""
+  }));
+
+  try {
+    await setDoc(sessionRef, {
+      sessionId: sessionRef.id,
+      materialId: currentMaterialId,
+      questionSetId: currentQuestionSetId,
+      materialName: questionSource.textContent.replace(
+        "Source: ",
+        ""
+      ),
+      score: currentScore,
+      totalQuestions,
+      correctCount,
+      incorrectCount: totalQuestions - correctCount,
+      percentage,
+      durationSeconds: sessionStartedAt
+        ? Math.max(0, Math.round((Date.now() - sessionStartedAt) / 1000))
+        : 0,
+      answers,
+      createdAt: serverTimestamp()
+    });
+
+    return true;
+
+  } catch (error) {
+    sessionSaved = false;
+
+    console.error("Study session save error:", error);
+
+    return false;
+  }
+}
+
+
+/* ==========================================
+   STUDY HISTORY INTERFACE
+========================================== */
+
+function getStudyHistoryPanel() {
+  let panel = document.getElementById("studyHistoryPanel");
+
+  if (panel) return panel;
+
+  panel = document.createElement("section");
+  panel.id = "studyHistoryPanel";
+  panel.className = "study-history-panel";
+  panel.hidden = true;
+
+  const heading = document.createElement("h2");
+  heading.textContent = "Study History";
+
+  const description = document.createElement("p");
+  description.textContent =
+    "Your previous revision sessions for this material.";
+
+  const list = document.createElement("div");
+  list.id = "studyHistoryList";
+  list.className = "study-history-list";
+
+  panel.append(heading, description, list);
+
+  questionSection.parentNode.insertBefore(
+    panel,
+    questionSection
+  );
+
+  return panel;
+}
+
+
+async function loadStudyHistory(material, button) {
+  if (!currentUser || !material.documentId) return;
+
+  const originalText = button.textContent;
+
+  button.disabled = true;
+  button.textContent = "Loading...";
+
+  const panel = getStudyHistoryPanel();
+  const list = document.getElementById("studyHistoryList");
+
+  panel.hidden = false;
+  list.innerHTML = "";
+
+  const heading = document.createElement("h3");
+  heading.textContent = material.name || "Study material";
+
+  list.appendChild(heading);
+
+  const loading = document.createElement("p");
+  loading.textContent = "Loading previous sessions...";
+  list.appendChild(loading);
+
+  try {
+    const sessionsRef = collection(
+      db,
+      "users",
+      currentUser.uid,
+      "studyMaterials",
+      material.documentId,
+      "studySessions"
+    );
+
+    const sessionsQuery = query(
+      sessionsRef,
+      orderBy("createdAt", "desc")
+    );
+
+    const snapshot = await getDocs(sessionsQuery);
+
+    list.innerHTML = "";
+    list.appendChild(heading);
+
+    if (snapshot.empty) {
+      const empty = document.createElement("p");
+      empty.className = "empty-state";
+      empty.textContent =
+        "No completed study sessions for this material yet.";
+
+      list.appendChild(empty);
+      return;
+    }
+
+    snapshot.forEach(sessionDoc => {
+      const session = sessionDoc.data();
+
+      const card = document.createElement("article");
+      card.className = "study-history-card";
+
+      const date = document.createElement("small");
+      date.textContent = formatDate(session.createdAt);
+
+      const score = document.createElement("strong");
+      score.textContent =
+        `${session.percentage ?? 0}% · ${session.score ?? 0} points`;
+
+      const details = document.createElement("p");
+      details.textContent =
+        `${session.correctCount ?? 0} correct out of ` +
+        `${session.totalQuestions ?? 0} questions`;
+
+      const incorrect = document.createElement("small");
+      incorrect.textContent =
+        `${session.incorrectCount ?? 0} incorrect`;
+
+      card.append(date, score, details, incorrect);
+
+      if (Array.isArray(session.answers)) {
+        const reviewButton = document.createElement("button");
+        reviewButton.type = "button";
+        reviewButton.className = "secondary-button";
+        reviewButton.textContent = "Review answers";
+
+        const review = document.createElement("div");
+        review.className = "study-history-review";
+        review.hidden = true;
+
+        session.answers.forEach((answer, index) => {
+          const item = document.createElement("div");
+
+          const question = document.createElement("strong");
+          question.textContent =
+            `${index + 1}. ${answer.question || "Question"}`;
+
+          const yourAnswer = document.createElement("p");
+          yourAnswer.textContent =
+            `Your answer: ${answer.userAnswer || "No answer"}`;
+
+          const correctAnswer = document.createElement("p");
+          correctAnswer.textContent =
+            `Correct answer: ${answer.correctAnswer || "Not available"}`;
+
+          const result = document.createElement("small");
+          result.textContent = answer.correct ? "Correct" : "Incorrect";
+          result.className = answer.correct ? "history-correct" : "history-incorrect";
+
+          item.append(question, yourAnswer, correctAnswer, result);
+
+          if (answer.explanation) {
+            const explanation = document.createElement("p");
+            explanation.textContent = `Explanation: ${answer.explanation}`;
+            item.appendChild(explanation);
+          }
+
+          review.appendChild(item);
+        });
+
+        reviewButton.addEventListener("click", () => {
+          review.hidden = !review.hidden;
+          reviewButton.textContent = review.hidden
+            ? "Review answers"
+            : "Hide answers";
+        });
+
+        card.append(reviewButton, review);
+      }
+
+      list.appendChild(card);
+    });
+
+    panel.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+
+  } catch (error) {
+    console.error("Study history error:", error);
+
+    list.innerHTML = "";
+
+    const errorMessage = document.createElement("p");
+    errorMessage.textContent =
+      "Could not load study history. Check Firestore permissions.";
+
+    list.appendChild(errorMessage);
+
+  } finally {
+    button.disabled = false;
+    button.textContent = originalText;
+  }
+}
+
+/* ==========================================
+   DELETE SAVED STUDY RECORDS
+========================================== */
+
+async function deleteStudyMaterialRecords(materialId) {
+  if (!currentUser || !materialId) {
+    throw new Error("Missing user or material ID.");
+  }
+
+  const basePath = [
+    "users",
+    currentUser.uid,
+    "studyMaterials",
+    materialId
+  ];
+
+  const questionSetsRef = collection(
+    db,
+    ...basePath,
+    "questionSets"
+  );
+
+  const sessionsRef = collection(
+    db,
+    ...basePath,
+    "studySessions"
+  );
+
+  const [questionSets, sessions] = await Promise.all([
+    getDocs(questionSetsRef),
+    getDocs(sessionsRef)
+  ]);
+
+  const deletions = [
+    ...questionSets.docs.map(item => deleteDoc(item.ref)),
+    ...sessions.docs.map(item => deleteDoc(item.ref))
+  ];
+
+  await Promise.all(deletions);
+}
+
 /* ==========================================
    LOAD STUDY MATERIALS
 ========================================== */
@@ -362,8 +799,10 @@ async function loadMaterials() {
       `${snapshot.size} saved document${snapshot.size === 1 ? "" : "s"}`;
 
     snapshot.forEach(documentSnapshot => {
-      const material = documentSnapshot.data();
-
+      const material = {
+  ...documentSnapshot.data(),
+  documentId: documentSnapshot.id
+};
       const card = document.createElement("article");
       card.className = "document-card";
 
@@ -458,13 +897,15 @@ async function loadMaterials() {
 
           await deleteObject(fileReference);
 
-          await deleteDoc(doc(
-            db,
-            "users",
-            currentUser.uid,
-            "studyMaterials",
-            documentSnapshot.id
-          ));
+await deleteStudyMaterialRecords(documentSnapshot.id);
+
+await deleteDoc(doc(
+  db,
+  "users",
+  currentUser.uid,
+  "studyMaterials",
+  documentSnapshot.id
+));
 
           await loadMaterials();
 
@@ -478,11 +919,33 @@ async function loadMaterials() {
         }
       });
 
-      actions.append(
-        openButton,
-        generateButton,
-        deleteButton
-      );
+      // STUDY SAVED QUESTIONS
+const savedQuestionsButton = document.createElement("button");
+
+savedQuestionsButton.type = "button";
+savedQuestionsButton.textContent = "Study Saved Set";
+
+savedQuestionsButton.addEventListener("click", () => {
+  loadLatestQuestionSet(material, savedQuestionsButton);
+});
+
+// STUDY HISTORY
+const historyButton = document.createElement("button");
+
+historyButton.type = "button";
+historyButton.textContent = "History";
+
+historyButton.addEventListener("click", () => {
+  loadStudyHistory(material, historyButton);
+});
+
+actions.append(
+  openButton,
+  generateButton,
+  savedQuestionsButton,
+  historyButton,
+  deleteButton
+);
 
       card.append(top, actions);
 
@@ -501,24 +964,58 @@ async function loadMaterials() {
 refreshButton.addEventListener("click", loadMaterials);
 
 
+
 /* ==========================================
    CONVERT PDF BYTES TO BASE64
 ========================================== */
 
-function bytesToBase64(bytes) {
-  let binary = "";
+
+function bytesToBase64(data) {
+  let bytes;
+
+  // Handle Firebase Uint8Array
+  if (data instanceof Uint8Array) {
+    bytes = data;
+  }
+
+  // Handle ArrayBuffer
+  else if (data instanceof ArrayBuffer) {
+    bytes = new Uint8Array(data);
+  }
+
+  // Handle other typed-array views
+  else if (ArrayBuffer.isView(data)) {
+    bytes = new Uint8Array(
+      data.buffer,
+      data.byteOffset,
+      data.byteLength
+    );
+  }
+
+  else {
+    throw new Error(
+      `Unsupported PDF data type: ${Object.prototype.toString.call(data)}`
+    );
+  }
+
+  if (bytes.length === 0) {
+    throw new Error("PDF data is empty.");
+  }
 
   const chunkSize = 0x8000;
+  let binary = "";
 
   for (let i = 0; i < bytes.length; i += chunkSize) {
-    const chunk = bytes.subarray(i, i + chunkSize);
+    const chunk = bytes.subarray(
+      i,
+      Math.min(i + chunkSize, bytes.length)
+    );
 
     binary += String.fromCharCode(...chunk);
   }
 
   return btoa(binary);
 }
-
 
 /* ==========================================
    GENERATE QUESTIONS
@@ -558,11 +1055,21 @@ async function generateQuestions(material, button) {
     // Download saved PDF from Firebase Storage.
 
     const fileReference = ref(storage, material.storagePath);
+const downloadedData = await getBytes(
+  ref(storage, material.storagePath),
+  MAX_FILE_SIZE
+);
 
-    const bytes = await getBytes(
-      fileReference,
-      MAX_FILE_SIZE
-    );
+console.log("Firebase PDF download:", {
+  type: Object.prototype.toString.call(downloadedData),
+  constructor: downloadedData?.constructor?.name,
+  isArrayBuffer: downloadedData instanceof ArrayBuffer,
+  isUint8Array: downloadedData instanceof Uint8Array,
+  byteLength: downloadedData?.byteLength,
+  length: downloadedData?.length
+});
+
+const bytes = downloadedData;
 
     if (!bytes || bytes.length === 0) {
       throw new Error("The saved PDF is empty.");
@@ -584,11 +1091,25 @@ async function generateQuestions(material, button) {
 
     // Convert PDF to Base64.
 
-    const pdfBase64 = bytesToBase64(bytes);
+  
+let pdfBase64;
 
-    if (!pdfBase64 || typeof pdfBase64 !== "string") {
-      throw new Error("PDF conversion failed.");
-    }
+try {
+  pdfBase64 = bytesToBase64(bytes);
+
+  console.log("PDF conversion successful:", {
+    originalBytes: bytes.length,
+    base64Characters: pdfBase64.length,
+    base64Type: typeof pdfBase64
+  });
+
+} catch (conversionError) {
+  console.error("PDF Base64 conversion failed:", conversionError);
+
+  throw new Error(
+    `PDF conversion failed: ${conversionError.message}`
+  );
+}
 
     const fileName =
       material.name ||
@@ -655,10 +1176,34 @@ async function generateQuestions(material, button) {
       throw new Error("The AI did not return any questions.");
     }
 
-    startQuestionSession(
-      result.questions,
-      fileName
-    );
+   let savedSetId = null;
+
+try {
+  savedSetId = await saveQuestionSet(
+    material,
+    result.questions
+  );
+
+  setQuestionStatus("Questions generated and saved successfully.");
+
+} catch (saveError) {
+  console.error("Question set save error:", saveError);
+
+  setQuestionStatus(
+    "Questions generated, but saving the question set failed.",
+    true
+  );
+}
+
+showGenerationComplete(
+  result.questions,
+  fileName,
+  {
+    materialId: material.documentId,
+    setId: savedSetId,
+    saved: Boolean(savedSetId)
+  }
+);
 
   } catch (error) {
     console.error("Question generation error:", error);
@@ -678,24 +1223,671 @@ async function generateQuestions(material, button) {
 
 
 /* ==========================================
-   START QUESTION SESSION
+   GENERATION COMPLETE SCREEN
 ========================================== */
 
-function startQuestionSession(questions, fileName) {
+
+function showGenerationComplete(questions, fileName, options = {}) {
+  questionResults.innerHTML = "";
+
+  const notification = document.createElement("div");
+  notification.id = "generationTopNotification";
+  notification.className = "generation-top-notification";
+  notification.setAttribute("role", "status");
+  notification.textContent =
+    `✓ Generation completed successfully! ${questions.length} questions are ready.`;
+
+  document.getElementById("generationTopNotification")?.remove();
+
+  const mainContainer = document.querySelector("main");
+  if (mainContainer) mainContainer.prepend(notification);
+
+  const card = document.createElement("div");
+  card.className = "session-complete generation-complete";
+
+  const icon = document.createElement("div");
+  icon.className = "generation-success-icon";
+  icon.textContent = "✓";
+
+  const heading = document.createElement("h2");
+  heading.textContent = "Generation Complete!";
+
+  const description = document.createElement("p");
+  description.textContent =
+    "Your questions are ready. Choose how you want to study.";
+
+  const count = document.createElement("div");
+  count.className = "final-score";
+  count.textContent = `${questions.length} Questions Ready`;
+
+  const source = document.createElement("p");
+  source.textContent = `Study material: ${fileName}`;
+
+  const saveStatus = document.createElement("p");
+  saveStatus.textContent = options.saved
+    ? "Your question set has been saved to your Study Library."
+    : "Your questions are ready, but the question set could not be saved.";
+
+  const practiceButton = document.createElement("button");
+  practiceButton.type = "button";
+  practiceButton.className = "primary-button";
+  practiceButton.textContent = "Start Practice Mode";
+
+  practiceButton.addEventListener("click", () => {
+    studyMode = "practice";
+
+    startQuestionSession(questions, fileName, {
+      materialId: options.materialId,
+      setId: options.setId,
+      mode: "practice"
+    });
+
+    questionSection.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+  });
+
+  const examButton = document.createElement("button");
+  examButton.type = "button";
+  examButton.className = "secondary-button";
+  examButton.textContent = "Start Exam Mode";
+
+  examButton.addEventListener("click", () => {
+    showExamSetup(questions, fileName, options);
+  });
+
+  card.append(
+    icon,
+    heading,
+    description,
+    count,
+    source,
+    saveStatus,
+    practiceButton,
+    examButton
+  );
+
+  questionResults.appendChild(card);
+
+  setQuestionStatus("Generation complete. Choose your study mode.");
+}
+
+
+/* ==========================================
+   EXAM SETUP
+========================================== */
+
+function showExamSetup(questions, fileName, options = {}) {
+  questionResults.innerHTML = "";
+
+  const card = document.createElement("div");
+  card.className = "exam-setup-card";
+
+  const heading = document.createElement("h2");
+  heading.textContent = "Examination Setup";
+
+  const description = document.createElement("p");
+  description.textContent =
+    "Configure your exam before starting. Answers and explanations will remain hidden until submission.";
+
+  const count = document.createElement("p");
+  count.textContent = `${questions.length} questions available`;
+
+  const durationLabel = document.createElement("label");
+  durationLabel.textContent = "Examination duration";
+
+  const durationSelect = document.createElement("select");
+  durationSelect.className = "exam-duration-select";
+
+  [
+    { value: 5, label: "5 minutes" },
+    { value: 10, label: "10 minutes" },
+    { value: 15, label: "15 minutes (Default)" },
+    { value: 20, label: "20 minutes" },
+    { value: 30, label: "30 minutes" },
+    { value: 45, label: "45 minutes" },
+    { value: 60, label: "60 minutes" }
+  ].forEach(option => {
+    const item = document.createElement("option");
+    item.value = option.value;
+    item.textContent = option.label;
+    if (option.value === DEFAULT_EXAM_DURATION) {
+      item.selected = true;
+    }
+    durationSelect.appendChild(item);
+  });
+
+  const startButton = document.createElement("button");
+  startButton.type = "button";
+  startButton.className = "primary-button";
+  startButton.textContent = "Begin Examination";
+
+  const cancelButton = document.createElement("button");
+  cancelButton.type = "button";
+  cancelButton.className = "secondary-button";
+  cancelButton.textContent = "Back";
+
+  startButton.addEventListener("click", () => {
+    examDurationMinutes = Number(durationSelect.value);
+
+    startExamSession(questions, fileName, options);
+
+    questionSection.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+  });
+
+  cancelButton.addEventListener("click", () => {
+    showGenerationComplete(questions, fileName, options);
+  });
+
+  card.append(
+    heading,
+    description,
+    count,
+    durationLabel,
+    durationSelect,
+    startButton,
+    cancelButton
+  );
+
+  questionResults.appendChild(card);
+  setQuestionStatus("Choose your examination duration.");
+}
+
+
+/* ==========================================
+   EXAMINATION ENGINE
+========================================== */
+
+function startExamSession(questions, fileName, options = {}) {
+  if (examTimer) clearInterval(examTimer);
+
+  studyMode = "exam";
+
   currentQuestions = questions.map((question, index) => ({
     ...question,
     _id: `question-${index}`
   }));
 
   answeredQuestions = [];
+  currentScore = 0;
+  currentQuestion = null;
+
+  currentMaterialId = options.materialId ?? null;
+  currentQuestionSetId = options.setId ?? null;
+
+  sessionStartedAt = Date.now();
+  sessionSaved = false;
+
+  examTimeRemaining = examDurationMinutes * 60;
+  examCurrentIndex = 0;
+  examAnswers = {};
+  examMarkedQuestions = new Set();
+  examSubmitted = false;
+
+  questionSource.textContent = `Source: ${fileName} · Examination Mode`;
+
+  setQuestionStatus("Your examination has started.");
+
+  renderExamInterface();
+  updateExamTimer();
+
+  examTimer = setInterval(() => {
+    examTimeRemaining -= 1;
+    updateExamTimer();
+
+    if (examTimeRemaining <= 0) {
+      submitExam(true);
+    }
+  }, 1000);
+}
+
+
+function updateExamTimer() {
+  const timer = document.getElementById("examTimer");
+  if (!timer) return;
+
+  const minutes = Math.floor(examTimeRemaining / 60);
+  const seconds = examTimeRemaining % 60;
+
+  timer.textContent =
+    `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+
+  timer.classList.toggle("exam-time-warning", examTimeRemaining <= 60);
+}
+
+
+function renderExamInterface() {
+  questionResults.innerHTML = "";
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "exam-interface";
+
+  const top = document.createElement("div");
+  top.className = "exam-top";
+
+  const timerLabel = document.createElement("div");
+  timerLabel.innerHTML = "<strong>TIME REMAINING</strong>";
+
+  const timer = document.createElement("div");
+  timer.id = "examTimer";
+  timer.className = "exam-timer";
+  timer.textContent = "15:00";
+
+  timerLabel.appendChild(timer);
+  top.appendChild(timerLabel);
+
+  const progressText = document.createElement("p");
+  progressText.className = "exam-progress-text";
+  progressText.id = "examProgressText";
+
+  wrapper.append(top, progressText);
+
+  const navigatorHeading = document.createElement("h3");
+  navigatorHeading.textContent = "Question Navigator";
+
+  const navigator = document.createElement("div");
+  navigator.className = "exam-navigator";
+  navigator.id = "examNavigator";
+
+  wrapper.append(navigatorHeading, navigator);
+
+  const questionCard = document.createElement("div");
+  questionCard.id = "examQuestionCard";
+  questionCard.className = "exam-question-card";
+
+  wrapper.appendChild(questionCard);
+
+  const navigation = document.createElement("div");
+  navigation.className = "exam-navigation";
+
+  const previousButton = document.createElement("button");
+  previousButton.type = "button";
+  previousButton.className = "secondary-button";
+  previousButton.textContent = "← Previous";
+
+  previousButton.addEventListener("click", () => {
+    if (examCurrentIndex > 0) {
+      examCurrentIndex--;
+      renderExamQuestion();
+    }
+  });
+
+  const nextButton = document.createElement("button");
+  nextButton.type = "button";
+  nextButton.className = "primary-button";
+  nextButton.textContent = "Next →";
+  nextButton.id = "examNextButton";
+
+  nextButton.addEventListener("click", () => {
+    if (examCurrentIndex < currentQuestions.length - 1) {
+      examCurrentIndex++;
+      renderExamQuestion();
+    }
+  });
+
+  navigation.append(previousButton, nextButton);
+
+  const submitButton = document.createElement("button");
+  submitButton.type = "button";
+  submitButton.className = "exam-submit-button";
+  submitButton.textContent = "Submit Examination";
+
+  submitButton.addEventListener("click", () => {
+    const unanswered = currentQuestions.length -
+      Object.keys(examAnswers).length;
+
+    const message = unanswered > 0
+      ? `You have ${unanswered} unanswered question(s). Submit anyway?`
+      : "Are you sure you want to submit your examination?";
+
+    if (window.confirm(message)) {
+      submitExam(false);
+    }
+  });
+
+  wrapper.append(navigation, submitButton);
+  questionResults.appendChild(wrapper);
+
+  renderExamQuestion();
+}
+
+
+function renderExamNavigator() {
+  const navigator = document.getElementById("examNavigator");
+  if (!navigator) return;
+
+  navigator.innerHTML = "";
+
+  currentQuestions.forEach((question, index) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "exam-nav-number";
+    button.textContent = String(index + 1);
+
+    if (index === examCurrentIndex) {
+      button.classList.add("active");
+    }
+
+    if (Object.prototype.hasOwnProperty.call(examAnswers, question._id)) {
+      button.classList.add("answered");
+    }
+
+    if (examMarkedQuestions.has(question._id)) {
+      button.classList.add("marked");
+    }
+
+    button.addEventListener("click", () => {
+      examCurrentIndex = index;
+      renderExamQuestion();
+    });
+
+    navigator.appendChild(button);
+  });
+
+  const progress = document.getElementById("examProgressText");
+  if (progress) {
+    progress.textContent =
+      `Question ${examCurrentIndex + 1} of ${currentQuestions.length} · ` +
+      `${Object.keys(examAnswers).length} answered`;
+  }
+}
+
+
+function renderExamQuestion() {
+  const question = currentQuestions[examCurrentIndex];
+  const card = document.getElementById("examQuestionCard");
+
+  if (!question || !card) return;
+
+  card.innerHTML = "";
+
+  const meta = document.createElement("div");
+  meta.className = "question-meta";
+
+  const difficulty = document.createElement("span");
+  difficulty.className = `question-tag ${question.difficulty || "medium"}`;
+  difficulty.textContent = question.difficulty || "General";
+
+  const type = document.createElement("span");
+  type.className = "question-tag";
+  type.textContent = question.type || "Question";
+
+  meta.append(difficulty, type);
+
+  const heading = document.createElement("h3");
+  heading.className = "question-text";
+  heading.textContent = question.question || "Question unavailable.";
+
+  const answerArea = document.createElement("div");
+  answerArea.className = "answer-options";
+
+  const existingAnswer = examAnswers[question._id] ?? "";
+
+  const isMultipleChoice =
+    question.type === "multiple-choice" &&
+    Array.isArray(question.options);
+
+  const isTrueFalse = question.type === "true-false";
+
+  if (isMultipleChoice || isTrueFalse) {
+    const options = isMultipleChoice
+      ? question.options
+      : ["True", "False"];
+
+    options.forEach((option, index) => {
+      const optionButton = createOptionButton(
+        String.fromCharCode(65 + index),
+        option
+      );
+
+      if (String(existingAnswer) === String(option)) {
+        optionButton.classList.add("selected");
+      }
+
+      optionButton.addEventListener("click", () => {
+        examAnswers[question._id] = option;
+        renderExamQuestion();
+      });
+
+      answerArea.appendChild(optionButton);
+    });
+  } else {
+    const input = document.createElement("textarea");
+    input.className = "answer-option";
+    input.rows = 4;
+    input.placeholder = "Write your answer...";
+    input.value = existingAnswer;
+
+    input.addEventListener("input", () => {
+      examAnswers[question._id] = input.value;
+      renderExamNavigator();
+    });
+
+    answerArea.appendChild(input);
+  }
+
+  const markButton = document.createElement("button");
+  markButton.type = "button";
+  markButton.className = "exam-mark-button";
+
+  markButton.textContent = examMarkedQuestions.has(question._id)
+    ? "★ Remove review mark"
+    : "☆ Mark for review";
+
+  markButton.addEventListener("click", () => {
+    if (examMarkedQuestions.has(question._id)) {
+      examMarkedQuestions.delete(question._id);
+    } else {
+      examMarkedQuestions.add(question._id);
+    }
+
+    renderExamQuestion();
+  });
+
+  card.append(meta, heading, answerArea, markButton);
+
+  renderExamNavigator();
+
+  const previous = document.querySelector(
+    ".exam-navigation button:first-child"
+  );
+
+  const next = document.getElementById("examNextButton");
+
+  if (previous) previous.disabled = examCurrentIndex === 0;
+
+  if (next) {
+    next.disabled = examCurrentIndex === currentQuestions.length - 1;
+    next.textContent = examCurrentIndex === currentQuestions.length - 1
+      ? "Last Question"
+      : "Next →";
+  }
+}
+
+
+async function submitExam(timeExpired = false) {
+  if (examSubmitted) return;
+
+  examSubmitted = true;
+
+  if (examTimer) {
+    clearInterval(examTimer);
+    examTimer = null;
+  }
+
+  const totalQuestions = currentQuestions.length;
+
+  answeredQuestions = currentQuestions.map(question => {
+    const userAnswer = examAnswers[question._id] ?? "";
+    const hasAnswer = String(userAnswer).trim().length > 0;
+    const correct = hasAnswer &&
+      checkAnswer(userAnswer, question.correctAnswer);
+
+    return {
+      id: question._id,
+      question: question.question,
+      difficulty: question.difficulty || "medium",
+      type: question.type || "question",
+      userAnswer: String(userAnswer),
+      correctAnswer: String(question.correctAnswer || ""),
+      correct,
+      explanation: question.explanation || "",
+      sourceEvidence: question.sourceEvidence || "",
+      unanswered: !hasAnswer
+    };
+  });
+
+  const correctCount = answeredQuestions.filter(
+    answer => answer.correct
+  ).length;
+
+  currentScore = answeredQuestions.reduce((score, answer, index) => {
+    return score + (answer.correct
+      ? Number(currentQuestions[index].points) || 1
+      : 0);
+  }, 0);
+
+  const percentage = totalQuestions
+    ? Math.round((correctCount / totalQuestions) * 100)
+    : 0;
+
+  const unanswered = answeredQuestions.filter(
+    answer => answer.unanswered
+  ).length;
+
+  questionResults.innerHTML = "";
+
+  const resultCard = document.createElement("div");
+  resultCard.className = "exam-result-card";
+
+  const heading = document.createElement("h2");
+  heading.textContent = timeExpired
+    ? "Time is up! Examination submitted."
+    : "Examination Submitted";
+
+  const score = document.createElement("div");
+  score.className = "exam-final-percentage";
+  score.textContent = `${percentage}%`;
+
+  const summary = document.createElement("p");
+  summary.textContent =
+    `${correctCount} correct · ${totalQuestions - correctCount - unanswered} incorrect · ${unanswered} unanswered`;
+
+  const points = document.createElement("p");
+  points.textContent = `Total points: ${currentScore}`;
+
+  const saving = document.createElement("p");
+  saving.textContent = "Saving your examination result...";
+
+  const reviewHeading = document.createElement("h3");
+  reviewHeading.textContent = "Answer Review";
+
+  const review = document.createElement("div");
+  review.className = "exam-answer-review";
+
+  answeredQuestions.forEach((answer, index) => {
+    const item = document.createElement("article");
+
+    const question = document.createElement("strong");
+    question.textContent = `${index + 1}. ${answer.question}`;
+
+    const yourAnswer = document.createElement("p");
+    yourAnswer.textContent =
+      `Your answer: ${answer.userAnswer || "Not answered"}`;
+
+    const correctAnswer = document.createElement("p");
+    correctAnswer.textContent =
+      `Correct answer: ${answer.correctAnswer}`;
+
+    const result = document.createElement("span");
+    result.className = answer.correct
+      ? "history-correct"
+      : "history-incorrect";
+    result.textContent = answer.correct
+      ? "Correct"
+      : answer.unanswered
+        ? "Unanswered"
+        : "Incorrect";
+
+    item.append(question, yourAnswer, correctAnswer, result);
+
+    if (answer.explanation) {
+      const explanation = document.createElement("p");
+      explanation.textContent = `Explanation: ${answer.explanation}`;
+      item.appendChild(explanation);
+    }
+
+    review.appendChild(item);
+  });
+
+  resultCard.append(
+    heading,
+    score,
+    summary,
+    points,
+    saving,
+    reviewHeading,
+    review
+  );
+
+  questionResults.appendChild(resultCard);
+
+  questionCounter.textContent =
+    `${totalQuestions} of ${totalQuestions} completed`;
+
+  scoreCounter.textContent = `Score: ${currentScore}`;
+  questionProgress.style.width = "100%";
+
+  const saved = await saveCompletedStudySession();
+
+  saving.textContent = saved
+    ? "Your examination result has been saved."
+    : "Your result is displayed, but could not be saved to your history.";
+
+  setQuestionStatus(
+    saved
+      ? "Examination completed and saved."
+      : "Examination completed. Saving failed.",
+    !saved
+  );
+}
+
+
+/* ==========================================
+   START QUESTION SESSION
+========================================== */
+function startQuestionSession(questions, fileName, options = {}) {
+  currentQuestions = questions.map((question, index) => ({
+    ...question,
+    _id: `question-${index}`
+  }));
+
+if (examTimer) {
+  clearInterval(examTimer);
+  examTimer = null;
+}
+
+studyMode = "practice";
+
+  answeredQuestions = [];
 
   currentQuestion = null;
   currentScore = 0;
 
+  currentMaterialId = options.materialId ?? null;
+  currentQuestionSetId = options.setId || null;
+
+  sessionStartedAt = Date.now();
+  sessionSaved = false;
+
   questionSource.textContent = `Source: ${fileName}`;
 
   setQuestionStatus(
-    `${currentQuestions.length} questions generated successfully.`
+    `${currentQuestions.length} questions ready.`
   );
 
   updateProgress();
@@ -912,12 +2104,17 @@ function renderQuestion(question) {
     if (isCorrect) {
       currentScore += points;
     }
-
-    answeredQuestions.push({
-      id: question._id,
-      correct: isCorrect
-    });
-
+answeredQuestions.push({
+  id: question._id,
+  correct: isCorrect,
+  question: question.question,
+  difficulty: question.difficulty || "medium",
+  type: question.type || "question",
+  userAnswer: String(selectedAnswer),
+  correctAnswer: String(question.correctAnswer || ""),
+  explanation: question.explanation || "",
+  sourceEvidence: question.sourceEvidence || ""
+});
     // Mark selected and correct answers.
 
     optionButtons.forEach(optionButton => {
@@ -1103,9 +2300,13 @@ function showSessionComplete() {
 
   restartButton.addEventListener("click", () => {
     startQuestionSession(
-      currentQuestions,
-      questionSource.textContent.replace("Source: ", "")
-    );
+  currentQuestions,
+  questionSource.textContent.replace("Source: ", ""),
+  {
+    materialId: currentMaterialId,
+    setId: currentQuestionSetId
+  }
+);
   });
 
   completion.append(
@@ -1116,9 +2317,23 @@ function showSessionComplete() {
     restartButton
   );
 
-  questionResults.appendChild(completion);
-}
+ questionResults.appendChild(completion);
 
+setQuestionStatus("Saving your study result...");
+
+saveCompletedStudySession().then(saved => {
+  if (saved) {
+    setQuestionStatus(
+      "Session completed and saved to your study history."
+    );
+  } else {
+    setQuestionStatus(
+      "Session completed, but its history could not be saved.",
+      true
+    );
+  }
+});
+}
 
 /* ==========================================
    AUTHENTICATION
