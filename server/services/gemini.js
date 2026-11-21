@@ -1,9 +1,16 @@
+
 /* ==========================================
    GRADEFLOW
    File: server/services/gemini.js
 
    Gemini AI Service
-   Supports text, images, PDFs, audio and video
+
+   Supports:
+   - Text
+   - Images
+   - PDFs
+   - Audio
+   - Video
 
    Improvements:
    - Secure API-key header
@@ -11,6 +18,7 @@
    - Limited retries for temporary failures
    - Attachment validation
    - Response validation
+   - Thinking configuration support
    - Better error handling
 ========================================== */
 
@@ -192,6 +200,71 @@ function getRetryDelay(response, attempt) {
 
 
 /* ==========================================
+   VALIDATE THINKING CONFIGURATION
+========================================== */
+
+function prepareThinkingConfig(thinkingConfig) {
+    if (
+        thinkingConfig === undefined ||
+        thinkingConfig === null
+    ) {
+        return undefined;
+    }
+
+    if (
+        typeof thinkingConfig !== "object" ||
+        Array.isArray(thinkingConfig)
+    ) {
+        throw new Error(
+            "thinkingConfig must be a valid object."
+        );
+    }
+
+    const allowedLevels = [
+        "MINIMAL",
+        "LOW",
+        "MEDIUM",
+        "HIGH"
+    ];
+
+    const cleanConfig = {};
+
+    if (thinkingConfig.thinkingLevel !== undefined) {
+        const level = String(
+            thinkingConfig.thinkingLevel
+        ).toUpperCase();
+
+        if (!allowedLevels.includes(level)) {
+            throw new Error(
+                "thinkingLevel must be MINIMAL, LOW, MEDIUM or HIGH."
+            );
+        }
+
+        cleanConfig.thinkingLevel = level;
+    }
+
+    if (thinkingConfig.thinkingBudget !== undefined) {
+        const budget = thinkingConfig.thinkingBudget;
+
+        if (
+            !Number.isInteger(budget) ||
+            budget < 0
+        ) {
+            throw new Error(
+                "thinkingBudget must be a non-negative integer."
+            );
+        }
+
+        cleanConfig.thinkingBudget = budget;
+    }
+
+    return Object.keys(cleanConfig).length
+        ? cleanConfig
+        : undefined;
+}
+
+
+/* ==========================================
    BUILD REQUEST BODY
 ========================================== */
 
@@ -202,7 +275,8 @@ function buildRequestBody({
     temperature,
     responseMimeType,
     responseSchema,
-    maxOutputTokens
+    maxOutputTokens,
+    thinkingConfig
 }) {
     const parts = [];
 
@@ -226,6 +300,10 @@ function buildRequestBody({
         generationConfig: {
             temperature,
             maxOutputTokens,
+
+            ...(thinkingConfig
+                ? { thinkingConfig }
+                : {}),
 
             ...(responseMimeType
                 ? { responseMimeType }
@@ -392,8 +470,22 @@ function extractGeminiText(data) {
     }
 
     if (finishReason === "MAX_TOKENS") {
+        const usage = data?.usageMetadata;
+
+        console.error(
+            "Gemini response limit reached:",
+            {
+                model: MODEL,
+                finishReason,
+                promptTokenCount: usage?.promptTokenCount,
+                candidatesTokenCount: usage?.candidatesTokenCount,
+                thoughtsTokenCount: usage?.thoughtsTokenCount,
+                totalTokenCount: usage?.totalTokenCount
+            }
+        );
+
         throw new Error(
-            "Gemini reached its response limit before completing the answer. Try a shorter request."
+            "Gemini reached its response limit before completing the answer. Try a shorter request or a larger output-token budget."
         );
     }
 
@@ -439,7 +531,8 @@ export async function askGemini({
     temperature = 0.7,
     responseMimeType,
     responseSchema,
-    maxOutputTokens = 4096
+    maxOutputTokens = 4096,
+    thinkingConfig
 }) {
     if (!API_KEY) {
         throw new Error(
@@ -495,6 +588,10 @@ export async function askGemini({
         );
     }
 
+    // Validate and prepare optional thinking configuration.
+    const preparedThinkingConfig =
+        prepareThinkingConfig(thinkingConfig);
+
     const cleanPrompt = prompt.trim();
 
     const preparedAttachments =
@@ -516,7 +613,8 @@ export async function askGemini({
         temperature,
         responseMimeType,
         responseSchema,
-        maxOutputTokens
+        maxOutputTokens,
+        thinkingConfig: preparedThinkingConfig
     });
 
     const data = await sendGeminiRequest(requestBody);
